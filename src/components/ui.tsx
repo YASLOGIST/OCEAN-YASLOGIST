@@ -1,0 +1,270 @@
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { cn } from "../utils/cn";
+import { subscribeScroll } from "../lib/scroll";
+import { useInView } from "../hooks/useInView";
+
+/* ── Glass card ─────────────────────────────────────────────────────── */
+export function GlassCard({
+  children,
+  className,
+  strong,
+}: {
+  children: ReactNode;
+  className?: string;
+  strong?: boolean;
+}) {
+  return (
+    <div className={cn("gpu", strong ? "glass-strong" : "glass", "rounded-2xl", className)}>{children}</div>
+  );
+}
+
+/* ── Scroll reveal wrapper (transform + opacity only → ultra light) ── */
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  from = "up",
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  from?: "up" | "down" | "left" | "right" | "zoom";
+}) {
+  const { ref, inView } = useInView<HTMLDivElement>();
+  /* will-change costs a retained compositor layer per element. Hold it only
+     while the reveal is actually animating, then release it. */
+  const [settled, setSettled] = useState(false);
+  const hidden = {
+    up: "translate-y-10",
+    down: "-translate-y-10",
+    left: "translate-x-14",
+    right: "-translate-x-14",
+    zoom: "scale-95",
+  }[from];
+
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      onTransitionEnd={(e) => {
+        /* transitionend bubbles — a child's hover transition must not retire
+           this element's will-change while the reveal is still running. */
+        if (e.target === e.currentTarget) setSettled(true);
+      }}
+      className={cn(
+        "transition-all duration-1000 ease-[cubic-bezier(.16,1,.3,1)]",
+        /* Hold the hint only while this reveal is actually in flight. Applying
+           it from mount would pin a compositor layer per Reveal at page load. */
+        inView && !settled ? "will-change-transform" : "will-change-auto",
+        inView ? "translate-x-0 translate-y-0 scale-100 opacity-100" : cn("opacity-0", hidden),
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ── Scroll-linked parallax float (direct DOM writes) ───────────────────
+   Two modes.
+
+   Default (`anchor` unset): displacement is `f.y * speed` — driven by ABSOLUTE
+   scroll offset. This grows without bound as the page scrolls, so it is only
+   safe for an element that lives at the top of the document.
+
+   `anchor`: displacement is measured from the element's own centre, so it is
+   zero when the element is centred in the viewport and clamped to its on-screen
+   travel. Required for anything repeated down the page. Two stacked sections
+   with opposite `speed` signs converge under the default mode at a rate of
+   `|2 · speed| · scrollY`, which at the foot of this document reached 405px —
+   enough to drive each card through the shared section seam and, because the
+   sections are `overflow: hidden` and exactly adjacent, slice ~200px off both.
+
+   The anchor is derived from `offsetTop`, which is layout and therefore immune
+   to this element's own transform — no feedback loop — and it is measured only
+   outside the scroll callback, because the engine forbids layout reads inside
+   the frame loop.
+────────────────────────────────────────────────────────────────────────── */
+export function Parallax({
+  speed = 0.15,
+  anchor = false,
+  className,
+  children,
+}: {
+  speed?: number;
+  anchor?: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const centre = useRef(0);
+  const halfHeight = useRef(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const measure = () => {
+      let y = 0;
+      for (let n: HTMLElement | null = el; n; n = n.offsetParent as HTMLElement | null) y += n.offsetTop;
+      halfHeight.current = el.offsetHeight / 2;
+      centre.current = y + halfHeight.current;
+    };
+
+    let ro: ResizeObserver | null = null;
+    if (anchor) {
+      measure();
+      window.addEventListener("resize", measure, { passive: true });
+      /* `content-visibility` sections resolve their real height only as they
+         approach the viewport, which shifts every anchor below them. */
+      if (typeof ResizeObserver !== "undefined") {
+        ro = new ResizeObserver(measure);
+        ro.observe(document.documentElement);
+      }
+    }
+
+    const unsubscribe = subscribeScroll((f) => {
+      if (!el) return;
+      let d = f.y;
+      if (anchor) {
+        const vh = f.vh || window.innerHeight;
+        /* Past this the element has fully left the viewport; freezing there
+           keeps the offset bounded instead of accumulating with scroll depth. */
+        const travel = vh / 2 + halfHeight.current;
+        d = f.y + vh / 2 - centre.current;
+        if (d > travel) d = travel;
+        else if (d < -travel) d = -travel;
+      }
+      el.style.transform = `translate3d(0, ${(d * speed).toFixed(2)}px, 0)`;
+    });
+
+    return () => {
+      unsubscribe();
+      if (anchor) {
+        window.removeEventListener("resize", measure);
+        ro?.disconnect();
+      }
+    };
+  }, [speed, anchor]);
+
+  return (
+    <div ref={ref} className={cn("gpu", className)}>
+      {children}
+    </div>
+  );
+}
+
+/* ── Animated counter ───────────────────────────────────────────────── */
+export function CountUp({
+  to,
+  decimals = 0,
+  suffix = "",
+  prefix = "",
+  duration = 1900,
+  className,
+}: {
+  to: number;
+  decimals?: number;
+  suffix?: string;
+  prefix?: string;
+  duration?: number;
+  className?: string;
+}) {
+  const { ref, inView } = useInView<HTMLSpanElement>({ threshold: 0.4 });
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let raf = 0;
+    const start = performance.now();
+    const step = (t: number) => {
+      const p = Math.min(1, (t - start) / duration);
+      const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+      setVal(to * eased);
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, to, duration]);
+
+  const formatted = val.toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+
+  return (
+    <span ref={ref} className={className}>
+      {prefix}
+      {formatted}
+      {suffix}
+    </span>
+  );
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────── */
+export function NeonButton({
+  children,
+  variant = "primary",
+  className,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost" }) {
+  return (
+    <button
+      {...props}
+      className={cn(
+        "group inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3.5 font-display text-sm font-semibold tracking-wide",
+        variant === "primary" ? "btn-primary" : "btn-ghost",
+        className
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* ── Mono section tag ───────────────────────────────────────────────── */
+export function SectionTag({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <span
+      className={cn(
+        "micro inline-flex items-center gap-2.5 rounded-full border border-neon/25 bg-neon/[0.06] px-4 py-1.5 font-mono text-neon",
+        className
+      )}
+    >
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon opacity-70" />
+        <span className="glow-dot relative inline-flex h-1.5 w-1.5 rounded-full bg-neon" />
+      </span>
+      {children}
+    </span>
+  );
+}
+
+/* ── Small icons ────────────────────────────────────────────────────── */
+export function ArrowRight({ className }: { className?: string }) {
+  return (
+    <svg
+      className={cn(
+        "h-4 w-4 transition-transform duration-300 rtl:-scale-x-100 group-hover:translate-x-1 rtl:group-hover:-translate-x-1",
+        className
+      )}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14" />
+      <path d="m13 6 6 6-6 6" />
+    </svg>
+  );
+}
+
+export function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={cn("h-3 w-3", className)} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}

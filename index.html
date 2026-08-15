@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#04081a" />
+    <meta
+      name="description"
+      content="YASLOGIST — the next-gen supply chain intelligence platform. AI demand forecasting, IoT fleet telemetry, autonomous warehousing, zero-emission logistics and blockchain smart contracts across 86 ports. Corporate branch: Dokki, Cairo, Egypt."
+    />
+    <title>YASLOGIST — The Next-Gen Supply Chain Intelligence Platform</title>
+    <script>
+      try {
+        var t = localStorage.getItem("oq-theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+        var l = localStorage.getItem("oq-lang");
+        if (l === "ar") {
+          document.documentElement.lang = "ar";
+          document.documentElement.dir = "rtl";
+        }
+      } catch (e) {}
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Latin + Arabic families. Fraunces = display serif, Inter = body,
+         Plus Jakarta Sans = UI chrome, Share Tech Mono = telemetry,
+         Amiri = Arabic headings, Aref Ruqaa = Cairo clock label only.
+         display=swap keeps text painted immediately; the @font-face
+         size-adjust block in index.css metric-matches the fallbacks so the
+         swap does not move layout. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Share+Tech+Mono&family=Cairo:wght@400;500;600;700;800&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304081a'/%3E%3Cpath d='M16 7v11' stroke='%2322e4ff' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M11 10.5 16 6l5 4.5' stroke='%2322e4ff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M9 20c2.2 1.4 4.2 1.4 7 0s4.8-1.4 7 0' stroke='%2322e4ff' stroke-width='2.4' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='16' cy='20' r='2' fill='%2322e4ff'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
