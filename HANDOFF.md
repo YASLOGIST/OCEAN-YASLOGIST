@@ -35,8 +35,15 @@ occurrences). Do not reintroduce them.
 ## 2 · HOW TO VERIFY — run this first
 
 ```bash
-cd /Users/ahmede/Desktop/YASLOGIST && npm run gate
+cd ~/Desktop/.claude/yaslogist && npm run gate
 ```
+
+That path is an **ASCII symlink** to the project, and it is the command to use.
+The project itself lives in a `~/Desktop` folder whose name is a single Egyptian
+hieroglyph (see §1). Do not retype that character: it does not survive shell or
+tooling round-trips here — `cd` fails, `find -print` drops the segment, and
+Python's `realpath` returns a lossy path. The symlink is the reliable handle;
+`Desktop/.claude/launch.json` points at it for the same reason.
 
 `gate` = `typecheck && test && build`. **Always use it.** `npm run typecheck`
 invokes `tsc` through npm, which puts `node_modules/.bin` first on PATH, so it
