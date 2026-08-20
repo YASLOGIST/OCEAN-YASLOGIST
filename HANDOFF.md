@@ -27,8 +27,12 @@ measured on this machine, not estimated. Where something is unmeasured it says s
 
 **No academic affiliation anywhere.** The platform was repositioned from an
 academic project in an earlier session. `AASTMT`, `Arab Academy`, `CITL` and the
-registration ID `211010469` are absent from the built artifact (verified: 0
-occurrences). Do not reintroduce them.
+registration ID `211010469` are absent from the built artifact. Do not
+reintroduce them. **This is now enforced, not just asserted** — `npm run gate`
+ends in `check:bundle`, which greps `dist/index.html` for all four tokens and
+exits non-zero on any hit (`scripts/check-bundle.mjs`). It had to be: the claim
+was documented as "verified: 0 occurrences" and had silently become false, the
+emblem still shipping as a 26,290 B data URI (§4, issue #1).
 
 ---
 
@@ -45,19 +49,21 @@ tooling round-trips here — `cd` fails, `find -print` drops the segment, and
 Python's `realpath` returns a lossy path. The symlink is the reliable handle;
 `Desktop/.claude/launch.json` points at it for the same reason.
 
-`gate` = `typecheck && test && build`. **Always use it.** `npm run typecheck`
-invokes `tsc` through npm, which puts `node_modules/.bin` first on PATH, so it
-cannot be shadowed by a global TypeScript. Do **not** use bare `npx tsc` — see
-§5.3.
+`gate` = `typecheck && test && build && check:bundle`. **Always use it.**
+`npm run typecheck` invokes `tsc` through npm, which puts `node_modules/.bin`
+first on PATH, so it cannot be shadowed by a global TypeScript. Do **not** use
+bare `npx tsc` — see §5.3. The final step, `check:bundle`, runs
+`scripts/check-bundle.mjs` against the built artifact; it is the only gate step
+that inspects `dist/` rather than source, so it must stay last.
 
-### Exact expected values (measured 2026-08-15)
+### Exact expected values (bundle re-measured 2026-08-21; rest 2026-08-15)
 
 | Gate | Exact value |
 |---|---|
 | TypeScript | **0 errors**, compiler **5.9.3** |
 | Scroll harness | **41/41 assertions passed** |
-| `dist/index.html` | **922110 bytes** (Vite prints `922.11 kB`) |
-| gzip | **491.87 kB** |
+| `dist/index.html` | **895790 bytes** (Vite prints `895.79 kB`) |
+| gzip | **472.50 kB** |
 | `.DS_Store` in dist | **0** |
 | `scroll-harness` in bundle | **0** |
 | `dist/` top level | exactly `frames` and `index.html` |
@@ -65,7 +71,7 @@ cannot be shadowed by a global TypeScript. Do **not** use bare `npx tsc` — see
 | `dist/frames/day` | 60 files, 2072 KB |
 | `dist/frames/night-sm` | 60 files, 1180 KB |
 | `dist/frames/day-sm` | 60 files, 504 KB |
-| Academic references in bundle | **0** |
+| Academic references in bundle | **0** — enforced by `check:bundle` |
 | Console errors on load | **0** |
 | Mounted components | `canvases: 2` · `videoElements: 0` · `solutionCards: 5` · `.nf: 1` · `.bay: 1` · `.radar-scope: 1` · `chainNodes: 7` · `.clock-value: 3` |
 
@@ -135,6 +141,7 @@ reachable there.
 
 | Item | Cause / resolution |
 |---|---|
+| **Issue #1 — AASTMT emblem still inlined in production** | The repositioning deleted the *components* (`AastmtEmblem`, `AastmtBadge`, `aastmtLogo`) but left `src/assets/brand/aastmt.png` on disk, where `src/assets/brand.ts` swept it up with an **eager wildcard glob** (`./brand/*.{png,jpg,…}`, `eager: true`). `eager` imports every match whether or not anything consumes it, so `vite-plugin-singlefile` kept base64-inlining the emblem: **26,290 B of data URI** — 2.85% of the artifact — reachable in the glob map, rendered by nothing, and shipped to `yaslogist.me`. Nothing caught it because §1's "0 occurrences" was documentation, not a check. Fixed three ways: asset deleted; the glob narrowed to the two basenames actually consumed (`./brand/{founder,yaslogist-logo}.{…}`) so a stray file can never silently ship again; and `check:bundle` added as the final gate step. Bundle **922110 → 895790 B (−26,320)**, accounted: 26,292 B of quoted data URI + 24 B glob-map entry + 3 B assignment = 26,319, the last byte from minifier identifier reallocation (63 → 62 modules). **The narrowed glob's failure mode is silent** — `brandLogo`/`founderPhoto` fall back to the built-in SVG and "AY" monogram rather than erroring — so both surviving assets were checked byte-for-byte against the pre-change bundle: founder.jpg **34,727 B** and yaslogist-logo.png **50,134 B**, identical. The guard itself was verified by making it fail, not just pass: a banned literal in dead code proved nothing (tree-shaken, gate still green), while `alt="YASLOGIST AASTMT"` — a string that actually ships — turned the full `npm run gate` red with `AASTMT — 1 occurrence`. |
 | **§4.5 visual verification, English** | Real Chrome, motion enabled: neural card packets animate, committed path renders, Bay 07 ribbon and floor plan correct, p4/p5 cards intact at the seam. |
 | **§4.5 visual verification, Arabic** | Real Chrome, `dir=rtl`: cursive joining intact, `عربي` pill in Aref Ruqaa, Cairo-first clock, founder line `YASLOGIST · الدقي، القاهرة`, numerals LTR-pinned, counterfactual strip direction-coded correctly. |
 | **FIX A — p2×p3 and p4×p5 card collision** | `Parallax` displaced by unbounded absolute `scrollY`; `PillarSection` alternates the sign, so `(+,−)` neighbours converged at `\|2·speed\|·scrollY`. At scroll 7170 that sliced 205 px off the p4 card and 201 px off p5 (sections are exactly adjacent and `overflow:hidden`). Fixed by anchoring displacement to element centre and clamping to travel; max offset fell from 370 px to ≤41 px. 0 overlaps across 9 viewport×language×theme combinations. |
