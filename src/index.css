@@ -772,6 +772,24 @@ input:focus-visible,
   }
 }
 
+/* ── Neural Route Forecast: in-SVG labels below `sm` ──────────────────────────
+   The diagram's viewBox is 460 user units wide but the card is only ~226px on a
+   phone, so everything inside is scaled by ~0.49: the labels declare 7.5–9.5
+   user units and render at 3.7–4.7 effective CSS px. Raising the declared size
+   is not available — the gutters hold only 11.3 (left) and 10.3 (right) units of
+   slack, so larger text overflows the viewBox immediately.
+
+   They are hidden below `sm` instead. Nothing is lost: the <svg> is already
+   `aria-hidden`, and the HTML band underneath states the same thing at readable
+   size — the legend line ("Four live signals · one committed route") plus the
+   Accuracy figure. At >=640px the card is 470px and the labels reach 8.65px,
+   in line with the 8px micro-type used elsewhere, so they stay. */
+@media (max-width: 639px) {
+  .nf svg text {
+    display: none;
+  }
+}
+
 /* Same 360px floor as the Blockchain panel (§3.6): below it four across cannot
    fit at any legible size, so the ribbon wraps to 2 x 2. */
 @media (max-width: 359px) {
