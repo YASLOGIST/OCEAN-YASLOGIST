@@ -55,7 +55,7 @@ function VesselCard() {
       </header>
 
       {/* tier 2 — the primary metric, highest contrast on the card */}
-      <div className="mt-6 flex items-end justify-between gap-4">
+      <div className="mt-6 flex items-end justify-between gap-4 max-[360px]:flex-col max-[360px]:items-start max-[360px]:gap-3">
         <div className="min-w-0">
           <div className="font-mono text-[9px] uppercase tracking-[0.24em] text-ghost/80">
             {t("hero.telemetry.speed")}

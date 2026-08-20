@@ -21,7 +21,7 @@ export default function VoyageProfile() {
   return (
     <div>
       {/* headline — the one number that matters, with its direction spelled out */}
-      <div className="flex items-baseline gap-4 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-5 py-4">
+      <div className="flex items-baseline gap-4 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-5 py-4 max-[360px]:flex-col max-[360px]:items-start max-[360px]:gap-2">
         <div className="tabular font-display text-4xl font-bold leading-none text-emerald-400">
           −42<span className="text-xl">%</span>
         </div>

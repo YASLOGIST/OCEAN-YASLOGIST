@@ -343,7 +343,7 @@ export default function Simulator() {
 
                     <HeroMetric label={t("sim.cost")} value={fmtMoney(aCost)} unit={t("sim.costUnit")} computing={sCost} />
 
-                    <div className="mt-3 grid grid-cols-3 gap-3">
+                    <div className="mt-3 grid grid-cols-3 gap-3 max-[360px]:grid-cols-1">
                       <MetricTile
                         icon={
                           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -455,7 +455,7 @@ export default function Simulator() {
                 {/* Fixed 3-row template per cell so row height is identical in every
                     language; numerals pinned dir="ltr" with tabular figures so digits
                     neither reorder nor re-measure when the document flips to RTL. */}
-                <div className="mt-4 grid grid-cols-3 gap-3">
+                <div className="mt-4 grid grid-cols-3 gap-3 max-[360px]:grid-cols-1">
                   {[
                     { label: t("sim.nmLabel"), value: fmtInt(nm), unit: t("sim.nmUnit"), hero: false },
                     { label: t("sim.eta"), value: etaText, unit: t("sim.reroute"), hero: true },
