@@ -757,6 +757,28 @@ input:focus-visible,
   border-color: color-mix(in srgb, var(--stat-hero) 45%, transparent);
   color: var(--stat-hero);
 }
+
+/* Below `sm` the four ribbon steps ARE the row's whole width budget. `1fr` has an
+   implicit `auto` minimum, so each column is pinned to its word plus 24px of
+   padding rather than to a quarter of the track: the columns measured
+   65.2/65.2/48.4/70.8px = 261.6px against the 228px the card leaves at 390px, and
+   the grid overflowed until `overflow-hidden` cut the terminal step. Tightening
+   the padding and the tracking is what closes it; Arabic keeps its own
+   `letter-spacing: 0` (higher specificity) so cursive joining is untouched. */
+@media (max-width: 639px) {
+  .bay-flow-step {
+    padding: 0 0.3125rem;
+    letter-spacing: 0.06em;
+  }
+}
+
+/* Same 360px floor as the Blockchain panel (§3.6): below it four across cannot
+   fit at any legible size, so the ribbon wraps to 2 x 2. */
+@media (max-width: 359px) {
+  .bay-flow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 .bay-flow-step::after {
   content: "›";
   position: absolute;
@@ -772,6 +794,17 @@ input:focus-visible,
 }
 .bay-flow-step:last-child::after {
   content: none;
+}
+
+/* Below the 360px floor the ribbon is 2 x 2 (above), so the chevron after step 2
+   would dangle at the row break; its -0.3rem inset also overhangs the track by
+   4.8px. Must sit AFTER the base `::after` rule - same specificity, so source
+   order decides. */
+@media (max-width: 359px) {
+  .bay-flow-step::after,
+  [dir="rtl"] .bay-flow-step::after {
+    content: none;
+  }
 }
 .bay-floor {
   background-image:

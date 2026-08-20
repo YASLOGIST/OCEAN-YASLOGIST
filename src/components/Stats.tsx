@@ -24,10 +24,15 @@ export default function Stats() {
       <div className="mx-auto max-w-7xl">
         <Reveal>
           <div className="glass grid grid-cols-2 gap-px overflow-hidden rounded-2xl lg:grid-cols-4">
+            {/* Below `sm` the tile padding and the figure both come down. The grid is
+                `grid-cols-2` under `lg`, so at a 320px viewport each column is 127.5px
+                while "99.98%" alone renders 132.4px at `text-4xl` — wider than the
+                column before any padding — and the container's `overflow-hidden` cut
+                it. 24px + p-4 needs 120.3px against 127.5px. `sm:` restores both. */}
             {stats.map((s, i) => (
-              <div key={s.label} className="card-lift group relative bg-transparent p-7 transition-colors duration-500 hover:bg-chrome/[0.03] sm:p-8">
+              <div key={s.label} className="card-lift group relative bg-transparent p-4 transition-colors duration-500 hover:bg-chrome/[0.03] sm:p-8">
                 <span className="absolute start-0 top-6 h-8 w-px bg-gradient-to-b from-neon/60 to-transparent" />
-                <div className="font-display text-4xl font-bold tracking-tight text-ice sm:text-[2.7rem]">
+                <div className="font-display text-2xl font-bold tracking-tight text-ice sm:text-[2.7rem]">
                   <CountUp to={s.to} decimals={s.decimals ?? 0} suffix={s.suffix} />
                 </div>
                 <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ghost">{s.label}</div>
