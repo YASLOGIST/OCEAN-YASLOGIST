@@ -12,6 +12,7 @@
     "gate": "npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "clsx": "2.1.1",
     "react": "19.2.6",
