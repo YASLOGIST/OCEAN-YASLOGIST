@@ -20,13 +20,15 @@ cd ~/Desktop/.claude/yaslogist && npm run gate
 Expect `41/41 assertions passed`, `dist/index.html 896.87 kB`, and
 `✓ dist/index.html: 0 academic references (4 tokens checked)`, exit 0.
 
-`main` equals `origin/main` at **`e343c4a`**. **The working tree is NOT clean**
-— three files carry the Bug A / Bug B / Bug C and contrast/glass work in §4 and are
-**uncommitted**, so `yaslogist.me` still serves the pre-fix build. Committing and
-deploying them is the first outstanding action. The only other open work is §6.
+The working tree is **clean**. `main` is **two commits ahead of `origin/main`**:
+`f74d3e8`, the Bug A/B/C/D, legibility and glass work in §4, and this document's
+own update on top of it. Neither is **pushed**, so `yaslogist.me` still serves
+the pre-fix build.
+**Pushing is the one outstanding action**; the deploy follows from it, since
+Vercel builds on push. The only other open work is §6.
 
 A prior version of this section named `b880e3f` as HEAD while the tree was
-already at `e343c4a`; the number above was re-read from `git rev-parse`.
+already at `e343c4a`; every number here is re-read from `git rev-parse`.
 
 ---
 
@@ -502,19 +504,23 @@ background. Verified live 2026-08-21: all four sets serve `image/jpeg` at HTTP
 | Fact | Value |
 |---|---|
 | Branch | `main` |
-| `HEAD` | `e343c4a341f532c9a2d72d7cf29a54e19f2002ec` |
+| `HEAD` | `f74d3e8` plus this document's own commit on top of it — `git rev-parse HEAD` for the exact value, which a doc commit cannot contain |
 | `origin/main` | `e343c4a341f532c9a2d72d7cf29a54e19f2002ec` |
-| Ahead / behind | **0 / 0** |
-| Working tree | **DIRTY — 3 modified, uncommitted**: `src/components/ui.tsx`, `src/components/Navbar.tsx`, `src/index.css` (the Bug A/B/C fixes in §4). The gate passes on them; they have not been committed or deployed. |
+| Ahead / behind | **2 / 0** — not pushed |
+| Working tree | **clean** |
 | Remote | `https://github.com/YasauraTeam/YASLOGIST.git` |
 | Latest production deployment | `dpl_9yz2r2seLGMaqS2EbmaMYUtX8MAZ`, commit `b880e3f`, state **READY** |
 | Live artifact SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
 | Local `dist/index.html` SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
 
-**`main`, `origin/main` and production are the same code**, confirmed by hashing
-the live response rather than by trusting deployment status. Recent history:
+**`main` is one commit ahead of `origin/main` and of production.** The parity
+statement below described the state before `f74d3e8`; it holds again once that
+commit is pushed and the deploy goes green. Re-confirm the same way — by hashing
+the live response, not by trusting deployment status. Recent history:
 
 ```
+(this doc commit)  docs: record the committed git state in HANDOFF
+f74d3e8  fix: bound hero parallax, repair mobile menu, rebalance the light theme
 e343c4a  docs: rewrite HANDOFF as a standalone zero-context document
 b880e3f  ci: enforce the banned-token guard on the Vercel deploy path
 426d704  fix: stop inlining the AASTMT emblem into the production bundle
@@ -527,8 +533,9 @@ by the `Closes #1` trailer on `426d704`. There are no other open issues.
 
 ### 7.5 HawkScan
 A session hook fires after every commit asking for a HawkScan DAST scan.
-**No scan has been run**, because the environment reports
-`hawk runtime=false, HAWK_API_KEY=false` and the app is not running. Do not
+**No scan has been run**, and none was run for `f74d3e8` either: the
+environment still reports `hawk runtime=false, HAWK_API_KEY=false` and the app
+is not running. Do not
 report scan results that were never produced.
 
 ---
