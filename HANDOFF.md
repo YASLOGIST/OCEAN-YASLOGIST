@@ -1,10 +1,28 @@
 # YASLOGIST — Handoff
 
-**Rewritten:** 2026-08-15. **This file supersedes every prior version.** It is
-self-contained: a new session needs nothing but this document and the repo.
-Earlier handoffs were append-only logs across eleven sessions; that history has
-been distilled here and the append log discarded. Where a number appears it was
-measured on this machine, not estimated. Where something is unmeasured it says so.
+**Rewritten: 2026-08-21. This file supersedes every prior version.** It is
+self-contained: a new session needs nothing but this document and the repo. Do
+not append to it — rewrite it, so it never becomes a log again.
+
+Every number here was measured on this machine during the session that wrote it.
+Where something is unmeasured, unverified, or merely claimed, it says so
+explicitly. Treat an unlabelled number as measured and an unlabelled claim as
+suspect.
+
+---
+
+## 0 · IF YOU READ NOTHING ELSE
+
+```bash
+cd ~/Desktop/.claude/yaslogist && npm run gate
+```
+
+Expect `41/41 assertions passed`, `dist/index.html 895.79 kB`, and
+`✓ dist/index.html: 0 academic references (4 tokens checked)`, exit 0.
+
+The repository is clean, `main` equals `origin/main` at **`b880e3f`**, and the
+live site at `yaslogist.me` serves a byte-identical copy of the local build. The
+only open work is in §6. Nothing is currently broken in production.
 
 ---
 
@@ -13,157 +31,174 @@ measured on this machine, not estimated. Where something is unmeasured it says s
 | Field | Value |
 |---|---|
 | **Name** | YASLOGIST |
-| **Purpose** | One-page bilingual (EN/AR) marketing + interactive-demo site for a supply-chain intelligence platform, presented as a **commercial** product. Corporate branch: Dokki, Cairo, Egypt. |
-| **Path** | `Desktop/𓂀/YASLOGIST` — **moved 2026-08-20** from `Desktop/YASLOGIST`. The non-ASCII segment breaks some runtimes' module resolution, so `Desktop/.claude/launch.json` points at an ASCII symlink `Desktop/.claude/yaslogist` instead. |
+| **Purpose** | One-page bilingual (EN/AR) marketing and interactive-demo site for a supply-chain intelligence platform, presented as a **commercial** product. Corporate branch: Dokki, Cairo, Egypt. |
+| **Path** | `/Users/ahmede/Desktop/YASLOGIST`, reached through the ASCII symlink `~/Desktop/.claude/yaslogist`. **Use the symlink.** A prior version of this file said the project had moved to `Desktop/𓂀/YASLOGIST`; that is **false and was corrected 2026-08-21** — the hieroglyph folder exists but contains unrelated files, and `git rev-parse --show-toplevel` resolves to `Desktop/YASLOGIST`. |
 | **Stack** | Vite `7.3.2` · React `19.2.6` · React-DOM `19.2.6` · TypeScript `5.9.3`. **Not Next.js.** |
 | **Styling** | Tailwind CSS `4.1.17`, CSS-first. **No `tailwind.config.*`, no `postcss.config.*`.** Tokens live in the `@theme` block at the top of `src/index.css`. Plugin: `@tailwindcss/vite`. |
-| **Runtime deps** | `clsx@2.1.1`, `tailwind-merge@3.4.0`, `react@19.2.6`, `react-dom@19.2.6`. That is the complete list. |
-| **Build plugin** | `vite-plugin-singlefile@2.3.0` — inlines all imported assets as base64 into one `index.html`. Files in `public/` bypass this and stay external. Single most important constraint on the project. |
-| **i18n** | Hand-rolled dictionary in `src/lib/i18n.tsx`. Access via `t()` / `ta()` from `useLang()`. Direction set imperatively: `document.documentElement.dir`. Persisted to `localStorage["oq-lang"]`. |
+| **Runtime deps** | `react@19.2.6`, `react-dom@19.2.6`, `clsx@2.1.1`, `tailwind-merge@3.4.0`, `@vercel/analytics@^2.0.1`, `@vercel/speed-insights@^2.0.0` — **six, not four**. A prior version of this file listed only the first four and called that "the complete list"; the two Vercel packages were already in `package.json`. |
+| **Build plugin** | `vite-plugin-singlefile@2.3.0` — inlines every imported asset as base64 into one `index.html`. Files in `public/` bypass this and stay external. This is the single most important constraint on the project: **anything you import becomes bundle weight**, which is exactly how the AASTMT leak (§4) happened. |
+| **i18n** | Hand-rolled dictionary in `src/lib/i18n.tsx`. Access via `t()` / `ta()` from `useLang()`. Direction is set imperatively on `document.documentElement.dir`. Persisted to `localStorage["oq-lang"]`. |
 | **Theming** | `data-theme` attribute on `<html>`, set in `src/lib/theme.tsx`. Persisted to `localStorage["oq-theme"]`. Default **dark**. |
-| **Toolchain** | **npm is canonical** (confirmed by the owner 2026-08-20). node `v26.7.0` · npm `11.19.0` · bun `1.3.14`. `npm ci` is the install of record and **passes**. **bun is still required** — not as a package manager, but as the *runtime* for `npm run test` (`bun tests/scroll-harness.ts`), which is a step of `npm run gate`. Vercel does not need it: `vercel.json` builds with `npm run build && npm run check:bundle`, not `npm run gate` — both halves are node-only, which is exactly why the deploy path stops short of `gate` (that would drag in the bun-run harness). |
-| **Package-manager cleanup (2026-08-20)** | A parallel agent had introduced pnpm: `pnpm-lock.yaml` + a malformed `pnpm-workspace.yaml` (`allowBuilds: esbuild: set this to true or false` — no `packages:` key, not a real pnpm field), and `@vercel/analytics` was installed through pnpm so it never reached `package-lock.json` — **`npm ci` was broken**. Both pnpm files deleted, `npm install` re-synced the lock, `npm ci` verified green, and the hybrid `node_modules` (it carried *both* `.pnpm/` and `.package-lock.json`) was rebuilt clean. Pinned versions never drifted: vite 7.3.2 · react 19.2.6 · typescript 5.9.3 · tailwindcss 4.1.17. **`bun.lock` was removed in the same pass** (owner-confirmed): it was a stale dependency lockfile from a past `bun install`, and a third claimant for package-manager auto-detection. Deleting it does **not** affect the bun-run test harness, which executes a TS file directly and installs nothing. `package-lock.json` is now the sole lockfile; `npm ci` re-verified green and the built artifact was byte-identical (922084 B) before and after. |
-| **Vercel build** | `vercel.json` pins `installCommand: "npm ci"` and `buildCommand: "npm run build && npm run check:bundle"` — so the banned-token guard blocks a bad **deploy**, not just a bad local gate. Do **not** promote this to `npm run gate`: `test` is `bun tests/scroll-harness.ts` and bun is not on the Vercel build image. Verified by running the exact `buildCommand` string locally — exit 0 clean, exit 1 with a shipping violation. This is **not cosmetic**: the production build for commit `07fbc19` logged `Detected pnpm-lock.yaml … Using pnpm@10.x … Done in 592ms using pnpm v10.28.0`, so the live site on `yaslogist.me` was being built by pnpm, not npm. Project `framework` is **null** (Other preset), so build/output otherwise come from dashboard settings not visible in the repo — `outputDirectory` was deliberately **left unset** so the working detection is not disturbed. |
 
 **No academic affiliation anywhere.** The platform was repositioned from an
-academic project in an earlier session. `AASTMT`, `Arab Academy`, `CITL` and the
-registration ID `211010469` are absent from the built artifact. Do not
-reintroduce them. **This is now enforced, not just asserted** — `npm run gate`
-ends in `check:bundle`, which greps `dist/index.html` for all four tokens and
-exits non-zero on any hit (`scripts/check-bundle.mjs`). It had to be: the claim
-was documented as "verified: 0 occurrences" and had silently become false, the
-emblem still shipping as a 26,290 B data URI (§4, issue #1).
+academic project. `AASTMT`, `Arab Academy`, `CITL` and the registration ID
+`211010469` must not appear in the built artifact. **This is enforced, not
+merely asserted** — see §4 and §7.2. The previous wording ("verified: 0
+occurrences") was documentation only, and it had silently become false.
 
 ---
 
-## 2 · HOW TO VERIFY — run this first
+## 2 · HOW TO VERIFY
 
 ```bash
 cd ~/Desktop/.claude/yaslogist && npm run gate
 ```
 
-That path is an **ASCII symlink** to the project, and it is the command to use.
-The project itself lives in a `~/Desktop` folder whose name is a single Egyptian
-hieroglyph (see §1). Do not retype that character: it does not survive shell or
-tooling round-trips here — `cd` fails, `find -print` drops the segment, and
-Python's `realpath` returns a lossy path. The symlink is the reliable handle;
-`Desktop/.claude/launch.json` points at it for the same reason.
-
-`gate` = `typecheck && test && build && check:bundle`. **Always use it.**
+That path is an **ASCII symlink** to the project and it is the command to use.
 `npm run typecheck` invokes `tsc` through npm, which puts `node_modules/.bin`
 first on PATH, so it cannot be shadowed by a global TypeScript. Do **not** use
-bare `npx tsc` — see §5.3. The final step, `check:bundle`, runs
-`scripts/check-bundle.mjs` against the built artifact; it is the only gate step
-that inspects `dist/` rather than source, so it must stay last.
+bare `npx tsc` — see §5.3.
 
-### Exact expected values (bundle re-measured 2026-08-21; rest 2026-08-15)
+`gate` = `typecheck && test && build && check:bundle`. The final step runs
+`scripts/check-bundle.mjs` against the built artifact; it is the only gate step
+that inspects `dist/` rather than source, so **it must stay last**.
+
+### Exact expected values (all measured 2026-08-21)
 
 | Gate | Exact value |
 |---|---|
 | TypeScript | **0 errors**, compiler **5.9.3** |
 | Scroll harness | **41/41 assertions passed** |
 | `dist/index.html` | **895790 bytes** (Vite prints `895.79 kB`) |
-| gzip | **472.50 kB** |
+| gzip, local | **472.50 kB** |
+| gzip, on Vercel | **471.23 kB** — different zlib on the build image compressing an identical file. Not a discrepancy. |
+| `check:bundle` | `✓ dist/index.html: 0 academic references (4 tokens checked)` |
 | `.DS_Store` in dist | **0** |
 | `scroll-harness` in bundle | **0** |
 | `dist/` top level | exactly `frames` and `index.html` |
-| `dist/frames/night` | 60 files, 3260 KB |
-| `dist/frames/day` | 60 files, 2072 KB |
-| `dist/frames/night-sm` | 60 files, 1180 KB |
-| `dist/frames/day-sm` | 60 files, 504 KB |
-| Academic references in bundle | **0** — enforced by `check:bundle` |
-| Console errors on load | **0** |
-| Mounted components | `canvases: 2` · `videoElements: 0` · `solutionCards: 5` · `.nf: 1` · `.bay: 1` · `.radar-scope: 1` · `chainNodes: 7` · `.clock-value: 3` |
+| `dist/frames/night` | 60 files, **2,953,663 bytes** |
+| `dist/frames/day` | 60 files, **1,980,016 bytes** |
+| `dist/frames/night-sm` | 60 files, **1,111,411 bytes** |
+| `dist/frames/day-sm` | 60 files, **466,983 bytes** |
+| SHA-256 of `dist/index.html` | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` — **identical to what `yaslogist.me` serves** |
+| Console errors on load | **0** (last measured 2026-08-15) |
+| Mounted components | `canvases: 2` · `videoElements: 0` · `solutionCards: 5` · `.nf: 1` · `.bay: 1` · `.radar-scope: 1` · `chainNodes: 7` · `.clock-value: 3` (last measured 2026-08-15) |
 
-Any deviation means something changed after this was written.
+**Correction to the previous file:** it listed `dist/frames/night` as "3260 KB".
+The measured content is 2,953,663 bytes (2884 KiB), and `du -sk` reports 3020.
+The other three sets matched. The frames are unchanged in git, so the old figure
+was simply wrong; it is corrected above rather than carried forward.
 
 **Markdown leak guard:** `src/index.css` contains `@source not "../*.md";`
-immediately after `@import "tailwindcss"`. Without it, Tailwind scans this file
-and compiles quoted class names into production CSS. Verified: the bundle is
-byte-identical with and without `HANDOFF.md` present. Do not remove that line.
+immediately after `@import "tailwindcss"`. Without it Tailwind scans this file
+and compiles quoted class names into production CSS. Verified again 2026-08-21:
+this document contains the banned tokens in prose and the bundle still reports
+zero. **Do not remove that line** — if you do, `check:bundle` will start failing
+on the strings in this very file.
 
 ---
 
-## 3 · CURRENT ARCHITECTURE — the parts that bite
+## 3 · ARCHITECTURE — the parts that bite
 
 ### 3.1 Scroll engine (`src/lib/scroll.ts`)
 One rAF loop, zero layout reads inside it. Exposes `startScrollLoop`,
-`stopScrollLoop`, `wakeScrollLoop`, `subscribeScroll`. Frame shape is exactly 9
-keys: `dir, progress, raw, rawProgress, reduced, scrub, vel, vh, y`. Sleeps when
-motion converges; wakes on gesture, `ResizeObserver`, or a 250 ms watchdog.
+`stopScrollLoop`, `wakeScrollLoop`, `subscribeScroll`. Frame shape is exactly
+nine keys: `dir, progress, raw, rawProgress, reduced, scrub, vel, vh, y`. Sleeps
+when motion converges; wakes on gesture, `ResizeObserver`, or a 250 ms watchdog.
 `tests/scroll-harness.ts` covers it with 41 assertions and imports the real
 `ScrollFrame` type, so a contract change fails the typecheck.
 
 ### 3.2 Parallax must stay anchored (`src/components/ui.tsx`)
-`Parallax` has two modes. Default displaces by `f.y * speed` — **absolute scroll,
-unbounded**. `anchor` displaces from the element's own centre and clamps to its
-on-screen travel. **Every repeated section must pass `anchor`.** `PillarSection`
-does. Hero deliberately does not (see §6, B2).
+`Parallax` has two modes. The default displaces by `f.y * speed` — **absolute
+scroll, unbounded**. `anchor` displaces from the element's own centre and clamps
+to its on-screen travel. **Every repeated section must pass `anchor`.**
+`PillarSection` does; the Hero deliberately does not. The previous file pointed
+here at "§6, B2" for the Hero rationale, but **no B2 entry has ever existed** in
+any version of this document or in git history — see §6.4.
 
 ### 3.3 SVG text in RTL (`src/lib/svgText.ts`)
-`text-anchor` resolves against the element's own direction, not geometry, so
-under RTL `start` becomes the right edge. `letter-spacing` breaks Arabic cursive
-joining. `font-family: monospace` has no Arabic coverage. `svgTextProps(side,
-rtl)` resolves all three; `svgNumProps(side)` is the LTR-locked variant for
-numerals. **Never partially override its output** — mixing an RTL-derived anchor
-with an LTR direction puts text on the wrong side of its own `x`.
+Three stacked traps. `text-anchor` resolves against the element's own direction,
+not geometry, so under RTL `start` becomes the right edge. `letter-spacing`
+breaks Arabic cursive joining. `font-family: monospace` has no Arabic coverage.
+`svgTextProps(side, rtl)` resolves all three; `svgNumProps(side)` is the
+LTR-locked variant for numerals. **Never partially override its output** —
+mixing an RTL-derived anchor with an LTR direction puts text on the wrong side
+of its own `x`.
 
 ### 3.4 Background frames (`src/components/Background.tsx`)
-No `<video>` anywhere. Two canvases blit a JPEG frame sequence. Frame set is
+No `<video>` anywhere. Two canvases blit a JPEG frame sequence. The frame set is
 chosen once per load: `innerWidth × min(devicePixelRatio, 2) <= 900` selects
-`640×360`, else `1280×720`. First 6 frames load at `fetchpriority="high"`; frames
-7–60 load after `load` + `requestIdleCallback` at `fetchpriority="low"`.
-**No cancellation flag in that effect** — React StrictMode's throwaway unmount
-would set it and permanently silence the only `Image` objects created.
+`640×360`, otherwise `1280×720`. The first 6 frames load at
+`fetchpriority="high"`; frames 7–60 load after `load` plus `requestIdleCallback`
+at `fetchpriority="low"`. **There is deliberately no cancellation flag in that
+effect** — React StrictMode's throwaway unmount would set it and permanently
+silence the only `Image` objects created.
 
 ### 3.5 Theme tokens
 Anything coloured that appears **outside** a dark well must be token-driven
 (`--stat-hero`, `--hairline`, `--tile-bg`, `--tile-brd-hover`, `--glow-soft`).
-Hardcoded mint/cyan lands near-white-on-white in the light theme. This defect
+Hardcoded mint or cyan lands near-white-on-white in the light theme. This defect
 class has recurred three times. The `.nf` and `.bay` wells keep dark backgrounds
 in both themes **by design** — they are instrument screens.
 
 ### 3.6 Declared viewport floor: 360 px
-The site supports **≥360 px normally**; below that it deliberately degrades. The
+The site supports **≥360 px normally** and deliberately degrades below that. The
 floor is expressed as `max-[360px]:` arbitrary variants — Tailwind emits
 `@media not all and (min-width:360px)`, so it is **active at ≤359 px and off at
-≥360 px** (both boundaries measured). Five occurrences, all greppable with
-`rg 'max-\[360px\]' src`: the Blockchain ledger row and steps row switch to a
-2 × 2 grid with their connectors hidden, and the header hides its wordmark.
-It exists because three separate surfaces run out of width below 360 px and no
-sizing tweak reaches 320 px (§4, B6). **If you add anything to the header bar or
-that panel, re-check 320 px** — the floor is what keeps the mobile menu button
-reachable there.
+≥360 px** (both boundaries measured). Five occurrences, greppable with
+`rg 'max-\[360px\]' src`. It exists because three separate surfaces run out of
+width below 360 px and no sizing tweak reaches 320 px (§4, B6). **If you add
+anything to the header bar or that panel, re-check 320 px** — the floor is what
+keeps the mobile menu button reachable there.
+
+### 3.7 Brand asset resolution (`src/assets/brand.ts`)
+`import.meta.glob` with `eager: true`, enumerating **only the basenames actually
+consumed**: `./brand/{founder,yaslogist-logo}.{png,jpg,jpeg,webp,svg,…}`. It is
+not a wildcard, and that is deliberate — see §4, issue #1.
+
+**This resolver fails silently by design.** `Brand.tsx` renders
+`brandLogo ? <img> : <BrandGlyph>`, so a glob that matches nothing replaces the
+real logo and founder portrait with the built-in SVG mark and the "AY" monogram
+while typecheck, harness, build and `check:bundle` all stay green. **If you
+touch that glob, verify the assets are still inlined**, do not just re-run the
+gate. Current values, for comparison: `founder.jpg` **34,727 B**,
+`yaslogist-logo.png` **50,134 B** as data URIs in the bundle.
 
 ---
 
 ## 4 · CLOSED — with technical cause
 
+Each row is a defect that is fixed, verified, and must not be re-opened without
+new evidence.
+
 | Item | Cause / resolution |
 |---|---|
-| **Issue #1 — AASTMT emblem still inlined in production** | The repositioning deleted the *components* (`AastmtEmblem`, `AastmtBadge`, `aastmtLogo`) but left `src/assets/brand/aastmt.png` on disk, where `src/assets/brand.ts` swept it up with an **eager wildcard glob** (`./brand/*.{png,jpg,…}`, `eager: true`). `eager` imports every match whether or not anything consumes it, so `vite-plugin-singlefile` kept base64-inlining the emblem: **26,290 B of data URI** — 2.85% of the artifact — reachable in the glob map, rendered by nothing, and shipped to `yaslogist.me`. Nothing caught it because §1's "0 occurrences" was documentation, not a check. Fixed three ways: asset deleted; the glob narrowed to the two basenames actually consumed (`./brand/{founder,yaslogist-logo}.{…}`) so a stray file can never silently ship again; and `check:bundle` added as the final gate step. Bundle **922110 → 895790 B (−26,320)**, accounted: 26,292 B of quoted data URI + 24 B glob-map entry + 3 B assignment = 26,319, the last byte from minifier identifier reallocation (63 → 62 modules). **The narrowed glob's failure mode is silent** — `brandLogo`/`founderPhoto` fall back to the built-in SVG and "AY" monogram rather than erroring — so both surviving assets were checked byte-for-byte against the pre-change bundle: founder.jpg **34,727 B** and yaslogist-logo.png **50,134 B**, identical. The guard itself was verified by making it fail, not just pass: a banned literal in dead code proved nothing (tree-shaken, gate still green), while `alt="YASLOGIST AASTMT"` — a string that actually ships — turned the full `npm run gate` red with `AASTMT — 1 occurrence`. |
-| **§4.5 visual verification, English** | Real Chrome, motion enabled: neural card packets animate, committed path renders, Bay 07 ribbon and floor plan correct, p4/p5 cards intact at the seam. |
-| **§4.5 visual verification, Arabic** | Real Chrome, `dir=rtl`: cursive joining intact, `عربي` pill in Aref Ruqaa, Cairo-first clock, founder line `YASLOGIST · الدقي، القاهرة`, numerals LTR-pinned, counterfactual strip direction-coded correctly. |
-| **FIX A — p2×p3 and p4×p5 card collision** | `Parallax` displaced by unbounded absolute `scrollY`; `PillarSection` alternates the sign, so `(+,−)` neighbours converged at `\|2·speed\|·scrollY`. At scroll 7170 that sliced 205 px off the p4 card and 201 px off p5 (sections are exactly adjacent and `overflow:hidden`). Fixed by anchoring displacement to element centre and clamping to travel; max offset fell from 370 px to ≤41 px. 0 overlaps across 9 viewport×language×theme combinations. |
-| **Commercial repositioning** | All academic references removed from source, dictionary, meta description and built artifact. `AastmtEmblem`, `AastmtBadge`, `aastmtLogo` and `.credential-badge` deleted. |
-| **RTL SVG text** | Three stacked defects (direction-relative anchors, letter-spacing severing joins, monospace fallback) fixed via `src/lib/svgText.ts`. |
-| **Phase 2 — Neural Route Forecast** | Column captions, committed path derived from the edge set (cannot drift from the topology), confidence pinned to its node, hero metric band. |
+| **Issue #1 — AASTMT emblem still inlined in production** (closed 2026-08-21) | The repositioning deleted the *components* (`AastmtEmblem`, `AastmtBadge`, `aastmtLogo`, `.credential-badge`) but left `src/assets/brand/aastmt.png` on disk, where `brand.ts` swept it up with an **eager wildcard glob**. `eager: true` imports every match whether or not anything consumes it, so `vite-plugin-singlefile` kept base64-inlining the emblem: **26,290 B of data URI**, 2.85% of the artifact, reachable in the glob map, rendered by nothing, and shipped to `yaslogist.me`. Nothing caught it because "0 occurrences" was documentation, not a check. Fixed three ways: asset deleted; glob narrowed to the two consumed basenames (§3.7); `check:bundle` added (§7.2). Bundle **922110 → 895790 B (−26,320)**, accounted as 26,292 B quoted data URI + 24 B glob-map entry + 3 B assignment = 26,319, the last byte from minifier identifier reallocation as module count fell 63 → 62. Both surviving assets verified byte-identical. Live site re-fetched and confirmed: **0 occurrences**, SHA-256 matching the local build. |
+| **Bundle-content guard** (2026-08-21) | `scripts/check-bundle.mjs` greps `dist/index.html` for all four banned tokens and exits non-zero on any hit. Wired as the last step of `npm run gate` **and** into Vercel's `buildCommand`, so a violation fails the deploy, not just the local gate. **Verified by making it fail, not only pass** — see §7.2 for the method and the trap that invalidated the first attempt. |
+| **npm adopted as canonical** (2026-08-20) | A parallel agent had introduced pnpm: `pnpm-lock.yaml` plus a malformed `pnpm-workspace.yaml` (`allowBuilds: esbuild: set this to true or false` — no `packages:` key, not a real pnpm field), and `@vercel/analytics` was installed through pnpm so it never reached `package-lock.json`, which meant **`npm ci` was broken**. Both pnpm files deleted, `npm install` re-synced the lock, `npm ci` verified green, and the hybrid `node_modules` (carrying both `.pnpm/` and `.package-lock.json`) was rebuilt clean. `bun.lock` was removed in the same pass, owner-confirmed: a stale lockfile from a past `bun install` and a third claimant for package-manager auto-detection. Deleting it does **not** affect the bun-run test harness, which executes a TS file directly and installs nothing. `package-lock.json` is now the sole lockfile. |
+| **Vercel was building with pnpm** (2026-08-20) | The production build for commit `07fbc19` logged `Detected pnpm-lock.yaml … Using pnpm@10.x`, so the live site was built by a package manager the repo had not sanctioned. Fixed by pinning `installCommand: "npm ci"` in `vercel.json`. Confirmed resolved on the `b880e3f` build, which logs `Running "install" command: npm ci`. |
+| **AUDIT Row 3 — Neural Route Forecast labels illegible on phones** | A scaling problem, not a sizing one. The diagram's viewBox is **460 user units** wide but the card is only ~226 px on a phone, so everything inside scales by **0.491**: labels declared at 7.5–9.5 user units render at **3.7–4.7 effective CSS px**. Raising the declared size was **not available** — the gutters hold only 11.3 (left) and 10.3 (right) units of slack, and enlarging the viewBox lowers the scale by the same factor, netting nothing. Labels are therefore **hidden below `sm`** (`.nf svg text { display: none }`). Nothing is lost: the `<svg>` is already `aria-hidden`, and the HTML band underneath states the same content at full size — the legend *"Four live signals · one committed route"* plus the **Accuracy 94.2%** figure. With labels gone the drawing occupies **86.8%** of the SVG width. **At ≥640 px the labels stay** (card is 470 px, labels reach 7.63 / 8.65 / 9.67 px). Verified in all four combinations at 390 px (0/11 shown) and 640 px (11/11). **+26 B.** |
+| **AUDIT Row 1 — Bay 07 process ribbon clipped** | `.bay-flow` is `repeat(4, 1fr)`, and **`1fr` carries an implicit `auto` (min-content) minimum**, so each column was pinned to its word plus 24 px of padding rather than a quarter of the track — measured `65.2 / 65.2 / 48.4 / 70.8 px` = **261.6 px against a 228 px container** at 390 px. `overflow-hidden` cut the terminal step: `Outbound` clipped 79.6 px @320, 39.6 @360, 9.6 @390; Arabic `الصادر` 39.4 px @320. Fixed in CSS only, below `sm`: step padding `0.75rem → 0.3125rem`, tracking `0.16em → 0.06em`; below the 360 px floor the ribbon becomes `repeat(2, 1fr)` with `::after` chevrons suppressed (the chevron's `-0.3rem` inset overhangs by 4.8 px and would dangle at the row break). **Two ordering traps:** the chevron override must sit *after* the base `.bay-flow-step::after` rule (equal specificity, source order decides) **and** must also name `[dir="rtl"] .bay-flow-step::after`, which outranks it (0,2,1 vs 0,1,1) — the first attempt failed silently in Arabic only. Overflow **0** everywhere; ≥640 px untouched. |
+| **AUDIT Row 2 — Stats figure clipped** | The tile grid is `grid-cols-2` below `lg` with `p-7` (28 px) and a `text-4xl` (36 px) figure. At 320 px each column is **127.5 px** while `99.98%` alone renders **132.4 px** — wider than the column *before any padding* — so it overflowed and was cut: 33.9 px past the card edge @320, 13.9 @360, 1.1 px of margin @390. Fixed below `sm` only: tile `p-7 → p-4`, figure `text-4xl → text-2xl`. Settled ink **88.3 px in a 94.5 px box** at 320 px EN (24.5 px AR), overflow 0; ≥640 px untouched. **Measurement note:** `CountUp` figures never settle under programmatic scrolling here, so early samples read `0.00%` and made the deficit look smaller — and made dark and light look different (28 vs 34 px) when the geometry is theme-invariant. Measure the *settled string's ink* with an offscreen probe at the live font. |
+| **AUDIT Rows 4–7 — 320 px bleed, two distinct causes** | The four "cosmetic bleed" rows did **not** share one root cause; batching them blindly would have mis-fixed half. **Family A (Rows 5, 7)** — both Simulator output strips are `grid-cols-3`, giving 60.7 px columns at 320 px whose padding leaves 32.7 px (`.metric-tile`) / 36.7 px (`.stat-tile`) for content inking at 53.3–58.5 px. Unfixable by padding or type, so below the floor both become `grid-cols-1` — one column, not two, because three items into two orphans one. Result: 206 px columns, 13–15 px clearance. **Family B (Rows 4, 6)** — a large figure beside a `min-w-0` caption inside a flex row, so flex shrank the block below its own content and `overflow: visible` let the ink bleed: the Vessel figure inked **139 px in a 118.7 px box**, physically overlapping the `shrink-0` FLAG/IMO column by 4.1 px. Fixed by **stacking the pair** (`flex-col items-start`) below the floor rather than shrinking type — these are hero figures and the point is that they read large. Bleed **0**; caption box 12.1 → 116 px; ≥360 px reverts exactly. **+444 B**, accounted as 270 B new floor utilities + 174 B class strings. |
+| **B1 — theme toggle 30.89 px at ≥1536 px, English** | **The originally recorded cause was wrong.** The row's *natural* content at ≥2xl is **1222.69 px** against the **1158 px** `max-w-7xl` leaves — a **64.69 px** deficit, not ~9 px; the old figure was the toggle's *share* of the shrink, read from post-shrink widths. Flex spread the deficit across the logo (−21.64), the status pill (−33.70, wrapping to two lines at 41 px tall) and the toggle (−9.11). Raising the clock's breakpoint is **disproven**: `max-width` is a flat 1280 px at every viewport ≥1280 px, so the budget is identical at 1536 and 2560 px (both measured: avail 1158, toggle 30.89). Narrowing `GlobalClock` cannot reach 64.69 px either — its two inter-column gaps total 32 px. Fixed by widening the header container at ≥2xl to `2xl:max-w-[85rem]` (1360 px outer → 1280 px bar, exactly the section width), applied **in English only**, since Arabic already fits with 176.16 px to spare. Result: toggle **40 × 40**, status pill on one line, logo at its natural 257.63 px, row overflow 0, 15.31 px slack. Verified in all four EN/AR × dark/light combinations; Arabic **pixel-identical** on every header rect. **Status queried by the owner 2026-08-21 — see §6.1 before assuming this is still true.** |
+| **B4 — Blockchain `VERIFIED` chip clipped** | **The originally recorded cause was wrong.** `-end-2` is not the problem: at 1920 px the chip sits 21 px clear in all four combinations. The real cause is the ledger row's intrinsic width — each node wrapper is sized by its **hash caption**, not the node, giving a **268 px** minimum against the **198 px** the panel leaves at 360 px. The row overflowed by 70 px and pushed the final node and its chip outside, where `overflow-hidden` cut them (chip 45 px outside EN, 29 px AR). Fixed by tuning the existing sub-`sm` step: node `h-14 w-14 → h-10 w-10`, connector `mx-1.5 → mx-1`, hash `text-[6px] tracking-[0.04em]` with `sm:` restoring 8 px / 0.1em. Row intrinsic **268 → 206 px**; chip now 17 px inside. ≥640 px untouched. |
+| **B5 — smart-contract steps row cut in English** | Measured rather than assumed, and it did **not** match B4's numbers: at 360 px the four step columns are sized by their labels (Initiate 44.8 px, rest 33.6 px; the 28 px circles never bind, and `max-w-[4.5rem]` never binds because nothing wraps), needing **193.6 px** against **164 px** — a 29.6 px deficit. Arabic already fit. Fixed with spacing and type inside existing elements, no restructure: connector `mx-2 → mx-1 sm:mx-2` (−24 px) and label `tracking-[0.16em] → tracking-[0.06em] sm:tracking-[0.16em]` (−15 px), keeping 8 px type so the caps stay legible. Row intrinsic **193.6 → 148.8 px**, 15.2 px slack. ≥640 px untouched. |
+| **B6 — 320 px structural failure (ledger row + steps row + header)** | Three surfaces, not two: at 320 px the header needed 308.7 px against 262 (hamburger **17.7 px off-screen**), the ledger row 184 against 158 (chip 9 px outside), the steps row 149 against 124. Sizing was genuinely exhausted — the ledger row fits only at ≥~346 px, the steps row ≥~345 px — so this is the one item that took structure. **A hard floor is declared at 360 px** (§3.6). Below it both panel rows become `grid grid-cols-2 justify-items-center gap-y-4` with connectors `hidden` — all four blocks, hashes and steps survive; only the connector line, decoration rather than information, is dropped. The header hides the wordmark, reclaiming 92.7 px against a 46.7 px deficit — removing *decoration* rather than *function*, since the language pill, theme toggle and menu button all stay. Alternatives rejected on evidence: `overflow-x-auto` on the ledger row clips the `-top-2` chip vertically (setting one overflow axis to auto forces the other) and re-opens B4; dropping to three nodes edits content; hiding the hashes removes the evidence the panel exists to show. At 320 px: header overflow **0** with the hamburger 29 px inside, both rows overflow 0, chip 36.5 px inside. Identical at 359 px; ≥360 px untouched. |
+| **B7 — 390 px header overflow, menu button unreachable** | The phone bar was over-subscribed: logo 194.5 + controls 192 + a 24 px gap needed **410.5 px** against **316 px** — 94.5 px over in English, 66.7 px in Arabic (which was **also broken**, contrary to B1's language split). The row carried the hamburger 57.5 px off-screen EN / 29.7 px off the left edge AR, **silently**, because `overflow-x-clip` on the page wrapper suppresses any scrollbar and `document.scrollWidth` still read 390. Fixed by reclaiming width below `sm` only, every step restoring its value at `sm`: outer padding `px-4 sm:px-5`, bar `px-3 gap-2 sm:gap-6 sm:px-5`, control cluster `gap-1.5 sm:gap-2.5`, logo `gap-2 sm:gap-3`, mark `h-10 w-10 sm:h-11 sm:w-11`, wordmark `text-[13px]`, decorative `CORE` badge `hidden sm:inline-block`, and a `@media (max-width:639px)` rule tightening `.lang-opt` from `min-width:2.5rem`/`padding:0 .5rem` to `2rem`/`0 .25rem` — the pill was 92 px, the widest control on the bar. **Verified functionally, not just geometrically:** the button hit-tests as its own target, clicking it flips the overlay to `pointer-events-auto opacity-100`, its links hit-test as clickable, and a screenshot shows the menu open with all 9 links. ≥640 px untouched. |
+| **FIX A — p2×p3 and p4×p5 card collision** | `Parallax` displaced by unbounded absolute `scrollY`, and `PillarSection` alternates the sign, so `(+,−)` neighbours converged at `\|2·speed\|·scrollY`. At scroll 7170 that sliced 205 px off the p4 card and 201 px off p5 (sections are exactly adjacent and `overflow:hidden`). Fixed by anchoring displacement to element centre and clamping to travel; max offset fell from 370 px to ≤41 px. 0 overlaps across 9 viewport × language × theme combinations. |
+| **Commercial repositioning** | All academic references removed from source, dictionary, meta description and built artifact. `AastmtEmblem`, `AastmtBadge`, `aastmtLogo` and `.credential-badge` deleted. Completed at the asset layer only on 2026-08-21 (issue #1, above). |
+| **RTL SVG text** | Three stacked defects — direction-relative anchors, letter-spacing severing cursive joins, monospace fallback with no Arabic coverage — fixed via `src/lib/svgText.ts` (§3.3). |
+| **Phase 2 — Neural Route Forecast** | Column captions, committed path derived from the edge set (so it cannot drift from the topology), confidence pinned to its node, hero metric band. |
 | **Phase 2 — Autonomous Bay 07** | Process ribbon `INBOUND › STORAGE › PICK › OUTBOUND` (4 nodes; connectors are `::after` chevrons that flip under RTL), throughput promoted to hero. |
-| **Phase 3 — Connect card** | Moved onto shared `.glass-strong`, decorative glows 3→1, typographic hierarchy, provenance block. Credibility line split from the promise line so they are complementary, not duplicate. |
-| **Phase 3 — Simulator** | `useAnimatedNumber` returns `[value, settling]`; `is-computing` state propagates slider→outputs→route. Tactile `:active` slider. Demo-provenance chip. **Computation logic unchanged.** |
-| **Counterfactual readout** | Second evaluation of the *same* formulas at an alternate corridor weighting. Verified against hand arithmetic at 500,000 TEU × 12,000 NM: `+1d 17h`, `+17,010 t`, `−$50.4M` all match. |
-| **P1/P3 — frame delivery** | Mobile 640×360 set added; deferred loading. Mobile transfer **2902 KB → 1103 KB (−62%)**, decoded bitmap **211 MB → 53 MB (−75%)**. Desktop unchanged (verified `lg`, 1280×720, 2902 KB). |
-| **R1/R2/R3 — compositor cleanup** | `blur-3xl` washes → `.glow-wash` radial-gradients (no element `filter`, no promotion); `will-change` removed from `.solution-card`, `.nf-node`, `.bay-*`, `.chain-pulse`, `.radar-blip`, `.radar-trail`. **`will-change` 46 → 10**, element filters **7 → 1**, estimated layer memory **77.9 MB → 36.2 MB (−54%)**. Kept on `.bg-camera`, `.radar-sweep`, `.cta-primary` — those do continuous transform work. All animations verified still running. |
-| **tsc shadowing** | `npx tsc` resolved a different TypeScript (7.0.2) and printed help instead of compiling, exiting 0 — a silent no-op typecheck. Permanently fixed by `npm run typecheck` / `npm run gate`, which resolve `node_modules/.bin` first. Verified 5.9.3. |
-| **B1 — theme toggle 30.89 px at ≥1536 px, English** | **The recorded cause was wrong.** The row's *natural* content at ≥2xl is **1222.69 px** against the **1158 px** `max-w-7xl` leaves — a **64.69 px** deficit, not ~9 px. The old figure was the toggle's *share* of the shrink, read from post-shrink widths. Flex spread the deficit across the logo (−21.64 px), the status pill (−33.70 px — it was wrapping to two lines, 41 px tall) and the toggle (−9.11 px). Raising the clock's breakpoint is **disproven** as a fix: `max-width` is a flat 1280 px at every viewport ≥1280 px, so the budget is identical at 1536 px and at 2560 px (both measured: avail 1158, toggle 30.89) — a higher threshold only relocates the defect. Narrowing `GlobalClock` cannot reach 64.69 px either: its two inter-column gaps total just 32 px. Fixed by widening the header container to the section content grid at ≥2xl — `2xl:max-w-[85rem]` (1360 px outer → 1280 px bar, exactly the section width, so the bar aligns with section content instead of sitting 40 px inside it) — applied **in English only**, since Arabic already fits with 176.16 px to spare and any shared-path change would move it. Result: toggle **40 × 40**, status pill on **one line** (166.55 × 27.5), logo at its natural 257.63 px, row overflow 0, 15.31 px slack. Verified in all four EN/AR × dark/light combinations on the built artifact; Arabic **pixel-identical** on every header rect (x, y, w, h). |
-| **AUDIT Row 3 — Neural Route Forecast labels illegible on phones** | A scaling problem, not a sizing one. The diagram's viewBox is **460 user units** wide but the card is only ~226 px on a phone, so everything inside is scaled by **0.491**: labels declared at 7.5–9.5 user units render at **3.7–4.7 effective CSS px**, roughly a third of any comfortable minimum. **Raising the declared size is not available** — measured gutters hold only **11.3 units (left)** and **10.3 units (right)** of slack, so larger text overflows the viewBox immediately; and enlarging the viewBox lowers the scale by the same factor, netting nothing. The labels are therefore **hidden below `sm`** (`.nf svg text { display: none }`). Nothing is lost: the `<svg>` is already `aria-hidden`, so assistive tech never had them, and the HTML band underneath states the same content at full size — the legend line *"Four live signals · one committed route"* plus the **Accuracy 94.2%** figure. The diagram still reads as a deliberate visual: with labels gone the drawing occupies **86.8%** of the SVG width, leaving only ~27 px of the former right gutter empty. **At ≥640 px the labels stay** — the card is 470 px there and they reach **7.63 / 8.65 / 9.67 px**, in line with the 8 px micro-type used across the site. Verified in all four combinations at 390 px (0/11 shown) and 640 px (11/11, unchanged). **+26 B**, exactly `.nf svg text{display:none}` folded by the minifier into the existing `max-width:639px` block. CSS-only — the `<text>` elements are untouched in source. |
-| **AUDIT Rows 4–7 — 320 px bleed, two distinct causes** | The four "cosmetic bleed" rows did **not** share one root cause; batching them blindly would have mis-fixed half. **Family A (Rows 5, 7)** — both Simulator output strips are `grid-cols-3`, giving 60.7 px columns at 320 px whose tile padding leaves **32.7 px** (`.metric-tile`) / **36.7 px** (`.stat-tile`) for content that inks at 53.3–58.5 px. Unfixable by padding or type (21.6 px would have to fall to ~12 px), so below the 360 px floor both become `grid-cols-1` — one column, not two, because three items into two columns orphans one. Result: 206 px columns, **13–15 px of clearance** instead of bleed. **Family B (Rows 4, 6)** — a large figure beside a `min-w-0` caption inside a flex row, so flex shrank the block below its own content and `overflow: visible` let the ink bleed: the Vessel figure inked **139 px in a 118.7 px box**, physically overlapping the `shrink-0` FLAG/IMO column by 4.1 px, and VoyageProfile's caption box was squeezed to **12.1 px** against 20.5/43.5 px of ink. Fixed by **stacking the pair** (`flex-col items-start`) below the floor rather than shrinking type — these are hero figures and the whole point is that they read large. Result: bleed **0**, caption box 12.1 → 116 px. Verified all four combinations at 320 px in both languages; **≥360 px reverts exactly** (hero `row`, grids 3-up, p4 `row`), so ≥640 is untouched. **+444 B**, accounted exactly: 270 B new floor utilities + 174 B class strings. No new `will-change` or `backdrop-filter` surfaces (P5/P6 guardrail). |
-| **AUDIT Row 1 — Bay 07 process ribbon clipped** | Found by the 2026-08-20 proactive audit, not by a report. `.bay-flow` is `grid-template-columns: repeat(4, 1fr)`, and **`1fr` carries an implicit `auto` (min-content) minimum**, so each column was pinned to its word plus 24px of padding rather than to a quarter of the track — measured `65.2 / 65.2 / 48.4 / 70.8px` = **261.6px against a 228px container** at 390px. The grid overflowed and `overflow-hidden` cut the terminal step: **`Outbound` clipped 79.6px @320, 39.6px @360, 9.6px @390**; Arabic `الصادر` 39.4px @320. Fixed in CSS only, below `sm`: step padding `0.75rem → 0.3125rem`, tracking `0.16em → 0.06em`; and below the 360px floor (§3.6) the ribbon becomes `repeat(2, 1fr)` with the `::after` chevrons suppressed — the chevron's `-0.3rem` inset overhangs the track by 4.8px and would dangle at the row break. **Two ordering traps:** the chevron override must sit *after* the base `.bay-flow-step::after` rule (equal specificity, source order decides) **and** must also name `[dir="rtl"] .bay-flow-step::after`, which outranks it (0,2,1 vs 0,1,1) — the first attempt failed silently in Arabic only. Result: overflow **0** everywhere; true min-content margin **13.2px EN / 32.6px AR** at 360px; 25px inside the clip edge at 320px, all four combinations. **≥640px untouched** (12px padding, 1.28px tracking, chevrons, 4 × 144px). |
-| **AUDIT Row 2 — Stats figure clipped** | The tile grid is `grid-cols-2` below `lg` with `p-7` (28px) and a `text-4xl` (36px) figure. At 320px each column is **127.5px** while `99.98%` alone renders **132.4px** — wider than the column *before any padding* — so it overflowed its tile and the container's `overflow-hidden` cut it: **33.9px past the card edge @320, 13.9px @360**, and only **1.1px** of margin left @390. Fixed below `sm` only: tile `p-7 → p-4` and figure `text-4xl → text-2xl` (24px). Settled ink now **88.3px in a 94.5px box = 6.3px slack** at 320px EN (24.5px AR), overflow 0. **≥640px untouched** (43.2px figure, 32px padding). **Measurement note:** the `CountUp` figures never settle under programmatic scrolling here, so early samples read `0.00%` and made the deficit look smaller — and made dark/light look different (28 vs 34px) when the geometry is in fact theme-invariant. Measure the *settled string's ink* with an offscreen probe at the live font, not the animated element. |
-| **B6 — 320 px structural failure (ledger row + steps row + header)** | Three surfaces, not two: at 320 px the header needed 308.7 px against 262 px (hamburger **17.7 px off-screen**), the ledger row 184 px against 158 px (chip **9 px outside**), and the steps row 149 px against 124 px. Sizing was genuinely exhausted — the ledger row fits only at viewport ≥ ~346 px and the steps row ≥ ~345 px — so this is the one item that took structure. **A hard floor is now declared at 360 px**, the width every other fix is verified at, expressed as `max-[360px]:` arbitrary variants (Tailwind emits `@media not all and (min-width:360px)`, so it is active at ≤359 px and off at ≥360 px — both boundaries measured). Below the floor: both panel rows become `grid grid-cols-2 justify-items-center gap-y-4` and their connectors are `hidden` — **all four blocks, all four hashes and all four steps survive**; only the connector line, which is decoration rather than information, is dropped. The header hides the wordmark (`.leading-none` → `max-[360px]:hidden`), reclaiming 92.7 px against a 46.7 px deficit and removing *decoration* rather than *function* — the language pill, theme toggle and menu button all stay. Alternatives rejected on evidence: `overflow-x-auto` on the ledger row would clip the `-top-2` chip vertically (setting one overflow axis to auto forces the other) and re-open B4; dropping to three nodes edits content; hiding the hashes removes the ledger evidence the panel exists to show. Result at 320 px, all four combinations: header overflow **0** with the hamburger **29 px inside the viewport**, both rows overflow **0**, chip **36.5 px inside**, every step label on one line. Verified identical at 359 px. **≥360 px is untouched** — at 360 px the floor reads inactive, the wordmark is `block`, both rows are `flex` with connectors `block`, and every B4/B5/B7 value is unchanged. |
-| **B5 — smart-contract steps row cut in English** | Measured rather than assumed, and it did **not** match B4's numbers: at 360 px the four step columns are sized by their labels (Initiate 44.8 px, the rest 33.6 px; the 28 px circles never bind, and `max-w-[4.5rem]` never binds because nothing wraps), needing **193.6 px** against the **164 px** the inner box leaves — a **29.6 px** deficit. Arabic already fit (labels 10.8–20.4 px, columns pinned to the 28 px circles). Fixed in B4's category — spacing and type inside the existing elements, no restructure: connector `mx-2` → `mx-1 sm:mx-2` (−24 px) and label `tracking-[0.16em]` → `tracking-[0.06em] sm:tracking-[0.16em]` (−15 px), keeping the 8 px type so the caps stay legible. Row intrinsic **193.6 → 148.8 px**, leaving **15.2 px** of slack; no padding change was needed. Verified in all four combinations at 360 px: overflow 0, every label on one line and inside the panel. **≥640 px is untouched** — English tracking back to 1.28 px and label widths back to 44.8/33.6/33.6/33.6. (Arabic computes 0.08 px there by design: the project neutralises letter-spacing in Arabic to protect cursive joining — that is not a regression.) |
-| **B7 — 390 px header overflow, menu button unreachable** | The phone bar was over-subscribed: logo 194.5 px + controls 192 px + a 24 px gap needed **410.5 px** against the **316 px** a 390 px viewport left — **94.5 px** over in English (66.7 px in Arabic, which was **also broken**, contrary to B1's language split). The row spilled past its box and carried the hamburger **57.5 px off-screen** in English and 29.7 px off the left edge in Arabic, silently, because `overflow-x-clip` on the page wrapper suppresses any scrollbar — `document.scrollWidth` still read 390. Fixed by reclaiming width below `sm` only, every step restoring its current value at `sm`: outer padding `px-4 sm:px-5`, bar `px-3` + `gap-2 sm:gap-6 sm:px-5`, control cluster `gap-1.5 sm:gap-2.5`, logo `gap-2 sm:gap-3`, brand mark `h-10 w-10 sm:h-11 sm:w-11`, wordmark `text-[13px]` (`sm:text-lg` unchanged), the decorative `CORE` badge `hidden sm:inline-block`, and a `@media (max-width:639px)` rule tightening `.lang-opt` from `min-width:2.5rem`/`padding:0 .5rem` to `2rem`/`0 .25rem` — the pill was 92 px, the single widest control on the bar. Result at 390 px, all four combinations: row overflow **0**, hamburger **13 px inside the bar / 29 px inside the viewport**, wordmark on one line. At 360 px it also passes (6.3 px inside the bar in English, 13 px in Arabic). **Verified functionally, not just geometrically:** the button hit-tests as its own target, clicking it flips the overlay to `pointer-events-auto opacity-100`, its links hit-test as clickable, and a screenshot shows the menu open with all 9 links. **≥640 px is untouched** — padding 20/20, gaps 24/10/12, mark 44 px, wordmark 18 px, `CORE` visible, pill 92 px, all re-measured. |
-| **B4 — Blockchain `VERIFIED` chip clipped** | **The recorded cause was wrong.** `-end-2` is not the problem: at 1920 px the chip sits **21 px clear** of the panel in all four combinations. The real cause is the ledger row's intrinsic width. Each node wrapper is sized by its **hash caption**, not the node, giving the row a **268 px** minimum against the **198 px** the panel leaves at a 360 px viewport. The row overflowed by 70 px and pushed the final node *and* its chip outside the panel, where `overflow-hidden` cut them — measured at 360 px: chip **45 px** outside in English, **29 px** outside in Arabic (node itself 37 px / 21 px outside). Fixed by tuning the row's existing sub-`sm` step so it fits: node `h-14 w-14` → `h-10 w-10`, connector `mx-1.5` → `mx-1`, hash `text-[6px] tracking-[0.04em]` with `sm:` restoring 8 px / 0.1em. Row intrinsic **268 → 206 px**. Chip now **17 px inside**, node 25 px inside, in all four combinations at 360 px. **≥640 px is untouched** (node 64 px, hash 8 px / 0.8 px tracking, connectors 10 px, chip 21 px clear). `clip-angled` unchanged. |
+| **Phase 3 — Connect card** | Moved onto shared `.glass-strong`, decorative glows 3 → 1, typographic hierarchy, provenance block. Credibility line split from the promise line so they are complementary rather than duplicate. |
+| **Phase 3 — Simulator** | `useAnimatedNumber` returns `[value, settling]`; `is-computing` state propagates slider → outputs → route. Tactile `:active` slider. Demo-provenance chip. **Computation logic unchanged.** |
+| **Counterfactual readout** | A second evaluation of the *same* formulas at an alternate corridor weighting. Verified against hand arithmetic at 500,000 TEU × 12,000 NM: `+1d 17h`, `+17,010 t`, `−$50.4M` all match. |
+| **P1/P3 — frame delivery** | Mobile 640×360 set added; deferred loading. Mobile transfer **2902 KB → 1103 KB (−62%)**, decoded bitmap **211 MB → 53 MB (−75%)**. Desktop unchanged. |
+| **R1/R2/R3 — compositor cleanup** | `blur-3xl` washes → `.glow-wash` radial gradients (no element `filter`, no promotion); `will-change` removed from `.solution-card`, `.nf-node`, `.bay-*`, `.chain-pulse`, `.radar-blip`, `.radar-trail`. **`will-change` 46 → 10**, element filters **7 → 1**, estimated layer memory **77.9 MB → 36.2 MB (−54%)**. Kept on `.bg-camera`, `.radar-sweep`, `.cta-primary`, which do continuous transform work. All animations verified still running. |
+| **`tsc` shadowing** | `npx tsc` resolved a different TypeScript (7.0.2) and printed help instead of compiling, **exiting 0** — a silent no-op typecheck. Permanently fixed by using `npm run typecheck` / `npm run gate`, which resolve `node_modules/.bin` first. Verified 5.9.3. |
+| **Visual verification, English** | Real Chrome, motion enabled: neural card packets animate, committed path renders, Bay 07 ribbon and floor plan correct, p4/p5 cards intact at the seam. |
+| **Visual verification, Arabic** | Real Chrome, `dir=rtl`: cursive joining intact, `عربي` pill in Aref Ruqaa, Cairo-first clock, founder line `YASLOGIST · الدقي، القاهرة`, numerals LTR-pinned, counterfactual strip direction-coded correctly. |
 
 ---
 
@@ -178,127 +213,323 @@ frames at 60.2 fps**. `FCP 1348 ms` and `loadEventEnd 3021 ms` from the same
 session are retracted for the same reason; re-measured with Chrome focused:
 **FCP 460 ms**, `domInteractive` **84 ms**, `loadEventEnd` **181 ms**.
 
+**Do not re-open this as a performance item.** There is no evidence a
+compositing bottleneck exists.
+
 ### 5.2 Frame rate is NOT reliably measurable with this tooling
 With page identity asserted, four consecutive **identical** baselines gave
 **10.0, 29.3, 19.8, 12.1 fps** — a 3× spread with nothing changed between runs.
-Every run reported `document.hasFocus() === false`, and fronting Chrome first did
-not change it. Every measurement path requires a Bash/osascript round trip that
-leaves Chrome unfocused.
+Every run reported `document.hasFocus() === false`, and fronting Chrome first
+did not change it. Every measurement path requires a Bash or osascript round
+trip that leaves Chrome unfocused.
 
 **A second trap:** an ablation matrix once showed a flat 60 fps for every group
 because the active tab had silently become `chrome://new-tab-page`. Any harness
 must assert `location.host` **and** site markers inside every result row.
 
-**What the page's real cost is, measured focus-independently** via Long Animation
-Frame attribution across a full scroll: style+layout **510 ms**, script **~285 ms**,
-together **0.8%** of long-frame time. The worst frames carry almost nothing — a
-2283 ms frame contained 34 ms of script and **0.9 ms** of style+layout; a 1302 ms
-frame contained **zero** scripts. That is the browser not scheduling, not the page
-being expensive. **The page's own per-frame work is ~1–2 ms.**
-
-**Conclusion for a future session:** do not chase a compositing bottleneck. There
-is no evidence one exists. If frame rate must be measured, it requires a real
-Chrome performance trace driven by a human at the keyboard.
+**What the page's real cost is, measured focus-independently** via Long
+Animation Frame attribution across a full scroll: style and layout **510 ms**,
+script **~285 ms**, together **0.8%** of long-frame time. The worst frames carry
+almost nothing — a 2283 ms frame contained 34 ms of script and **0.9 ms** of
+style and layout; a 1302 ms frame contained **zero** scripts. That is the browser
+not scheduling, not the page being expensive. **The page's own per-frame work is
+~1–2 ms.** If frame rate must be measured, it requires a real Chrome performance
+trace driven by a human at the keyboard.
 
 ### 5.3 `npx tsc` is not a trustworthy gate
-It resolved TypeScript 7.0.2 at least once and printed help text while exiting 0.
-Use `npm run gate`.
+It resolved TypeScript 7.0.2 at least once and printed help text while exiting
+0. Use `npm run gate`.
+
+### 5.4 Two "recorded causes" in §4 were wrong before being corrected
+B1 and B4 both carry a note that the originally filed cause was mistaken. The
+lesson generalises: **a cause recorded without a measurement is a hypothesis.**
+Re-measure before building on one.
 
 ---
 
 ## 6 · OPEN BACKLOG
 
-### B3 — `.glass` / `.glass-strong` / `.nf` / `.bay` have no backdrop blur in production
+### 6.1 B1 — status disputed, needs one measurement
+§4 records B1 as **closed**, with the `2xl:max-w-[85rem]` fix verified in all
+four EN/AR × dark/light combinations and Arabic pixel-identical on every header
+rect. The owner listed B1 as **open** on 2026-08-21.
+
+**No measurement was taken this session to settle it**, and this document will
+not move a closed item on an unverified basis. If the defect is visible again,
+the repro is: load the built artifact at **≥1536 px in English**, and measure the
+theme toggle's rendered box. Closed means **40 × 40** with the status pill on one
+line and row overflow 0. Anything else re-opens B1 with the header container
+(`2xl:max-w-[85rem]`) as the first suspect — and note from §4 that raising the
+clock's breakpoint is already **disproven** as a fix, so do not retry it.
+
+### 6.2 B3 — `.glass` / `.glass-strong` / `.nf` / `.bay` have no backdrop blur
 **Root cause, confirmed.** `-webkit-backdrop-filter` is **inert in current
-Chrome** — every prefixed form returns `none`, including `blur()` alone (tested
-directly). The minifier emits **only** the prefixed property for `.glass`, `.nf`
+Chrome** — every prefixed form returns `none`, including `blur()` alone, tested
+directly. The minifier emits **only** the prefixed property for `.glass`, `.nf`
 and `.bay`, and drops the declaration **entirely** for `.glass-strong`. Only
 Tailwind's `backdrop-blur-*` utilities emit the unprefixed property and actually
-blur — those are the 8 surfaces that remain.
+blur — those are the 8 surfaces that still work.
 
 **Consequence:** the site's signature glass cards have never blurred in a
 production build. This also explains why moving the Connect card onto
 `.glass-strong` produced no visible change.
 
 **Explicitly NOT fixed, by decision.** Restoring blur would add ~10 backdrop
-surfaces. Weigh it against §7 before acting; it is a visual-fidelity change, not
-a performance fix.
+surfaces. It is a **visual-fidelity call, not a bug fix** — weigh it against the
+compositor budget in §4 (R1/R2/R3) before acting, and take it after §8 step 2,
+not before.
+
+### 6.3 B8 — radar bearing labels below the site's own type floor
+**Raised by the owner 2026-08-21. It had no prior entry in any version of this
+document or in git history**, so the arithmetic below was measured fresh this
+session and is the only evidence that exists.
+
+`src/components/FleetRadar.tsx:59` renders the scope as
+`<svg viewBox="0 0 100 100" class="… h-[15rem] w-[15rem] …">`. There is no
+rem-base override in `src/index.css` (`html` sets only scroll properties), so
+15rem is **240 px** and the internal scale is **240 / 100 = 2.4**. The four
+bearing labels `000 / 090 / 180 / 270` at `FleetRadar.tsx:117–122` are declared
+`fontSize="3"` user units, so they render at **3 × 2.4 = 7.2 effective CSS px** —
+**0.8 px below the 8 px micro-type floor** the site uses everywhere else
+(`text-[8px]` in Hero, BlockchainSection and Simulator).
+
+**How this differs from Row 3, which is closed.** Row 3's labels fell to
+3.7–4.7 px *because the card shrank on phones*. The radar SVG is a **fixed**
+`15rem` at every viewport, with no responsive variant on that element, so 7.2 px
+is what it renders at on desktop and on a phone alike. It is marginal, not
+severe, and it does not degrade.
+
+**Not yet decided, and deliberately not acted on:** whether 7.2 px is judged
+illegible at all. **No visual verification was performed.** Note before fixing
+that the `<svg>` is `aria-hidden`, so assistive technology never reads these —
+the same fact that made hiding Row 3's labels lossless. Raising `fontSize` to
+`3.34` would reach exactly 8 px; whether the surrounding geometry has the slack
+for that is **unmeasured**.
+
+### 6.4 B2 — a dangling reference with no entry
+`src/components/ui.tsx` behaviour in §3.2 is annotated "(see §6, B2)", but **no
+B2 entry exists** in this document, in any prior committed version, or anywhere
+in git history (`git log --all -S'B2 ' -- HANDOFF.md` returns nothing). Either
+the rationale for the Hero's unanchored `Parallax` was never written down, or it
+was lost in the 2026-08-15 distillation. **Low priority**, but if you work on
+Hero parallax, know that the reason it is exempt from the anchoring rule is
+undocumented rather than obvious.
+
+### 6.5 npm audit — 3 advisories, none reaching production
+`npm audit` reports **3 vulnerabilities (1 low, 2 high)**. Measured 2026-08-21:
+
+| Package | Severity | Advisory | Reaches production? |
+|---|---|---|---|
+| `esbuild` 0.27.7 | low | arbitrary file read when running the **dev server on Windows** | No |
+| `nanoid` 3.3.17 | high | custom generators can loop indefinitely when size is zero | No |
+| `vite` 7.3.2 | high | `launch-editor` NTLMv2 hash disclosure via UNC path on **Windows**; `server.fs.deny` bypass on **Windows** alternate paths | No |
+
+**`npm audit --omit=dev` reports `found 0 vulnerabilities`.** All three sit in
+the devDependency tree only — `vite → esbuild` and `vite → postcss → nanoid`.
+The project ships a static single-file artifact with no server, and the
+production dependency tree contains only React, React-DOM, clsx, tailwind-merge
+and the two Vercel packages. Two of the three advisories are additionally
+**Windows-only**, and this machine is darwin.
+
+**Why it is still open rather than dismissed:** the `vite` fix requires
+**7.3.6**, which `npm audit fix --force` warns is *outside the stated dependency
+range* — the project pins 7.3.2 exactly. Taking it means a deliberate version
+bump plus a full gate run to confirm the 895,790-byte artifact and 41/41
+assertions survive, not an `audit fix`. **Do not run `npm audit fix --force`
+casually**; it will move a pinned build dependency that every measured number in
+§2 depends on.
+
+### 6.6 Verified only by arithmetic, never on hardware
+The mobile frame work (§4, P1/P3) is a byte and arithmetic fact — transfer
+−62%, decoded bitmap −75% — and is environment-independent. **Whether the site
+feels fast on an actual handset has never been checked.** This needs a human
+with a phone and remains the single highest-value unknown.
 
 ---
 
-## 7 · DEFERRED — not started, not urgent
+## 7 · INFRASTRUCTURE STATE
+
+### 7.1 Toolchain — npm is canonical
+**npm is the package manager of record**, owner-confirmed 2026-08-20.
+`package-lock.json` is the **sole** lockfile; `npm ci` is the install of record
+and passes. There is no `pnpm-lock.yaml` and no `bun.lock`, and none should be
+reintroduced — see §4.
+
+**bun is still required**, but not as a package manager: it is the *runtime* for
+`npm run test` (`bun tests/scroll-harness.ts`), which is a step of
+`npm run gate`. The harness executes a TypeScript file directly and installs
+nothing.
+
+**Local versions measured 2026-08-21 — and they have drifted:**
+
+| Tool | Recorded 2026-08-20 | Measured 2026-08-21 |
+|---|---|---|
+| node | v26.7.0 | **v20.20.2** (`/usr/local/opt/node@20/bin/node`) |
+| npm | 11.19.0 | **10.8.2** |
+| bun | 1.3.14 | 1.3.14 |
+| tsc | 5.9.3 | 5.9.3 |
+
+The `/usr/local/bin/node` symlink into the Homebrew `node@20` keg is dated
+**2026-08-21 03:31**, so node was changed on this machine shortly before the
+session that wrote this. **Nothing pins it** — there is no `.nvmrc`, no
+`.node-version`, and no `engines` field in `package.json`. The full gate passes
+on node 20.20.2, so this is recorded rather than treated as a problem, but a
+future session seeing different numbers should suspect the host rather than the
+repo. Vercel builds on its own image and is unaffected.
+
+### 7.2 The bundle-content guard
+`scripts/check-bundle.mjs` reads `dist/index.html` and greps for `AASTMT`,
+`Arab Academy`, `CITL` and `211010469`, case-insensitively, exiting 1 with the
+offending token and its count on any hit. It runs in **two** places:
+
+- **`npm run gate`** — `typecheck && test && build && check:bundle`, last, since
+  it is the only step that inspects `dist/`.
+- **`vercel.json` → `buildCommand`** — `npm run build && npm run check:bundle`,
+  so a violation **fails the deployment** rather than shipping.
+
+**Why the deploy path is not `npm run gate`, and must not become it.** `gate`
+includes `test`, which is `bun tests/scroll-harness.ts`, and **bun is not on the
+Vercel build image**. Both halves of the current chain are node-only:
+`npm ci` → `vite build` → `node scripts/check-bundle.mjs`. Promoting
+`buildCommand` to `gate` would break every deploy.
+
+**The guard was verified by making it fail, and the first attempt was
+worthless.** Injecting `const _tmpProbe = "AASTMT"` into a source file left the
+gate **green** — dead code is tree-shaken before it reaches the bundle, so that
+test proved nothing. A probe that actually ships (`alt="YASLOGIST AASTMT"` on
+the brand image) turned the full gate **red** with `AASTMT — 1 occurrence`, and
+running `vercel.json`'s exact `buildCommand` string produced exit 1 the same
+way. **If you ever change this guard, re-verify with a probe that survives
+minification.**
+
+### 7.3 Vercel
+`vercel.json` pins `installCommand: "npm ci"` and
+`buildCommand: "npm run build && npm run check:bundle"`. Project `framework` is
+**null** (Other preset), so build and output settings otherwise come from
+dashboard configuration not visible in the repo. **`outputDirectory` is
+deliberately left unset** so the working detection is not disturbed.
+
+- Project `prj_jAONLzFYAxJvdHF2Yu4GSXNSUdb2`, team
+  `team_40txApd9c7pODaJ664QGtRnt`, from `.vercel/project.json`.
+- The Vercel **CLI is not installed** on this machine (`which vercel` → not
+  found). Use the Vercel MCP tools, or install the CLI if you need
+  `vercel logs`.
+- Deployment-specific `*.vercel.app` URLs return a **deployment-protection
+  page**, not the site. Verify against `yaslogist.me`, not the preview host —
+  a protected URL returning ~481 KB of Vercel HTML is not your build.
+
+**`dist/` is not self-contained.** `dist/frames/` is 240 files across four
+directories (§2). A pipeline that uploads only `index.html` ships a site with no
+background. Verified live 2026-08-21: all four sets serve `image/jpeg` at HTTP
+200, including the last frame of the sequence.
+
+### 7.4 Git and production parity — measured 2026-08-21
+
+| Fact | Value |
+|---|---|
+| Branch | `main` |
+| `HEAD` | `b880e3f7771a180e7db94b9f23f1367f2889409b` |
+| `origin/main` | `b880e3f7771a180e7db94b9f23f1367f2889409b` |
+| Ahead / behind | **0 / 0** |
+| Working tree | **clean** (0 entries from `git status --porcelain -uall`) |
+| Remote | `https://github.com/YasauraTeam/YASLOGIST.git` |
+| Latest production deployment | `dpl_9yz2r2seLGMaqS2EbmaMYUtX8MAZ`, commit `b880e3f`, state **READY** |
+| Live artifact SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
+| Local `dist/index.html` SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
+
+**`main`, `origin/main` and production are the same code**, confirmed by hashing
+the live response rather than by trusting deployment status. Recent history:
+
+```
+b880e3f  ci: enforce the banned-token guard on the Vercel deploy path
+426d704  fix: stop inlining the AASTMT emblem into the production bundle
+a76de40  fix: hide sub-5px Neural Route Forecast labels on phones
+1918cee  docs: repoint the HANDOFF verify command at a path that actually works
+```
+
+GitHub issue **#1 is closed** (completed) — the AASTMT emblem leak, auto-closed
+by the `Closes #1` trailer on `426d704`. There are no other open issues.
+
+### 7.5 HawkScan
+A session hook fires after every commit asking for a HawkScan DAST scan.
+**No scan has been run**, because the environment reports
+`hawk runtime=false, HAWK_API_KEY=false` and the app is not running. Do not
+report scan results that were never produced.
+
+---
+
+## 8 · NEXT STEPS — ranked by measured impact
+
+1. **Settle B1** (§6.1). One measurement at ≥1536 px in English decides whether
+   a closed item is actually closed. Cheapest open question here.
+2. **Get one real Chrome performance trace, human-driven.** Everything in §5
+   says this tooling cannot measure frame rate. A DevTools trace during scroll,
+   on both desktop and a throttled mobile profile, would settle whether any
+   runtime problem remains. Until then treat "the site feels slow" as
+   **unexplained**, not as diagnosed.
+3. **Confirm the mobile frame work on a real phone** (§6.6). Needs a human with
+   a handset.
+4. **Decide B3** (§6.2) — restore backdrop blur, or accept its absence. A
+   visual-fidelity call, informed by step 2. Not a bug fix.
+5. **Decide B8** (§6.3) — 7.2 px bearing labels against an 8 px floor. Needs a
+   judgement call before any code.
+6. **Plan the `vite` bump** (§6.5) if the advisories matter to you. Deliberate
+   version change plus a full gate run, never `npm audit fix --force`.
+7. **Counterfactual coefficients.** `ALT_TIME_GAIN 0.13`, `ALT_CO2_CUT 0.09`,
+   `ALT_COST_GAIN 0.04` in `src/components/Simulator.tsx` are **invented**,
+   unlike the IMO-DCS-derived constants above them. They are labelled as a
+   modelled scenario in the UI and in a source comment. If real corridor data
+   arrives, replace all three and delete the comment. **Never re-tune the
+   committed constants to flatter the comparison.**
+
+---
+
+## 9 · DEFERRED — not started, not urgent
 
 | Item | Status |
 |---|---|
 | **Tech Stack strip** | Not started. No design or copy exists yet. |
-| **Blockchain disclaimer text** | Not started. The Blockchain card currently carries no equivalent of the Simulator's `sim.demoNote` provenance line. |
+| **Blockchain disclaimer text** | Not started. The Blockchain card carries no equivalent of the Simulator's `sim.demoNote` provenance line. |
 | **Video demo** | Not started. Requires an external tool; nothing in this repo depends on it. |
 
-*(These three were named by the project owner as known-pending. No further detail
-was supplied and none is invented here.)*
+*(Named by the project owner as known-pending. No further detail was supplied
+and none is invented here.)*
 
 ---
 
-## 8 · NEXT STEPS — ranked by measured impact, not assumed impact
+## 10 · WORKING RULES THAT HAVE PAID FOR THEMSELVES
 
-1. **Deploy correctly — `dist/frames/` must ship.** `dist/` is **not** a single
-   self-contained file. `dist/frames/` is 7016 KB across 240 files in four
-   directories. A pipeline that uploads only `index.html` ships a site with no
-   background. This is the only item that is currently *broken in production* if
-   mishandled. **Verify before anything else.**
-
-2. **Confirm the mobile frame work on a real phone.** The measured wins are
-   transfer **−62%** and decoded bitmap **−75%** on mobile — those are byte and
-   arithmetic facts, environment-independent. What has *never* been verified is
-   whether the site now feels fast on an actual handset. This is the single
-   highest-value unknown and it needs a human with a phone.
-
-3. **Get one real Chrome performance trace, human-driven.** Everything in §5 says
-   this tooling cannot measure frame rate. A DevTools trace during scroll on both
-   desktop and a throttled mobile profile would settle whether any runtime
-   problem remains. Until then, treat "the site feels slow" as **unexplained**,
-   not as diagnosed.
-
-4. **Decide B3** (restore backdrop blur) — a visual-fidelity call, informed by
-   step 3. Do not treat it as a bug fix.
-
-5. **B3 is the only open item left** (§6). It is a visual-fidelity decision, not
-   a bug — take it after step 3, not before. Every mobile overflow found this
-   session is closed and the site now has a declared 360 px floor (§3.6).
-
-6. **Counterfactual coefficients.** `ALT_TIME_GAIN 0.13`, `ALT_CO2_CUT 0.09`,
-   `ALT_COST_GAIN 0.04` in `src/components/Simulator.tsx` are **invented**, unlike
-   the IMO-DCS-derived constants above them. They are labelled as a modelled
-   scenario in the UI and in a source comment. If real corridor data arrives,
-   replace all three and delete the comment. **Never re-tune the committed
-   constants to flatter the comparison.**
-
----
-
-## 9 · WORKING RULES THAT HAVE PAID FOR THEMSELVES
-
+- **A documented guarantee is not a guarantee.** "0 academic references" sat in
+  this file as a verified fact while the emblem shipped for weeks. If a rule
+  must hold, put it in the gate — §7.2 is the pattern.
+- **Verify a guard by making it fail.** A check that has only ever passed is
+  untested. And pick a probe that survives minification: dead code is
+  tree-shaken and will fake a pass (§7.2).
+- **Watch for silent fallbacks.** `brand.ts` degrades to an SVG mark instead of
+  erroring, so a broken glob is invisible to the whole gate (§3.7). When a
+  change touches something with a fallback, verify the *positive* case.
 - **Assert page identity inside every browser measurement.** Two separate false
-  conclusions came from measuring the wrong page or an unfocused window.
+  conclusions came from measuring the wrong page or an unfocused window (§5).
 - **Reload after every viewport resize, before measuring.** Sections carry
-  `content-visibility: auto` + `contain: content`, so a resized window keeps the
-  *previous* width's layout until the section re-renders. This produced a fake
-  "B4 regressed" reading — a 64 px node at a 360 px viewport with
-  `matchMedia('(min-width:640px)')` returning false — that vanished on reload.
-- **Verify variant/sizing behaviour on the production build, not the dev server.**
-  Tailwind's dev sheet appends newly-seen utilities in discovery order, so a base
-  utility added mid-session can land *after* its own `sm:` variant and win the
-  cascade at every width. Production sorts variants canonically (verified: `.h-10`
-  at byte 829568, `.sm\:h-16` at 868622). Same class of trap as the one above and
-  it presents identically.
+  `content-visibility: auto` and `contain: content`, so a resized window keeps
+  the *previous* width's layout until the section re-renders. This produced a
+  fake "B4 regressed" reading that vanished on reload.
+- **Verify variant and sizing behaviour on the production build, not the dev
+  server.** Tailwind's dev sheet appends newly-seen utilities in discovery
+  order, so a base utility added mid-session can land *after* its own `sm:`
+  variant and win the cascade at every width. Production sorts canonically.
 - **Check the language before calling a computed value a regression.** Arabic
   deliberately neutralises `letter-spacing` to protect cursive joining, so a
-  label that computes `1.28px` in English computes `0.08px` in Arabic with the
-  identical class. That is correct, not a bug.
+  label computing `1.28px` in English computes `0.08px` in Arabic with the
+  identical class. Correct, not a bug.
 - **Test the hypothesis, don't assert it.** "The minifier's missing space breaks
   `backdrop-filter`" was wrong; a two-line probe disproved it and found the real
-  cause.
-- **Verify in all four combinations** (EN/AR × dark/light). Three separate
-  light-theme contrast defects and two RTL defects were caught only this way.
+  cause (§6.2).
+- **Verify in all four combinations** (EN/AR × dark/light). Three light-theme
+  contrast defects and two RTL defects were caught only this way.
 - **Account for every byte of bundle delta.** It has repeatedly surfaced changes
-  nobody intended.
-- **Docs are part of done.** This file is the only durable memory across sessions.
+  nobody intended, and it is how the −26,320 B of issue #1 was confirmed to be
+  exactly the emblem and nothing else.
+- **A recorded cause without a measurement is a hypothesis** (§5.4).
+- **Docs are part of done.** This file is the only durable memory across
+  sessions. Rewrite it; never append.
