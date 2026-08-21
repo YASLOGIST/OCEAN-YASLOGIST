@@ -17,12 +17,16 @@ suspect.
 cd ~/Desktop/.claude/yaslogist && npm run gate
 ```
 
-Expect `41/41 assertions passed`, `dist/index.html 895.79 kB`, and
+Expect `41/41 assertions passed`, `dist/index.html 896.87 kB`, and
 `✓ dist/index.html: 0 academic references (4 tokens checked)`, exit 0.
 
-The repository is clean, `main` equals `origin/main` at **`b880e3f`**, and the
-live site at `yaslogist.me` serves a byte-identical copy of the local build. The
-only open work is in §6. Nothing is currently broken in production.
+`main` equals `origin/main` at **`e343c4a`**. **The working tree is NOT clean**
+— three files carry the Bug A / Bug B / Bug C and contrast/glass work in §4 and are
+**uncommitted**, so `yaslogist.me` still serves the pre-fix build. Committing and
+deploying them is the first outstanding action. The only other open work is §6.
+
+A prior version of this section named `b880e3f` as HEAD while the tree was
+already at `e343c4a`; the number above was re-read from `git rev-parse`.
 
 ---
 
@@ -69,8 +73,8 @@ that inspects `dist/` rather than source, so **it must stay last**.
 |---|---|
 | TypeScript | **0 errors**, compiler **5.9.3** |
 | Scroll harness | **41/41 assertions passed** |
-| `dist/index.html` | **895790 bytes** (Vite prints `895.79 kB`) |
-| gzip, local | **472.50 kB** |
+| `dist/index.html` | **896872 bytes** (Vite prints `896.87 kB`) — was 895790 before the §4 fixes; the **+1082 B** is **+611 B CSS** and **+471 B JS**. All the JS is Bug A's clamp; the CSS splits +238 B (Bugs B/C), +293 B (contrast + glass) and +80 B (Bug D). |
+| gzip, local | **472.84 kB** |
 | gzip, on Vercel | **471.23 kB** — different zlib on the build image compressing an identical file. Not a discrepancy. |
 | `check:bundle` | `✓ dist/index.html: 0 academic references (4 tokens checked)` |
 | `.DS_Store` in dist | **0** |
@@ -80,7 +84,7 @@ that inspects `dist/` rather than source, so **it must stay last**.
 | `dist/frames/day` | 60 files, **1,980,016 bytes** |
 | `dist/frames/night-sm` | 60 files, **1,111,411 bytes** |
 | `dist/frames/day-sm` | 60 files, **466,983 bytes** |
-| SHA-256 of `dist/index.html` | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` — **identical to what `yaslogist.me` serves** |
+| SHA-256 of `dist/index.html` | `19d1eb0f84f2b084d2a6b845a8ea5df215cc3a5d31ff9edc5c6ae570080bde7b` — this is the **fixed, uncommitted** build. `yaslogist.me` still serves `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725`, the pre-fix artifact. They will match again once §0's outstanding commit and deploy happen. |
 | Console errors on load | **0** (last measured 2026-08-15) |
 | Mounted components | `canvases: 2` · `videoElements: 0` · `solutionCards: 5` · `.nf: 1` · `.bay: 1` · `.radar-scope: 1` · `chainNodes: 7` · `.clock-value: 3` (last measured 2026-08-15) |
 
@@ -116,6 +120,21 @@ to its on-screen travel. **Every repeated section must pass `anchor`.**
 here at "§6, B2" for the Hero rationale, but **no B2 entry has ever existed** in
 any version of this document or in git history — see §6.4.
 
+**Both modes are now additionally bounded by the clip box** (added 2026-08-21
+with Bug A, §4). `measure()` walks up to the nearest ancestor whose computed
+`overflowY` is not `visible`, and the per-frame shift is clamped to the slack
+the element has inside it, less `CLIP_MARGIN` (52px — the reach of
+`--glass-sshadow` below a card's border box, so the box-shadow stays inside the
+clip too). Without that bound the default mode rides content straight through
+the clipping edge and the ancestor slices it flat. `overflowY` and not the
+`overflow` shorthand: the page wrapper sets only `overflow-x`, and the shorthand
+reads back there as a two-axis value that a naive `!== "visible"` test would
+mistake for a clip box.
+
+**The Hero's exemption from `anchor` is therefore now safe rather than merely
+undocumented** — it still starts at zero displacement on load, which is what the
+unanchored mode buys, but it can no longer grow without limit.
+
 ### 3.3 SVG text in RTL (`src/lib/svgText.ts`)
 Three stacked traps. `text-anchor` resolves against the element's own direction,
 not geometry, so under RTL `start` becomes the right edge. `letter-spacing`
@@ -138,8 +157,24 @@ silence the only `Image` objects created.
 Anything coloured that appears **outside** a dark well must be token-driven
 (`--stat-hero`, `--hairline`, `--tile-bg`, `--tile-brd-hover`, `--glow-soft`).
 Hardcoded mint or cyan lands near-white-on-white in the light theme. This defect
-class has recurred three times. The `.nf` and `.bay` wells keep dark backgrounds
-in both themes **by design** — they are instrument screens.
+class has now recurred **five** times — instances four and five were the two
+mint literals in `.live-eyebrow-ok` and `.live-eyebrow.is-computing`, found and
+tokenised 2026-08-21 (§4). The `.nf`, `.bay` and `.radar-scope` wells keep dark
+backgrounds in both themes **by design** — they are instrument screens.
+
+**Their fills are only 55–75% opaque, so the ground beneath them decides what
+they look like.** That ground is `--well-base`: `transparent` in dark, where the
+page already supplies a dark backdrop, and an opaque `#0a1730` in light, where
+it does not. Without it the same declaration renders a six-fold brighter, washed
+panel in light and lets the background footage through — Bug D in §4. **If you
+change a well's fill alpha, re-check both themes**, because only one of them has
+a backdrop of its own.
+
+**All three wells share one material, declared once on `.card-inset`.** Do not
+put a `box-shadow` on `.nf`, `.bay` or `.radar-scope` — `.card-inset` is later
+in the sheet at equal specificity and will silently replace it, which is exactly
+what had already happened to the rim-and-falloff those two wells thought they
+had (§4, Bug D).
 
 ### 3.6 Declared viewport floor: 360 px
 The site supports **≥360 px normally** and deliberately degrades below that. The
@@ -174,6 +209,12 @@ new evidence.
 | Item | Cause / resolution |
 |---|---|
 | **Issue #1 — AASTMT emblem still inlined in production** (closed 2026-08-21) | The repositioning deleted the *components* (`AastmtEmblem`, `AastmtBadge`, `aastmtLogo`, `.credential-badge`) but left `src/assets/brand/aastmt.png` on disk, where `brand.ts` swept it up with an **eager wildcard glob**. `eager: true` imports every match whether or not anything consumes it, so `vite-plugin-singlefile` kept base64-inlining the emblem: **26,290 B of data URI**, 2.85% of the artifact, reachable in the glob map, rendered by nothing, and shipped to `yaslogist.me`. Nothing caught it because "0 occurrences" was documentation, not a check. Fixed three ways: asset deleted; glob narrowed to the two consumed basenames (§3.7); `check:bundle` added (§7.2). Bundle **922110 → 895790 B (−26,320)**, accounted as 26,292 B quoted data URI + 24 B glob-map entry + 3 B assignment = 26,319, the last byte from minifier identifier reallocation as module count fell 63 → 62. Both surviving assets verified byte-identical. Live site re-fetched and confirmed: **0 occurrences**, SHA-256 matching the local build. |
+| **Bug A — hero cards sliced flat against the hero's clip edge** (2026-08-21) | Reported as "a ticker-like card overlapping the Stats card's top edge, a jagged horizontal line where the two cards meet". Neither the reveal nor a card collision: `Parallax` in the Hero runs **unanchored**, so it displaces by `f.y × 0.22` — absolute scroll, unbounded — while the hero's content column leaves only `pb-36` (**144px**) of slack above the section's `overflow:hidden` edge. Past scroll ≈654 the content rides through that edge and is **sliced flat**: no border, no radius, straight through whatever card is there, with the Stats card's own clean top edge a constant **24px** below it — two horizontal edges 24px apart, which is exactly what was screenshotted. Measured on mobile 390×664: slice grows linearly at 22px per 100px of scroll, reaching **186px at y=1500**; the cut sweeps up through the vessel card's 2×2 HEADING/DRAFT/CARGO/ETA tile row, which is the "ticker" in the report. **Present on desktop too**, on a different card — the first desktop scan inspected only `.glass-strong` and wrongly read clean; re-measured at 1280×800 the **FounderBadge is sliced by 54px at y=900** (predicted 54, measured 54 on a pre-fix build). Fixed in `Parallax` for both modes by clamping the shift to the element's slack inside its nearest `overflowY != visible` ancestor, less a 52px `CLIP_MARGIN` (§3.2). Shift now caps at **92px**; worst card position **−52px** (inside the edge) in all four EN/AR × dark/light combinations at 390×664 and at 1280×800. Pillars/FIX A re-verified unaffected: max escape **−73px**, closest pair separation **169.7px**. **+471 B JS**, shared with Bug B. |
+| **Bug B — mobile menu: row 01 unreachable, row 02 clipped by the header** (2026-08-21) | Nine rows at `text-3xl`/`py-4` measure **685px against a 664px** phone viewport. `justify-content: center` splits an overflow across **both** ends, and the start-edge half cannot be scrolled to — a flex container will not scroll above its own content origin. Measured: row 01 at top **−10.5px**, entirely behind the header (which is `z-9999` against the menu's `z-9998`), row 02 clipped **16.5px**, row 09 cut **10.5px** below. The header collision is **not** merely a consequence of the overflow — at 375×812, where the rows fit, row 01 still landed at 63.5 against a header bottom of 103, i.e. 39.5px obscured, because the menu is `inset-0` with no reserved header space. Both halves fixed: `.nav-menu` declares `justify-content: safe center` (with plain `center` first as the fallback for engines that reject the keyword), `overflow-y: auto`, `overscroll-behavior: contain`, and `padding-top: var(--nav-clear)` = **7rem**, sized to the tallest the header ever gets below `lg` (103px, unscrolled); rows step to `py-2`/`text-2xl` below `sm`, bringing the stack to **505px**. Verified in all four combinations: 9 rows, numbering `01`→`09`, first row top **119.5** against a header bottom of **87**, last row bottom **624.5** in a 664 viewport, **0 offenders**, no scrolling needed. Worst case re-checked on a fresh load with the header at its full 103px: row 01 clears by **16.5px**. Short-viewport fallback checked at 390×420: content 649px, `safe center` correctly degrades to flex-start, row 01 at **112px** (clears by 9px, not above the viewport) and the last row is reachable by scrolling. **+238 B CSS** total with Bug C. |
+| **Bug C — light theme washed the animated background out** (2026-08-21) | **Not the §3.5 hardcoded-token defect class**, which is what it looked like: `--veil-1/2/rad` were already tokenised with real `[data-theme="light"]` values. The light *values* were simply miscalibrated. Measured from the live canvas (day frame mean luminance **122.1**, sd **35.7**): `brightness(1.22)` then a white veil at **α 0.62** and a pale-blue radial at **α 0.30** composited to mean **215.5**, sd **11.6** — a Weber contrast of **5.4%** against the dark theme's **25.4%** for the same stack. The footage was still drawing and still animating; it had been compressed into the top 5% of the luminance range, where the eye cannot resolve it. A white veil over a light ground is not the mirror of a dark veil over a dark one — it raises the mean and divides the contrast simultaneously. Retuned to **0.18 / 0.38 / 0.18**, chosen by solving for the largest reduction that keeps body copy over the background at AA: the darkest patch of veiled footage (mean − 2sd) still holds **4.92:1** against `--c-text`. Result **11.4%** Weber, a 2.1× gain, verified in EN and AR light; dark theme byte-identical (veil alphas in the shipped bundle read 0.349/0.600/0.259 unchanged). Confirmed visually — the vessel hull, containers and water tone are legible where before they were a featureless wash. **Every card surface was separately checked for theme adaptation**; all adapt, and `.stat-tile` is transparent in both themes so there is nothing to adapt. `.nf`/`.bay`/`.radar-scope` keep dark instrument-screen treatments **by design** (§3.5) and were left alone. |
+| **Legibility pass — text tiers re-grounded** (2026-08-21) | The readable tiers were measured against the surfaces they actually sit on: the composited light card (`--glass-a` over the retuned ground, luminance **237.9**) and the composited dark card (`--glass-sa`, luminance **21.1**). `--c-text` went `#e8f7ff → #ffffff` in dark (16.67:1 → **18.25:1**; the old value carried a cyan cast that read as dimmed beside the accent) and `#0b2a4a → #0a1119` in light (12.53:1 → **16.35:1**). `--c-muted` was **lifted but deliberately kept a step below** so the hierarchy survives: dark `#8aa3c7 → #a8bcd8` (7.08 → **9.43:1**), light `#47688e → #2c4059` (4.97 → **9.12:1** on card, and 1.95 → **5.94:1** on the open background at its mean). Two hardcoded mint literals — `.live-eyebrow-ok` `#6ee7b7` and `.live-eyebrow.is-computing` `#5eead4` — were **the §3.5 defect class again, instances four and five**: both sit on `.glass-strong`, which is near-white in the light theme, where mint measured **1.31:1**. Replaced with `--status-ok` / `--status-busy`, whose dark values are the exact literals they replace (dark renders identically, verified: `rgb(110, 231, 183)`) and whose light values measure **4.72:1** and 4.62:1. `[data-theme="light"] .cf-val-cost` was nudged `#a16207 → #945906` (4.24 → **4.90:1**) — it had a light override already but sat just under AA at its 17px weight. **The cyan accent system was not touched**, per instruction; see §6.7 for what that leaves outstanding. |
+| **Glass material — the blur had never rendered** (2026-08-21) | B3 (§6.2) root-caused and fixed for the card surfaces. The source declared `backdrop-filter` **and** `-webkit-backdrop-filter` by hand; Lightning CSS treats the later hand-written vendor line as the winner and **drops the standard property**, and Chrome does not implement the prefixed spelling at all — measured directly: `CSS.supports('-webkit-backdrop-filter','blur(6px)')` is **false** on Chrome 148, and a probe element set only via the prefixed form computes `none`. So `.glass` and `.glass-strong` resolved to `backdrop-filter: none`; the signature cards had never blurred in a production build. `.btn-ghost` was the one rule that always worked, and the reason is instructive: it declares **only** the unprefixed property, so the minifier auto-prefixes and emits both. Fixed by matching that — the hand-written vendor lines were deleted from `.glass`/`.glass-strong`, and the build now emits both spellings for each. Verified on live elements: both compute `blur(6px) saturate(1.4)` in all four combinations. Refraction was deepened with an inset under-edge (`--glass-edge`, tokenised per theme) paired with the existing top rim light, giving the pane two lit edges — **inset shadows only, no extra layer**. **A prior version of §6.2 recorded that the minifier "drops the declaration entirely for `.glass-strong`" — that is wrong**: it emits the prefixed form there exactly as it does for `.glass`. The earlier reading came from a naive substring search rather than a rule-level scan. |
+| **Bug D — light-theme instrument wells washed out and leaking the background** (2026-08-21) | Reported from a real device: the Global Fleet Telemetry and Neural Route Forecast panels looked transparent and noisy in light mode against a clean, opaque dark mode. Measured cause: `.nf`, `.bay` and `.radar-scope` declare a fill that is only **55–75% opaque**, so the result is decided by the backdrop — and the two themes' backdrops differ by 11× in luminance. The identical declaration composites to **19.0 → 11.3** over the dark card and **116.6 → 65.6** over the light one (`.bay` 18.8 → 10.7 vs 105.6 → 54.1), a six-fold brighter panel that also transmits **45% of the backdrop at its top edge** — which is how the hull and sea came through. **Part 2 made it worse**, honestly: halving the light veil roughly doubled the footage contrast arriving behind these wells. Fixed with `--well-base`, an opaque ground under the existing gradients — `transparent` in dark (renders byte-identically, re-measured 19.0 → 11.3) and `#0a1730` in light, a navy at luminance 22.05 chosen to reproduce the dark theme's own ground of 21.0. Light now composites to **19.4 → 11.6** with **0% transmission**, i.e. within 0.4 luminance of dark on every well. The wells are *not* lightened — §3.5 is explicit that they read as dark instrument screens in both themes. **Also fixed a latent defect found while measuring:** `.nf` and `.bay` each carried a three-layer recessed rim-and-falloff that **had never rendered** — `.card-inset` is later in the sheet at equal specificity (0,1,0), so its single-layer box-shadow replaced theirs, and all three wells computed only `rgba(255,255,255,0.03) 0 1px 0 inset`. The material now lives once on `.card-inset` (restated in its light override, which outranks it), the dead copies are gone, and the radar scope has the family treatment for the first time. **Zero new compositor surfaces** — background-color and inset shadows only. **+80 B CSS.** |
 | **Bundle-content guard** (2026-08-21) | `scripts/check-bundle.mjs` greps `dist/index.html` for all four banned tokens and exits non-zero on any hit. Wired as the last step of `npm run gate` **and** into Vercel's `buildCommand`, so a violation fails the deploy, not just the local gate. **Verified by making it fail, not only pass** — see §7.2 for the method and the trap that invalidated the first attempt. |
 | **npm adopted as canonical** (2026-08-20) | A parallel agent had introduced pnpm: `pnpm-lock.yaml` plus a malformed `pnpm-workspace.yaml` (`allowBuilds: esbuild: set this to true or false` — no `packages:` key, not a real pnpm field), and `@vercel/analytics` was installed through pnpm so it never reached `package-lock.json`, which meant **`npm ci` was broken**. Both pnpm files deleted, `npm install` re-synced the lock, `npm ci` verified green, and the hybrid `node_modules` (carrying both `.pnpm/` and `.package-lock.json`) was rebuilt clean. `bun.lock` was removed in the same pass, owner-confirmed: a stale lockfile from a past `bun install` and a third claimant for package-manager auto-detection. Deleting it does **not** affect the bun-run test harness, which executes a TS file directly and installs nothing. `package-lock.json` is now the sole lockfile. |
 | **Vercel was building with pnpm** (2026-08-20) | The production build for commit `07fbc19` logged `Detected pnpm-lock.yaml … Using pnpm@10.x`, so the live site was built by a package manager the repo had not sanctioned. Fixed by pinning `installCommand: "npm ci"` in `vercel.json`. Confirmed resolved on the `b880e3f` build, which logs `Running "install" command: npm ci`. |
@@ -262,22 +303,25 @@ line and row overflow 0. Anything else re-opens B1 with the header container
 (`2xl:max-w-[85rem]`) as the first suspect — and note from §4 that raising the
 clock's breakpoint is already **disproven** as a fix, so do not retry it.
 
-### 6.2 B3 — `.glass` / `.glass-strong` / `.nf` / `.bay` have no backdrop blur
-**Root cause, confirmed.** `-webkit-backdrop-filter` is **inert in current
-Chrome** — every prefixed form returns `none`, including `blur()` alone, tested
-directly. The minifier emits **only** the prefixed property for `.glass`, `.nf`
-and `.bay`, and drops the declaration **entirely** for `.glass-strong`. Only
-Tailwind's `backdrop-blur-*` utilities emit the unprefixed property and actually
-blur — those are the 8 surfaces that still work.
+### 6.2 B3 — remaining unblurred surfaces (`.nf`, `.bay`, `.brand-mark`, `.lang-pill`)
+**Mostly closed 2026-08-21** — see the glass-material row in §4 for the root
+cause and the fix. `.glass` and `.glass-strong` now genuinely blur. Two
+corrections to what this entry used to say: the minifier does **not** drop the
+declaration entirely for `.glass-strong` (it emits the prefixed form there just
+like `.glass`), and the trigger is not the prefix being "inert" on its own but
+**declaring both properties by hand** — Lightning CSS then keeps only the
+vendor line, which Chrome cannot parse.
 
-**Consequence:** the site's signature glass cards have never blurred in a
-production build. This also explains why moving the Connect card onto
-`.glass-strong` produced no visible change.
+**Note after Bug D:** in the light theme the wells now sit on an opaque base,
+so `.nf` and `.bay` have nothing left to blur there even if the property were
+fixed. Any value in restoring it would be dark-theme only.
 
-**Explicitly NOT fixed, by decision.** Restoring blur would add ~10 backdrop
-surfaces. It is a **visual-fidelity call, not a bug fix** — weigh it against the
-compositor budget in §4 (R1/R2/R3) before acting, and take it after §8 step 2,
-not before.
+**Still open, deliberately:** `.nf`, `.bay`, `.brand-mark` and `.lang-pill` are
+still prefixed-only and therefore still flat. They were left out of scope by an
+explicit call — the two instrument wells are opaque dark screens by design
+(§3.5) and gain almost nothing from a blur they would pay a compositor surface
+for. The one-line fix, if it is ever wanted, is to **delete the hand-written
+`-webkit-backdrop-filter` line** and let the minifier prefix it.
 
 ### 6.3 B8 — radar bearing labels below the site's own type floor
 **Raised by the owner 2026-08-21. It had no prior entry in any version of this
@@ -314,6 +358,36 @@ the rationale for the Hero's unanchored `Parallax` was never written down, or it
 was lost in the 2026-08-15 distillation. **Low priority**, but if you work on
 Hero parallax, know that the reason it is exempt from the anchoring rule is
 undocumented rather than obvious.
+
+**Partly overtaken by Bug A (§4, 2026-08-21).** The exemption's *risk* is now
+gone — the default mode is bounded by its clip box regardless of why the Hero
+opted out — so the missing rationale is no longer load-bearing. What the
+exemption still buys, and the likeliest reason it was chosen, is that the
+unanchored mode is the only one that renders **zero displacement at scroll 0**,
+so the Hero's first paint is its designed composition. That is inference from
+the code, **not a recovered rationale**; it is recorded as such.
+
+### 6.7 Cyan accent text below AA on light cards — flagged, not changed
+`--c-neon` in the light theme is `#0284c7`, which measures **3.53:1** on a light
+card and **2.30:1** over the open background. Every `text-neon` run at normal
+size therefore sits under the 4.5:1 threshold: measured instances include the
+ticker lane names (`Singapore`, `Rotterdam`, … 22 of them at 10px), the
+telemetry eyebrows at 11px, `KN`, `SIN → LAX → ROT`, the `CORE` badge, and the
+section tags. The large simulator figures pass, because at 36px the threshold
+drops to 3.0.
+
+**Not changed, by instruction** — the cyan accent system is the site's colour
+identity and was explicitly out of scope for the legibility pass. It is recorded
+here because it is real and measured, and because there are two ways to resolve
+it that do *not* touch the palette:
+
+1. Move the runs that are **content rather than colour-coding** off `text-neon`
+   onto the readable tier — the lane names are the clearest case.
+2. Keep the accent only where the colour *means* something (state, origin vs
+   destination, section tag) and accept the ratio there as decorative.
+
+Either is a design call, not a defect fix. **Do not "fix" this by darkening
+`--c-neon`** without an explicit decision to change the brand colour.
 
 ### 6.5 npm audit — 3 advisories, none reaching production
 `npm audit` reports **3 vulnerabilities (1 low, 2 high)**. Measured 2026-08-21:
@@ -428,10 +502,10 @@ background. Verified live 2026-08-21: all four sets serve `image/jpeg` at HTTP
 | Fact | Value |
 |---|---|
 | Branch | `main` |
-| `HEAD` | `b880e3f7771a180e7db94b9f23f1367f2889409b` |
-| `origin/main` | `b880e3f7771a180e7db94b9f23f1367f2889409b` |
+| `HEAD` | `e343c4a341f532c9a2d72d7cf29a54e19f2002ec` |
+| `origin/main` | `e343c4a341f532c9a2d72d7cf29a54e19f2002ec` |
 | Ahead / behind | **0 / 0** |
-| Working tree | **clean** (0 entries from `git status --porcelain -uall`) |
+| Working tree | **DIRTY — 3 modified, uncommitted**: `src/components/ui.tsx`, `src/components/Navbar.tsx`, `src/index.css` (the Bug A/B/C fixes in §4). The gate passes on them; they have not been committed or deployed. |
 | Remote | `https://github.com/YasauraTeam/YASLOGIST.git` |
 | Latest production deployment | `dpl_9yz2r2seLGMaqS2EbmaMYUtX8MAZ`, commit `b880e3f`, state **READY** |
 | Live artifact SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
@@ -441,6 +515,7 @@ background. Verified live 2026-08-21: all four sets serve `image/jpeg` at HTTP
 the live response rather than by trusting deployment status. Recent history:
 
 ```
+e343c4a  docs: rewrite HANDOFF as a standalone zero-context document
 b880e3f  ci: enforce the banned-token guard on the Vercel deploy path
 426d704  fix: stop inlining the AASTMT emblem into the production bundle
 a76de40  fix: hide sub-5px Neural Route Forecast labels on phones
@@ -529,7 +604,20 @@ and none is invented here.)*
   contrast defects and two RTL defects were caught only this way.
 - **Account for every byte of bundle delta.** It has repeatedly surfaced changes
   nobody intended, and it is how the −26,320 B of issue #1 was confirmed to be
-  exactly the emblem and nothing else.
+  exactly the emblem and nothing else. It earned its keep again on 2026-08-21:
+  a CSS delta 243 B larger than the source change could explain turned out to be
+  **a code comment leaking a utility into the stylesheet** (below).
+- **Tailwind scans your comments.** `@source not "../*.md"` keeps Markdown out,
+  but `.ts`/`.tsx`/`.css` are still scanned in full, comments included, and a
+  bare word matching a utility name compiles that utility into production CSS.
+  Writing "drop shadow" in a `Parallax` comment emitted a dead `.shadow` rule —
+  **243 B** nothing referenced. Hyphenated forms (`box-shadow`) do not trigger
+  it; the bare noun does, and so does the class written out with its leading
+  dot. Diff the built CSS when a delta does not match the source change.
+  A `.blur` rule from the same cause is **already in the bundle and predates
+  this session** — it was present in the pre-change baseline, so it is not part
+  of any recent delta. Small, and left alone rather than swept up in unrelated
+  work, but it is the same leak.
 - **A recorded cause without a measurement is a hypothesis** (§5.4).
 - **Docs are part of done.** This file is the only durable memory across
   sessions. Rewrite it; never append.

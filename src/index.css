@@ -66,6 +66,11 @@
   --z-nav: 9000;
   --z-modal: 10000;
 
+  /* Tallest the fixed header ever gets below `lg`: 20px outer padding + 10px
+     bar padding + a 44px mark, plus a little air. The mobile menu reserves it
+     so its first row can never sit under a header that outranks it in z-order. */
+  --nav-clear: 7rem;
+
   /* Card rhythm — one spacing scale so every panel breathes identically. */
   --card-pad: 1.5rem;
   --card-pad-lg: 1.75rem;
@@ -78,6 +83,13 @@
   --tile-brd-hover: rgba(34, 228, 255, 0.22);
   --stat-hero: #5eead4;
   --stat-hero-glow: rgba(94, 234, 212, 0.35);
+  /* Live-status hues. These were literals inside `.live-eyebrow-ok` and
+     `.live-eyebrow.is-computing`, which is the §3.5 defect class: the eyebrow
+     sits on `.glass-strong`, and that surface is near-white in the light
+     theme, where mint measured **1.31:1**. The dark values below are the exact
+     literals they replace, so the dark theme renders identically. */
+  --status-ok: #6ee7b7;
+  --status-busy: #5eead4;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-soft: cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,8 +107,16 @@
   --c-deep: #071030;
   --c-navy: #0b1d4b;
   --c-neon: #22e4ff;
-  --c-text: #e8f7ff;
-  --c-muted: #8aa3c7;
+  /* Legibility tier. Primary copy is PURE white — the old #e8f7ff carried a
+     cyan cast that read as slightly dimmed against the accent it sat beside.
+     Measured on the composited dark card (--glass-sa over the veiled ground,
+     luminance 21.1): 16.67:1 before, 18.25:1 now. `--c-muted` is the
+     deliberate step below it and is lifted, not erased — 7.08:1 to 9.43:1 —
+     so secondary copy gains contrast while the hierarchy survives. Accents
+     (--c-neon, emerald, amber, --stat-hero) are colour-coded meaning and are
+     NOT part of this tier. */
+  --c-text: #ffffff;
+  --c-muted: #a8bcd8;
   --c-chrome: 255 255 255;
 
   --bg-grad-a: rgba(10, 26, 68, 0.3);
@@ -117,6 +137,15 @@
   --glass-sbrd: rgba(0, 229, 255, 0.26);
   --glass-fb: rgba(10, 11, 16, 0.65);
   --glass-sshadow: 0 30px 90px -24px rgba(0, 6, 28, 0.95);
+  /* Under-edge line. Paired with the existing top rim light it gives the pane
+     two lit edges instead of one, which is what reads as thickness rather than
+     as a flat tinted rectangle. An inset shadow, so it costs no extra layer. */
+  --glass-edge: rgba(0, 0, 0, 0.34);
+  /* Ground beneath the instrument wells. The well fills are only 55–75%
+     opaque, so what they finally look like is decided by whatever sits behind
+     them — and that differs by 11× between the themes. Dark already supplies a
+     dark backdrop of its own, so the base stays out of the way here. */
+  --well-base: transparent;
 
   --grid-line: rgba(96, 180, 255, 0.055);
   --wm-stroke: rgba(34, 228, 255, 0.16);
@@ -145,16 +174,39 @@
   --c-deep: #d9eafb;
   --c-navy: #164e7a;
   --c-neon: #0284c7;
-  --c-text: #0b2a4a;
-  --c-muted: #47688e;
+  /* Same tier on the light ground, and this is the half that was actually
+     failing. Measured on the composited light card (--glass-a over the
+     retuned ground, luminance 237.9) and on the darkest patch of that ground
+     (mean − 2sd = 150), which is the worst case any text over the background
+     lands on:
+       --c-text  #0b2a4a → #0a1119   card 12.53:1 → 16.35:1, ground 4.92 → 6.41
+       --c-muted #47688e → #2c4059   card  4.97:1 →  9.12:1, ground 1.95 → 3.58
+     The muted tier over open background still does not reach 4.5 — it cannot
+     without collapsing into the primary tier — but it is a 1.8× gain and the
+     text that sits there (hero badges, sub-copy) is secondary by design.
+     --c-chrome stays on the old navy: it drives borders and chrome fills, not
+     type, and neutralising it would drain the cool cast from every hairline. */
+  --c-text: #0a1119;
+  --c-muted: #2c4059;
   --c-chrome: 11 42 74;
 
   --bg-grad-a: rgba(217, 237, 255, 0.5);
   --bg-grad-b: rgba(242, 248, 255, 0.4);
   --bg-grad-c: rgba(227, 240, 253, 0.35);
-  --veil-1: rgba(255, 255, 255, 0.3);
-  --veil-2: rgba(255, 255, 255, 0.62);
-  --veil-rad: rgba(190, 222, 250, 0.3);
+  /* These are the only layers between the viewer and the day footage, and they
+     were set high enough to erase it. Measured on the live frame (mean
+     luminance 122.1, sd 35.7): at the old 0.62/0.30 the composite landed at
+     mean 215.5 with sd 11.6 — a Weber contrast of 5.4%, against the dark
+     theme's 25.4% for the same stack. The footage was still animating; it had
+     simply been compressed into the top 5% of the range, where the eye cannot
+     resolve it. A white veil over a light ground is not the mirror of a dark
+     veil over a dark one: it raises the mean and divides the contrast at once.
+     0.38/0.18 restores 11.4% while the darkest patch of veiled footage still
+     holds 4.92:1 against --c-text, so body copy over the background keeps AA.
+     Do not raise these again without re-checking that ratio. */
+  --veil-1: rgba(255, 255, 255, 0.18);
+  --veil-2: rgba(255, 255, 255, 0.38);
+  --veil-rad: rgba(190, 222, 250, 0.18);
   --veil-glow: rgba(2, 132, 199, 0.1);
 
   --glass-a: rgba(255, 255, 255, 0.72);
@@ -167,6 +219,17 @@
   --glass-sbrd: rgba(0, 130, 200, 0.32);
   --glass-fb: rgba(255, 255, 255, 0.72);
   --glass-sshadow: 0 30px 80px -26px rgba(20, 60, 120, 0.4);
+  --glass-edge: rgba(16, 60, 110, 0.1);
+  /* …and light does not, which is the whole of Bug D. Measured: the identical
+     declaration composites to 19.0 → 11.3 over the dark card and
+     **116.6 → 65.6** over the light one — a six-fold brighter, washed panel
+     that also transmits 45% of the backdrop at its top edge, which is how the
+     hull and sea came through. This is an opaque navy at luminance 22.05,
+     chosen to reproduce the dark theme's own ground (21.0), so the existing
+     gradients land where they always did instead of being re-tinted by the
+     page behind them. Not a lightened well: §3.5 is explicit that these read
+     as dark instrument screens in BOTH themes. */
+  --well-base: #0a1730;
 
   --grid-line: rgba(2, 90, 160, 0.07);
   --wm-stroke: rgba(2, 132, 199, 0.13);
@@ -184,6 +247,9 @@
   /* Mint on white fails contrast; this teal holds ≈5:1 on the light card. */
   --stat-hero: #0f766e;
   --stat-hero-glow: transparent;
+  /* Same hues resolved against a near-white card: 4.72:1 and 4.62:1. */
+  --status-ok: #0f766e;
+  --status-busy: #0e7490;
 
   --glow: rgba(2, 132, 199, 0.32);
   --glow-soft: rgba(2, 132, 199, 0.22);
@@ -537,14 +603,12 @@ input:focus-visible,
   background:
     radial-gradient(circle at 50% 45%, rgba(34, 228, 255, 0.07), transparent 62%),
     linear-gradient(160deg, rgba(6, 18, 44, 0.55), rgba(3, 8, 24, 0.75));
+  /* Longhand AFTER the shorthand — `background:` resets background-color to
+     transparent, so this order is load-bearing. */
+  background-color: var(--well-base);
   contain: paint;
-  /* Depth: a hairline inner rim plus a corner falloff, so the well reads as a
-     recessed instrument screen rather than a flat panel. Inset shadows only —
-     no extra nodes, nothing that can affect layout. */
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    inset 0 0 0 1px rgba(34, 228, 255, 0.05),
-    inset 0 -28px 44px -30px rgba(0, 0, 0, 0.85);
+  /* The recessed treatment lives on `.card-inset`, which every well also
+     carries — see the note there for why it cannot live here. */
   backdrop-filter: blur(12px) saturate(130%);
   -webkit-backdrop-filter: blur(12px) saturate(130%);
 }
@@ -692,13 +756,9 @@ input:focus-visible,
   background:
     radial-gradient(circle at 22% 40%, rgba(34, 228, 255, 0.09), transparent 58%),
     linear-gradient(160deg, rgba(6, 18, 44, 0.6), rgba(3, 8, 24, 0.8));
+  background-color: var(--well-base);
   contain: paint;
-  /* Same recessed treatment as the neural well, so the two engine cards read as
-     one family. Inset shadows only. */
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    inset 0 0 0 1px rgba(34, 228, 255, 0.05),
-    inset 0 -28px 44px -30px rgba(0, 0, 0, 0.85);
+  /* Recessed treatment: see `.card-inset`. */
   backdrop-filter: blur(12px) saturate(130%);
   -webkit-backdrop-filter: blur(12px) saturate(130%);
 }
@@ -1008,10 +1068,22 @@ input:focus-visible,
   background: linear-gradient(155deg, var(--glass-a), var(--glass-b));
   /* Blur radius is the dominant backdrop-filter cost; 6px keeps the frosted
      look while cutting the per-frame compositor work during scroll. */
+  /* Declare the UNPREFIXED property only, and let the minifier add the vendor
+     form. Writing both by hand is what silently disabled this effect for the
+     life of this project: Lightning CSS treats the hand-written
+     `-webkit-` line as the winner and drops the standard property, and Chrome
+     does not implement the prefixed spelling at all
+     (`CSS.supports('-webkit-backdrop-filter','blur(6px)')` is **false** on
+     Chrome 148), so the surface resolved to `none`. `.btn-ghost` declared only
+     the unprefixed property and was the one rule that always blurred — this
+     now matches it. Verify after any change to this rule by reading the
+     computed `backdropFilter`, never by reading the source. */
   backdrop-filter: blur(6px) saturate(140%);
-  -webkit-backdrop-filter: blur(6px) saturate(140%);
   border: 1px solid var(--glass-brd);
-  box-shadow: inset 0 1px 0 var(--glass-inset), var(--glass-shadow);
+  box-shadow:
+    inset 0 1px 0 var(--glass-inset),
+    inset 0 -1px 0 var(--glass-edge),
+    var(--glass-shadow);
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -1021,10 +1093,13 @@ input:focus-visible,
 .glass-strong {
   background: var(--glass-fb);
   background: linear-gradient(155deg, var(--glass-sa), var(--glass-sb));
+  /* Unprefixed only — see the note on `.glass`. */
   backdrop-filter: blur(6px) saturate(140%);
-  -webkit-backdrop-filter: blur(6px) saturate(140%);
   border: 1px solid var(--glass-sbrd);
-  box-shadow: inset 0 1px 0 var(--glass-inset), var(--glass-sshadow);
+  box-shadow:
+    inset 0 1px 0 var(--glass-inset),
+    inset 0 -1px 0 var(--glass-edge),
+    var(--glass-sshadow);
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -1229,6 +1304,7 @@ input:focus-visible,
   background:
     radial-gradient(circle at 50% 50%, rgba(34, 228, 255, 0.07), transparent 62%),
     linear-gradient(160deg, rgba(6, 18, 44, 0.55), rgba(3, 8, 24, 0.75));
+  background-color: var(--well-base);
   contain: paint;
 }
 
@@ -1583,7 +1659,20 @@ input[type="range"].oq-range::-moz-range-track {
 /* Inset well — the recessed surface a visualisation sits in. */
 .card-inset {
   border: 1px solid var(--hairline);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  /* The recessed instrument-screen material for all three wells — `.nf`,
+     `.bay` and `.radar-scope` are this class's only users.
+
+     It has to be declared HERE and nowhere else. `.nf` and `.bay` each carried
+     their own three-layer version, and neither ever rendered: this rule is
+     later in the sheet at equal specificity (0,1,0), so its single-layer
+     box-shadow silently replaced theirs. Measured before the move — all three
+     wells computed `rgba(255,255,255,0.03) 0 1px 0 inset` and nothing else.
+     Declaring it once removes the source-order dependency and is what finally
+     makes the radar scope match its two siblings. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(34, 228, 255, 0.05),
+    inset 0 -28px 44px -30px rgba(0, 0, 0, 0.85);
 }
 /* The visualisations inside these wells are drawn for a dark ground (neon on
    navy). On the light theme the well keeps its dark floor rather than
@@ -1591,8 +1680,13 @@ input[type="range"].oq-range::-moz-range-track {
    and the neon retains its contrast instead of washing out. */
 [data-theme="light"] .card-inset {
   border-color: rgba(16, 60, 110, 0.22);
+  /* Outranks the base rule (0,2,0), so it must restate the recessed layers or
+     the light wells lose them. The well is dark in this theme too, so the same
+     rim and falloff apply; only the outer drop is theme-specific. */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 1px rgba(34, 228, 255, 0.05),
+    inset 0 -28px 44px -30px rgba(0, 0, 0, 0.85),
     0 1px 3px rgba(20, 60, 120, 0.12);
 }
 
@@ -1704,7 +1798,7 @@ input[type="range"].oq-range::-moz-range-track {
 }
 /* The live eyebrow states it in words while the figures settle. */
 .live-eyebrow.is-computing {
-  color: #5eead4;
+  color: var(--status-busy);
 }
 /* Route arc quickens while the engine recomputes, then returns to its idle
    cadence — the visualisation is tied to the same state as the numbers. */
@@ -1791,7 +1885,10 @@ input[type="range"].oq-range::-moz-range-track {
   color: #f0b45f;
 }
 [data-theme="light"] .cf-val-cost {
-  color: #a16207;
+  /* Was #a16207, which measured 4.24:1 on the light card — just under AA at
+     this 17px weight. Darkened the minimum that clears it (4.90:1) so the
+     amber still reads as amber rather than brown. */
+  color: #945906;
 }
 .cf-key {
   font-family: var(--font-mono);
@@ -1962,7 +2059,7 @@ input[type="range"].oq-range::-moz-range-track {
   color: var(--c-neon);
 }
 .live-eyebrow-ok {
-  color: #6ee7b7;
+  color: var(--status-ok);
 }
 [lang="ar"] .live-eyebrow {
   font-family: var(--font-ar-tech);
@@ -2031,6 +2128,25 @@ input[type="range"].oq-range::-moz-range-track {
 [lang="ar"] .radar-readout-val {
   font-family: var(--font-ar-tech);
   letter-spacing: 0;
+}
+
+/* ═══════════════════════ Mobile menu ═══════════════════════
+   `safe center` is the whole point. Plain `center` centres even when the
+   content is taller than the box, pushing the overflow out both ends — and the
+   start-edge half is unreachable, because scrolling cannot travel above a
+   flex container's own content origin. `safe` falls back to flex-start the
+   moment centring would overflow, so the first row stays reachable; the
+   reserved padding keeps it clear of the header. The unprefixed `center`
+   above it is the fallback for engines that reject the `safe` keyword and
+   drop the declaration — declaration order, not class order, decides.       */
+.nav-menu {
+  justify-content: center;
+  justify-content: safe center;
+  overflow-y: auto;
+  /* A menu that does scroll must not hand the gesture to the page behind it. */
+  overscroll-behavior: contain;
+  padding-top: var(--nav-clear);
+  padding-bottom: 2rem;
 }
 
 /* ═══════════════════════ Language pill ═══════════════════════

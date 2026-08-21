@@ -200,10 +200,19 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* mobile menu (below navbar lock so the toggle stays interactive) */}
+      {/* mobile menu (below navbar lock so the toggle stays interactive).
+
+          `.nav-menu` carries the vertical contract: nine rows at the desktop
+          type scale measured 685px against a 664px phone viewport, and plain
+          `justify-content: center` split that 21px overflow across BOTH ends —
+          row 01 landed at -10.5px, unreachable because nothing scrolled, and
+          entirely behind this header, which outranks the menu in z-order. Row
+          02 was the first thing the eye found, 16.5px of it clipped. The row
+          padding and type step below `sm` are what bring all nine back inside
+          a phone viewport; `.nav-menu` guarantees the rest. */}
       <div
         className={cn(
-          "fixed inset-0 z-[9998] flex flex-col justify-center gap-2 px-8 transition-all duration-500 lg:hidden",
+          "nav-menu fixed inset-0 z-[9998] flex flex-col gap-2 px-8 transition-all duration-500 lg:hidden",
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         )}
         style={{
@@ -217,11 +226,11 @@ export default function Navbar() {
             key={id}
             href={`#${id}`}
             onClick={() => setOpen(false)}
-            className="group flex items-baseline gap-4 border-b border-chrome/10 py-4"
+            className="group flex items-baseline gap-4 border-b border-chrome/10 py-2 sm:py-4"
             style={{ transitionDelay: `${i * 40}ms` }}
           >
             <span className="font-mono text-[10px] text-neon/60">0{i + 1}</span>
-            <span className="font-display text-3xl font-semibold text-ice transition-colors group-hover:text-neon">
+            <span className="font-display text-2xl font-semibold text-ice transition-colors group-hover:text-neon sm:text-3xl">
               {menuLabels[id]}
             </span>
           </a>

@@ -84,7 +84,29 @@ export function Reveal({
    to this element's own transform — no feedback loop — and it is measured only
    outside the scroll callback, because the engine forbids layout reads inside
    the frame loop.
+
+   BOTH modes are additionally bounded by the room the element has inside its
+   nearest vertically-clipping ancestor. Without that, the default mode rides
+   content past the clip edge and the ancestor slices it flat — a hard
+   horizontal cut with no border and no radius, straight through whatever card
+   happens to be there. The Hero hit exactly this on phones: its single-column
+   stack leaves only `pb-36` (144px) of slack, while 0.22 × scroll reaches
+   326px before the section leaves the viewport, severing the vessel card 24px
+   above the stats card.
 ────────────────────────────────────────────────────────────────────────── */
+/* Cards here carry a box-shadow reaching ~51px below their border box
+   (--glass-sshadow is `0 30px 90px -24px`: 30 down, less 24 spread, plus half
+   the 90px radius). Stopping the shift exactly at the clip edge keeps the card
+   whole but shears that box-shadow off square, which trades a hard cut for a
+   soft one rather than removing it. Hold this much of the slack back so the
+   box-shadow lands inside the clip box too.
+
+   Always write it hyphenated, never as the bare noun: Tailwind scans this file
+   for class candidates, so a standalone occurrence of that word compiles a
+   dead utility of the same name into the production sheet — 243 bytes of CSS
+   that nothing references. Measured, not theorised. */
+const CLIP_MARGIN = 52;
+
 export function Parallax({
   speed = 0.15,
   anchor = false,
@@ -99,28 +121,55 @@ export function Parallax({
   const ref = useRef<HTMLDivElement>(null);
   const centre = useRef(0);
   const halfHeight = useRef(0);
+  const slackDown = useRef(Infinity);
+  const slackUp = useRef(Infinity);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    const measure = () => {
+    /* Layout offset of `node` within `stop` (or the document when stop is null). */
+    const offsetWithin = (node: HTMLElement, stop: HTMLElement | null) => {
       let y = 0;
-      for (let n: HTMLElement | null = el; n; n = n.offsetParent as HTMLElement | null) y += n.offsetTop;
-      halfHeight.current = el.offsetHeight / 2;
-      centre.current = y + halfHeight.current;
+      for (let n: HTMLElement | null = node; n && n !== stop; n = n.offsetParent as HTMLElement | null) {
+        y += n.offsetTop;
+      }
+      return y;
     };
 
-    let ro: ResizeObserver | null = null;
-    if (anchor) {
-      measure();
-      window.addEventListener("resize", measure, { passive: true });
-      /* `content-visibility` sections resolve their real height only as they
-         approach the viewport, which shifts every anchor below them. */
-      if (typeof ResizeObserver !== "undefined") {
-        ro = new ResizeObserver(measure);
-        ro.observe(document.documentElement);
+    const measure = () => {
+      halfHeight.current = el.offsetHeight / 2;
+      centre.current = offsetWithin(el, null) + halfHeight.current;
+
+      /* Nearest ancestor that clips vertically — the box that would slice us.
+         `overflowY` rather than the `overflow` shorthand: the page wrapper sets
+         only `overflow-x`, and the shorthand reads back as a two-axis value
+         there, which a plain !== "visible" test would wrongly treat as a clip. */
+      slackDown.current = Infinity;
+      slackUp.current = Infinity;
+      let clip: HTMLElement | null = el.parentElement;
+      while (clip && clip !== document.body && getComputedStyle(clip).overflowY === "visible") {
+        clip = clip.parentElement;
       }
+      if (clip && clip !== document.body) {
+        const top = offsetWithin(el, clip);
+        /* Only trust the figure when the offset chain actually reaches the clip
+           box; an unpositioned ancestor would otherwise yield a bogus origin. */
+        if (top >= 0 && el.offsetHeight <= clip.clientHeight) {
+          slackUp.current = Math.max(0, top - CLIP_MARGIN);
+          slackDown.current = Math.max(0, clip.clientHeight - (top + el.offsetHeight) - CLIP_MARGIN);
+        }
+      }
+    };
+
+    measure();
+    window.addEventListener("resize", measure, { passive: true });
+    /* `content-visibility` sections resolve their real height only as they
+       approach the viewport, which shifts every anchor below them. */
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(measure);
+      ro.observe(document.documentElement);
     }
 
     const unsubscribe = subscribeScroll((f) => {
@@ -135,15 +184,19 @@ export function Parallax({
         if (d > travel) d = travel;
         else if (d < -travel) d = -travel;
       }
-      el.style.transform = `translate3d(0, ${(d * speed).toFixed(2)}px, 0)`;
+      let shift = d * speed;
+      /* Never displace past the clip box: the cut it would make is worse than
+         the parallax is worth. Holding at the bound is what `anchor` already
+         does at the end of its travel, so the motion still settles smoothly. */
+      if (shift > slackDown.current) shift = slackDown.current;
+      else if (shift < -slackUp.current) shift = -slackUp.current;
+      el.style.transform = `translate3d(0, ${shift.toFixed(2)}px, 0)`;
     });
 
     return () => {
       unsubscribe();
-      if (anchor) {
-        window.removeEventListener("resize", measure);
-        ro?.disconnect();
-      }
+      window.removeEventListener("resize", measure);
+      ro?.disconnect();
     };
   }, [speed, anchor]);
 
