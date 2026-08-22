@@ -1302,13 +1302,6 @@ input:focus-visible,
 }
 
 /* video treatment per theme */
-.bg-poster {
-  opacity: 0.85;
-}
-[data-theme="light"] .bg-poster {
-  opacity: 0.75;
-  filter: brightness(1.08) saturate(1.05);
-}
 .bg-video {
   filter: none;
   /* Day/night cross-fade. Opacity is the only animated property — compositor
@@ -1320,7 +1313,7 @@ input:focus-visible,
 [data-theme="light"] .bg-video-day {
   filter: brightness(1.22) saturate(1.08);
 }
-/* Stack the two videos; the poster sits beneath both. */
+/* Stack the two videos; the background gradient sits beneath both. */
 .bg-video-day {
   z-index: 1;
 }

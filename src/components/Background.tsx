@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { subscribeScroll } from "../lib/scroll";
 import { useTheme } from "../lib/theme";
-import poster from "../assets/poster.jpg";
 
 /**
  * Scroll-scrubbed background — canvas frame sequence, no <video> element.
@@ -280,9 +279,9 @@ export default function Background() {
       {/* Camera layer — the ONLY element the scroll engine transforms. Its own
           compositing layer: each frame is a GPU transform, no layout, no paint. */}
       <div ref={moverRef} className="bg-camera absolute inset-0">
-        {/* Placeholder until the first frame decodes. */}
-        <img src={poster} alt="" className="bg-poster absolute inset-0 h-full w-full object-cover" />
-
+        {/* No placeholder image: the radial gradient above this layer already
+            covers the moment before the first frame decodes, and the stock
+            aerial that used to sit here matched neither sequence. */}
         <FrameCanvas
           base={seqBase("day", setKey)}
           active={!nightActive}
