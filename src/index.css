@@ -1440,12 +1440,21 @@ input:focus-visible,
 /* One rotating conic wedge: bright leading edge decaying into a persistence
    tail. Rotation is a pure GPU transform. */
 .radar-sweep {
+  /* Persistence tail. The previous ramp died at 72° in four stops, which ends
+     the trail while it is still visibly bright — it read as a rotating wedge
+     rather than as decaying phosphor. Seven stops out to 128° approximate an
+     exponential decay, so the tail thins away instead of stopping. Still one
+     conic gradient on one compositor layer: the extra stops are rasterised once
+     and cost nothing per frame. */
   background: conic-gradient(
     from 0deg,
-    rgba(34, 228, 255, 0.55) 0deg,
-    rgba(34, 228, 255, 0.16) 14deg,
-    rgba(34, 228, 255, 0.05) 40deg,
-    transparent 72deg,
+    rgba(34, 228, 255, 0.5) 0deg,
+    rgba(34, 228, 255, 0.28) 10deg,
+    rgba(34, 228, 255, 0.15) 26deg,
+    rgba(34, 228, 255, 0.075) 48deg,
+    rgba(34, 228, 255, 0.032) 74deg,
+    rgba(34, 228, 255, 0.012) 100deg,
+    transparent 128deg,
     transparent 360deg
   );
   -webkit-mask-image: radial-gradient(circle, #000 0 46%, transparent 46.5%);
@@ -1454,6 +1463,21 @@ input:focus-visible,
   will-change: transform;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
+}
+/* Leading edge of the beam. A real PPI has a crisp bright line at the head of
+   the trail; without it the wedge has no defined front and the rotation reads as
+   a smear. A child of the sweep, so it inherits the same rotation and the same
+   circular mask — no second animation, no extra layer. */
+.radar-sweep::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 50%;
+  width: 1.5px;
+  margin-left: -0.75px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, rgba(34, 228, 255, 0) 0%, rgba(34, 228, 255, 0.55) 62%, rgba(34, 228, 255, 0.95) 100%);
 }
 @keyframes radarsweep {
   to {

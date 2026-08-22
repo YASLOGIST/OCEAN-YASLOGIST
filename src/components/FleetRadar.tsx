@@ -111,6 +111,21 @@ export default function FleetRadar() {
         <circle cx="50" cy="50" r="1.1" fill="var(--c-neon)" />
         <circle cx="50" cy="50" r="3" fill="none" stroke="var(--c-neon)" strokeOpacity="0.5" strokeWidth="0.25" />
 
+        {/* Range-ring calibration. The outer ring is the RANGE readout, so the
+            inner rings are its even divisions — the rings meant something
+            already, this states what. Offset off the 180 spoke so the numerals
+            never sit on a line. */}
+        {[
+          { r: 11.5, v: "3" },
+          { r: 23, v: "6" },
+          { r: 34.5, v: "9" },
+        ].map(({ r, v }) => (
+          <text key={v} x="51.8" y={50 + r - 1.1} fill="var(--well-muted)" fillOpacity="0.7"
+                fontSize="2.6" textAnchor="start" style={bearing.style}>
+            {v}
+          </text>
+        ))}
+
         {["000", "090", "180", "270"].map((lbl, i) => {
           const rad = ((i * 90 - 90) * Math.PI) / 180;
           return (
@@ -118,7 +133,7 @@ export default function FleetRadar() {
               key={lbl}
               x={50 + Math.cos(rad) * 40}
               y={50 + Math.sin(rad) * 40 + 1.2}
-              fill="var(--c-muted)"
+              fill="var(--well-muted)"
               fontSize="3"
               textAnchor={bearing.textAnchor}
               style={bearing.style}
