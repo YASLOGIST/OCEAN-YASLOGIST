@@ -76,6 +76,15 @@
   --card-pad-lg: 1.75rem;
   --card-radius: 1rem;
   --card-gap: 0.75rem;
+  /* The two lit edges that make a pane read as a pane rather than a tinted
+     rectangle: a rim highlight across its head and a darker line under its
+     foot. Declared once because `box-shadow` is a single property — a rule
+     that sets it restates the whole list, it cannot add a layer — and three
+     separate rules had already drifted into dropping one or both. Composed
+     from theme tokens, so it resolves per theme at the point of use. */
+  --glass-edges:
+    inset 0 1px 0 var(--glass-inset),
+    inset 0 -1px 0 var(--glass-edge);
   /* Dark-theme defaults; [data-theme="light"] redefines all five. */
   --hairline: rgba(255, 255, 255, 0.05);
   --tile-bg: rgba(255, 255, 255, 0.025);
@@ -146,6 +155,13 @@
      them — and that differs by 11× between the themes. Dark already supplies a
      dark backdrop of its own, so the base stays out of the way here. */
   --well-base: transparent;
+  /* Ground under the page footer — the same principle as `--well-base`, one
+     level up. The footer declares no surface of its own, so its copy sits
+     straight on the scroll-scrubbed footage. Here `.bg-night-veil` already
+     supplies one: measured at mid-viewport against the brightest tenth of
+     the night sequence, --c-text holds 14.9:1 and --c-muted 7.7:1, so this
+     stays out of the way. */
+  --footer-ground: none;
 
   --grid-line: rgba(96, 180, 255, 0.055);
   --wm-stroke: rgba(34, 228, 255, 0.16);
@@ -230,6 +246,17 @@
      page behind them. Not a lightened well: §3.5 is explicit that these read
      as dark instrument screens in BOTH themes. */
   --well-base: #0a1730;
+  /* …and light supplies nothing at mid-viewport, where the veil gradient's
+     middle stop is fully see-through. The same copy measured 3.7:1 for
+     --c-muted over the mean of the day sequence and 1.6:1 over its darkest
+     tenth, against a 4.5:1 threshold. An opaque ground on --c-bg restores
+     9.5:1 — which is what the muted tier already gets on a light card — so
+     the footer stops being the one region that reads unlike the rest of the
+     page. The ramp is 2rem, the footer's own top padding, so it reaches
+     full strength exactly at the hairline above the first column and no
+     copy ever lands on a partial ground. Gradient interpolation is
+     premultiplied, so ramping up from nothing carries no grey cast. */
+  --footer-ground: linear-gradient(180deg, transparent 0, var(--c-bg) 2rem, var(--c-bg) 100%);
 
   --grid-line: rgba(2, 90, 160, 0.07);
   --wm-stroke: rgba(2, 132, 199, 0.13);
@@ -550,7 +577,7 @@ input:focus-visible,
      hairline on the white light-theme card. Only the outer glow is added here,
      built from the theme's own `--glow-soft`. */
   box-shadow:
-    inset 0 1px 0 var(--glass-inset),
+    var(--glass-edges),
     0 0 70px -10px var(--glow-soft),
     var(--glass-sshadow);
 }
@@ -608,9 +635,17 @@ input:focus-visible,
   background-color: var(--well-base);
   contain: paint;
   /* The recessed treatment lives on `.card-inset`, which every well also
-     carries — see the note there for why it cannot live here. */
-  backdrop-filter: blur(12px) saturate(130%);
-  -webkit-backdrop-filter: blur(12px) saturate(130%);
+     carries — see the note there for why it cannot live here.
+
+     No `backdrop-filter` here, deliberately. This rule used to declare the
+     standard property and the vendor spelling by hand, which makes Lightning
+     CSS keep only the vendor line — a spelling Chrome does not implement —
+     so the well computed `none` for the life of the project. Repairing it
+     would buy a dark-theme-only softening of the card gradient behind an
+     already dark screen, and pay a compositor surface for it; in light the
+     well sits on an opaque `--well-base` and there is nothing left behind it
+     to soften at all. Removed rather than repaired, so the source says what
+     the browser actually does. `.bay` points back at this note. */
 }
 
 /* Live-inference marker, pinned to the well's leading corner. Logical inset so
@@ -737,7 +772,12 @@ input:focus-visible,
 .solution-card:hover {
   transform: translate3d(0, -2px, 0);
   border-color: var(--accent-ring);
+  /* `--glass-edges` first: this element is always `.glass` (Solutions.tsx),
+     and a rule that sets `box-shadow` replaces the pane material outright
+     rather than adding to it. Without the token restated here the card threw
+     away both of its lit edges the moment the pointer arrived. */
   box-shadow:
+    var(--glass-edges),
     0 0 0 1px var(--accent-ring),
     0 14px 34px -18px var(--accent-rule),
     var(--glass-shadow);
@@ -758,9 +798,8 @@ input:focus-visible,
     linear-gradient(160deg, rgba(6, 18, 44, 0.6), rgba(3, 8, 24, 0.8));
   background-color: var(--well-base);
   contain: paint;
-  /* Recessed treatment: see `.card-inset`. */
-  backdrop-filter: blur(12px) saturate(130%);
-  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  /* Recessed treatment: see `.card-inset`. No `backdrop-filter` either, and
+     for the reason spelled out on `.nf`. */
 }
 
 /* ── Process ribbon ────────────────────────────────────────────────────
@@ -1081,8 +1120,7 @@ input:focus-visible,
   backdrop-filter: blur(6px) saturate(140%);
   border: 1px solid var(--glass-brd);
   box-shadow:
-    inset 0 1px 0 var(--glass-inset),
-    inset 0 -1px 0 var(--glass-edge),
+    var(--glass-edges),
     var(--glass-shadow);
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -1097,8 +1135,7 @@ input:focus-visible,
   backdrop-filter: blur(6px) saturate(140%);
   border: 1px solid var(--glass-sbrd);
   box-shadow:
-    inset 0 1px 0 var(--glass-inset),
-    inset 0 -1px 0 var(--glass-edge),
+    var(--glass-edges),
     var(--glass-sshadow);
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -1297,6 +1334,19 @@ input:focus-visible,
   z-index: 3;
   background: linear-gradient(180deg, rgba(2, 6, 20, 0.52), rgba(2, 6, 20, 0.68));
   transition: opacity 0.7s ease;
+}
+
+/* ═══════════════════════ Page footer ═══════════════════════
+   The one region of the document that carried no surface of its own — see
+   `--footer-ground` in the theme blocks for the measurements and for why
+   this resolves to nothing at all in the dark theme.
+
+   `background-image` and nothing else: no `contain`, no `isolation`, no
+   `z-index`, no `transform`. `LegalModal` renders inside this element and
+   escapes to the viewport on `position: fixed`; any one of those would make
+   this a containing block or a stacking context and trap it. */
+.site-footer {
+  background-image: var(--footer-ground);
 }
 
 /* ═══════════════════════ Fleet radar scope (Engine 02) ═══════════════════════ */
@@ -1572,6 +1622,29 @@ input[type="range"].oq-range::-moz-range-track {
     0 18px 44px -18px rgba(0, 90, 170, 0.3),
     var(--glass-sshadow);
 }
+/* `.card-lift` is worn by two different bases: the Hero micro-card, which is
+   a `.glass` pane, and the Stats tiles, which are see-through cells inside a
+   `.glass` wrapper. The two rules above replace the pane material outright,
+   which costs the Hero card both of its lit edges on hover and costs the
+   Stats tiles nothing, because they never had any. So the edges are restated
+   for the pane case ONLY — compounding on `.glass` keeps the tiles exactly
+   as they are. Specificity is deliberate: (0,3,0) beats the base rule, and
+   the light variant is (0,4,0) so it still outranks the (0,3,0)
+   `[data-theme="light"] .card-lift:hover` above it. */
+.glass.card-lift:hover {
+  box-shadow:
+    var(--glass-edges),
+    0 0 0 1px rgba(0, 229, 255, 0.14),
+    0 18px 50px -18px rgba(0, 229, 255, 0.28),
+    var(--glass-sshadow);
+}
+[data-theme="light"] .glass.card-lift:hover {
+  box-shadow:
+    var(--glass-edges),
+    0 0 0 1px rgba(0, 120, 190, 0.18),
+    0 18px 44px -18px rgba(0, 90, 170, 0.3),
+    var(--glass-sshadow);
+}
 
 /* ═══════════════════════ Brand assets ═══════════════════════ */
 
@@ -1581,8 +1654,11 @@ input[type="range"].oq-range::-moz-range-track {
 .brand-mark {
   border-radius: 9999px;
   background: linear-gradient(155deg, var(--glass-a), var(--glass-b));
+  /* Unprefixed only — see the note on `.glass`. Declaring both spellings by
+     hand left this disc computing `none`, and unlike the instrument wells it
+     genuinely sits on the moving footage: the header bar behind it is fully
+     see-through until the page scrolls. */
   backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 1px solid rgba(34, 211, 238, 0.5);
   box-shadow:
     0 0 15px rgba(6, 182, 212, 0.5),
@@ -2164,8 +2240,10 @@ input[type="range"].oq-range::-moz-range-track {
   border-radius: 9999px;
   border: 1px solid var(--hairline);
   background: linear-gradient(155deg, var(--glass-a), var(--glass-b));
+  /* Unprefixed only — see the note on `.glass`. Same situation as
+     `.brand-mark`: this pill is on the footage whenever the page is at rest
+     at the head of the document. */
   backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
   box-shadow: inset 0 1px 0 var(--glass-inset);
   transition:
     border-color var(--dur-base) ease,

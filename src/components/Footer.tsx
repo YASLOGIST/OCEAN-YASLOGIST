@@ -14,7 +14,7 @@ export default function Footer() {
   }));
 
   return (
-    <footer className="relative overflow-hidden px-6 pb-10 pt-8 lg:px-10">
+    <footer className="site-footer relative overflow-hidden px-6 pb-10 pt-8 lg:px-10">
       {/* link columns */}
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-10 border-t border-chrome/10 pt-14 md:grid-cols-5">
         <div className="col-span-2">
