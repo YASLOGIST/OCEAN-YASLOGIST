@@ -48,16 +48,27 @@ const OUT_X = 380;
 const WINNER = 1;
 
 /* Deterministic edge set — a fixed, sparse topology reads as a real network;
-   a fully-connected mesh reads as noise. */
-const E1: Array<[number, number]> = [
-  [0, 0], [0, 1], [0, 2],
-  [1, 1], [1, 3],
-  [2, 0], [2, 2], [2, 4],
-  [3, 3], [3, 4],
+   a fully-connected mesh reads as noise. Third element is the edge weight. A uniform 1px stroke made every connection
+   look equally important, which is precisely what a trained network is not —
+   varying stroke and opacity by weight is what makes the topology read as
+   learned rather than drawn. Fixed values, not random: the same picture has to
+   come back on every render and in every screenshot. */
+const E1: Array<[number, number, number]> = [
+  [0, 0, 0.92], [0, 1, 0.54], [0, 2, 0.33],
+  [1, 1, 0.78], [1, 3, 0.47],
+  [2, 0, 0.41], [2, 2, 0.88], [2, 4, 0.62],
+  [3, 3, 0.71], [3, 4, 0.36],
 ];
-const E2: Array<[number, number]> = [
-  [0, 0], [1, 0], [1, 1], [2, 1], [3, 1], [3, 2], [4, 2],
+const E2: Array<[number, number, number]> = [
+  [0, 0, 0.58], [1, 0, 0.44], [1, 1, 0.95], [2, 1, 0.83], [3, 1, 0.9], [3, 2, 0.5], [4, 2, 0.66],
 ];
+
+/* Activation of each hidden unit, drawn as a partial ring around the node. The
+   ring uses `pathLength={100}` so the dash array is a literal percentage and the
+   geometry stays correct if the radius ever changes. */
+const ACT = [0.82, 0.64, 0.91, 0.55, 0.73] as const;
+
+const sw = (w: number) => (0.45 + w * 1.05).toFixed(2);
 
 const edge = (x1: number, y1: number, x2: number, y2: number) => {
   const mx = (x1 + x2) / 2;
@@ -121,7 +132,7 @@ export default function NeuralForecast() {
             localized end labels, whose length varies by language. Measured worst
             cases are "Committed" reaching 441.7 in English and the input labels
             reaching 1.6 in Arabic — both would clip against a flush viewBox. */}
-        <svg viewBox="-8 -22 460 218" className="w-full" aria-hidden>
+        <svg viewBox="-8 -22 460 218" className="w-full" shapeRendering="geometricPrecision" aria-hidden>
           <defs>
             <linearGradient id="nfEdge" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#22e4ff" stopOpacity="0.05" />
@@ -143,18 +154,32 @@ export default function NeuralForecast() {
             { x: HID_X, label: n("layerHidden") },
             { x: OUT_X, label: n("layerOut") },
           ].map((c) => (
-            <text key={c.x} x={c.x} y={-10} fill="var(--c-muted)" fontSize="7.5" textAnchor={cap.textAnchor} style={cap.style}>
+            <text key={c.x} x={c.x} y={-10} fill="var(--well-muted)" fontSize="7.5" textAnchor={cap.textAnchor} style={cap.style}>
               {c.label}
             </text>
           ))}
 
-          {/* ── base edges ── */}
-          <g fill="none" stroke="url(#nfEdge)" strokeWidth="1">
-            {E1.map(([a, b], i) => (
-              <path key={`a${i}`} id={`nfe-a${i}`} d={edge(IN_X, INPUTS[a].y, HID_X, HIDDEN[b])} />
+          {/* ── instrument backplane: column rules and a measurement baseline.
+                Drawn from `--well-muted` at low alpha rather than `--grid-line`,
+                which is tuned for the page ground and disappears on the well. ── */}
+          <g className="nf-plane" fill="none" stroke="var(--well-muted)" strokeOpacity="0.1" strokeWidth="0.5">
+            {[IN_X, HID_X, OUT_X].map((x) => (
+              <line key={`c${x}`} x1={x} y1={-4} x2={x} y2={186} />
             ))}
-            {E2.map(([a, b], i) => (
-              <path key={`b${i}`} id={`nfe-b${i}`} d={edge(HID_X, HIDDEN[a], OUT_X, OUTPUTS[b])} />
+            {[10, 55, 100, 145, 186].map((y) => (
+              <line key={`r${y}`} x1={-4} y1={y} x2={444} y2={y} />
+            ))}
+          </g>
+
+          {/* ── base edges, stroked by weight ── */}
+          <g fill="none" stroke="url(#nfEdge)">
+            {E1.map(([a, b, w], i) => (
+              <path key={`a${i}`} id={`nfe-a${i}`} strokeWidth={sw(w)} strokeOpacity={0.35 + w * 0.5}
+                    d={edge(IN_X, INPUTS[a].y, HID_X, HIDDEN[b])} />
+            ))}
+            {E2.map(([a, b, w], i) => (
+              <path key={`b${i}`} id={`nfe-b${i}`} strokeWidth={sw(w)} strokeOpacity={0.35 + w * 0.5}
+                    d={edge(HID_X, HIDDEN[a], OUT_X, OUTPUTS[b])} />
             ))}
           </g>
 
@@ -191,7 +216,7 @@ export default function NeuralForecast() {
             <g key={p.key}>
               <circle cx={IN_X} cy={p.y} r="5" fill="#0b2c5e" stroke="#22e4ff" strokeOpacity="0.75" />
               <circle cx={IN_X} cy={p.y} r="2" fill="#22e4ff" />
-              <text x={IN_X - 12} y={p.y + 3.5} fill="var(--c-muted)" fontSize="8.5" textAnchor={inLabel.textAnchor} style={inLabel.style}>
+              <text x={IN_X - 12} y={p.y + 3.5} fill="var(--well-muted)" fontSize="8.5" textAnchor={inLabel.textAnchor} style={inLabel.style}>
                 {n(`in${i}`)}
               </text>
             </g>
@@ -201,17 +226,27 @@ export default function NeuralForecast() {
           {HIDDEN.map((y, i) => {
             const onPath = WIN_HIDDEN.includes(i);
             return (
-              <circle
-                key={y}
-                cx={HID_X}
-                cy={y}
-                r={onPath ? 7 : 6.5}
-                fill="#08183a"
-                stroke={onPath ? "#34d399" : "#38bdf8"}
-                strokeOpacity={onPath ? 0.85 : 0.6}
-                className="nf-node"
-                style={{ animationDelay: `${i * 0.3}s` }}
-              />
+              <g key={y}>
+                {/* Activation ring: how hard this unit is firing, as a share of
+                    its circumference. Static geometry — no animation cost. */}
+                <circle cx={HID_X} cy={y} r="10.5" fill="none"
+                        stroke={onPath ? "#34d399" : "#38bdf8"} strokeOpacity="0.2" strokeWidth="1.4" />
+                <circle cx={HID_X} cy={y} r="10.5" fill="none"
+                        stroke={onPath ? "#34d399" : "#38bdf8"} strokeOpacity={onPath ? 0.9 : 0.55}
+                        strokeWidth="1.4" strokeLinecap="round" pathLength={100}
+                        strokeDasharray={`${(ACT[i] * 100).toFixed(1)} 100`}
+                        transform={`rotate(-90 ${HID_X} ${y})`} />
+                <circle
+                  cx={HID_X}
+                  cy={y}
+                  r={onPath ? 7 : 6.5}
+                  fill="#08183a"
+                  stroke={onPath ? "#34d399" : "#38bdf8"}
+                  strokeOpacity={onPath ? 0.85 : 0.6}
+                  className="nf-node"
+                  style={{ animationDelay: `${i * 0.3}s` }}
+                />
+              </g>
             );
           })}
 
@@ -226,7 +261,7 @@ export default function NeuralForecast() {
                     sized for Arabic, not Latin: Cairo's glyph box measures 16.04
                     units at 8.5px — nearly twice the Latin box — because of
                     diacritic ascenders, and a Latin-sized gap collides. */}
-                <text x={OUT_X + 15} y={win ? y - 5 : y + 3.5} fill={win ? "#34d399" : "var(--c-muted)"} fontSize="8.5" textAnchor={outLabel.textAnchor} style={outLabel.style}>
+                <text x={OUT_X + 15} y={win ? y - 5 : y + 3.5} fill={win ? "#34d399" : "var(--well-muted)"} fontSize="8.5" textAnchor={outLabel.textAnchor} style={outLabel.style}>
                   {n(`rt${i}`)}
                 </text>
                 {/* Confidence pinned to the node it belongs to. Same value as the

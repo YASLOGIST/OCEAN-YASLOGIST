@@ -174,6 +174,16 @@
      them — and that differs by 11× between the themes. Dark already supplies a
      dark backdrop of its own, so the base stays out of the way here. */
   --well-base: transparent;
+  /* Ink for the instrument wells (`.nf`, `.bay`, `.radar-scope`). Those read as
+     dark screens in BOTH themes by design (§3.5), so their labels must not
+     follow `--c-muted`: that token flips to a dark navy in light and lands
+     dark-on-dark. Measured against the well's own rgb(10,23,48): 1.68:1, for 9
+     of the 12 forecast labels and all four radar bearings. These are the dark
+     theme's own text tiers reused unchanged — no new colour enters the palette —
+     and because they are declared on `:root` the light block inherits them
+     rather than overriding them. */
+  --well-ink: #ffffff;
+  --well-muted: #a8bcd8;
   /* Ground under the page footer — the same principle as `--well-base`, one
      level up. The footer declares no surface of its own, so its copy sits
      straight on the scroll-scrubbed footage. Here `.bg-night-veil` already
