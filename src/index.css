@@ -131,6 +131,25 @@
   --bg-grad-a: rgba(10, 26, 68, 0.3);
   --bg-grad-b: rgba(5, 11, 34, 0.24);
   --bg-grad-c: rgba(3, 6, 20, 0.2);
+  /* THESE ARE AT THEIR FLOOR — do not reduce them to make the footage clearer.
+     Measured against the trial footage by sweeping the whole dark stack and
+     reading `--c-muted` off the rendered background layer at five scroll
+     positions (worst case is the lit-port passage at the end of the sequence,
+     not the average frame, which is what makes an averaged model too
+     optimistic here):
+
+       scale 1.00 (these values)  5.27:1
+       scale 0.96                 4.94:1
+       scale 0.92                 4.33:1   below AA
+       scale 0.88                 4.22:1   below AA
+       scale 0.80                 3.82:1   below AA
+
+     Only ~4% of reduction survives the 4.5:1 floor, and 4% is below the
+     perceptual threshold — it buys roughly +5% local contrast in the ground
+     while spending all remaining margin. The headroom that used to exist was
+     consumed by the trial footage being brighter and higher-contrast than the
+     set these were tuned against; a properly graded re-export is what returns
+     it. Re-run the sweep against new masters before touching these. */
   --veil-1: rgba(4, 8, 26, 0.35);
   --veil-2: rgba(4, 8, 26, 0.6);
   --veil-rad: rgba(3, 6, 20, 0.26);
@@ -1325,6 +1344,10 @@ input:focus-visible,
    Above both videos, below the HUD grid/veils. Fades with the theme. */
 .bg-night-veil {
   z-index: 3;
+  /* At its floor with the trial footage — see the sweep on `--veil-1`. This
+     scrim is the only cover at mid-viewport, so it alone sets the worst-case
+     contrast for copy on open footage. Lowering it to 0.42/0.54 measured
+     3.82:1 for `--c-muted`, well under AA. */
   background: linear-gradient(180deg, rgba(2, 6, 20, 0.52), rgba(2, 6, 20, 0.68));
   transition: opacity 0.7s ease;
 }
