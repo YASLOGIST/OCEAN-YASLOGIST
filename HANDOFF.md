@@ -20,8 +20,13 @@ cd ~/Desktop/.claude/yaslogist && npm run gate
 Expect `41/41 assertions passed`, `dist/index.html 896.87 kB`, and
 `✓ dist/index.html: 0 academic references (4 tokens checked)`, exit 0.
 
-The working tree is **clean**, `main` equals `origin/main`, and the live site
-serves a byte-identical copy of the local build — confirmed by hashing the
+The working tree carries **two modified files** — `src/index.css` and
+`src/components/Footer.tsx` — holding the F3/F4/F5/F6 layer fixes in §4. They
+are built, gated and verified in all four EN/AR × dark/light combinations, and
+they are **not committed and not deployed**, so the live site still serves the
+pre-fix artifact. Before this work the tree was clean, `main` equalled
+`origin/main`, and the live site
+served a byte-identical copy of the local build — confirmed by hashing the
 response, not by trusting deployment status. The Bug A/B/C/D, legibility and
 glass work in §4 is **shipped**.
 Nothing is currently broken in production. The only open work is §6.
@@ -74,8 +79,8 @@ that inspects `dist/` rather than source, so **it must stay last**.
 |---|---|
 | TypeScript | **0 errors**, compiler **5.9.3** |
 | Scroll harness | **41/41 assertions passed** |
-| `dist/index.html` | **896872 bytes** (Vite prints `896.87 kB`) — was 895790 before the §4 fixes; the **+1082 B** is **+611 B CSS** and **+471 B JS**. All the JS is Bug A's clamp; the CSS splits +238 B (Bugs B/C), +293 B (contrast + glass) and +80 B (Bug D). |
-| gzip, local | **472.84 kB** |
+| `dist/index.html` | **897279 bytes** (Vite prints `897.28 kB`) — was 896872 before the §4 F3–F6 fixes; the **+407 B** is **+395 B CSS** and **+12 B JS**, and the JS is exactly the string `"site-footer "` added to the footer's class list. The CSS splits into one new token pair, three new rules and four removed declarations; every selector in the built sheet was diffed before and after, and the only additions are `.site-footer`, `.glass.card-lift:hover` and `[data-theme=light] .glass.card-lift:hover`. **Superseded figure:** **896872 bytes** (`896.87 kB`) — was 895790 before the §4 fixes; the **+1082 B** is **+611 B CSS** and **+471 B JS**. All the JS is Bug A's clamp; the CSS splits +238 B (Bugs B/C), +293 B (contrast + glass) and +80 B (Bug D). |
+| gzip, local | **472.93 kB** (`gzip -9` reports 472467 B) — was 472.84 kB |
 | gzip, on Vercel | **471.23 kB** — different zlib on the build image compressing an identical file. Not a discrepancy. |
 | `check:bundle` | `✓ dist/index.html: 0 academic references (4 tokens checked)` |
 | `.DS_Store` in dist | **0** |
@@ -85,7 +90,7 @@ that inspects `dist/` rather than source, so **it must stay last**.
 | `dist/frames/day` | 60 files, **1,980,016 bytes** |
 | `dist/frames/night-sm` | 60 files, **1,111,411 bytes** |
 | `dist/frames/day-sm` | 60 files, **466,983 bytes** |
-| SHA-256 of `dist/index.html` | `19d1eb0f84f2b084d2a6b845a8ea5df215cc3a5d31ff9edc5c6ae570080bde7b` — this is the **fixed, uncommitted** build. `yaslogist.me` still serves `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725`, the pre-fix artifact. They will match again once §0's outstanding commit and deploy happen. |
+| SHA-256 of `dist/index.html` | `0514d01ec7b86a0630204a12dce45c9691600bdd5e64617d17ffab1ef486b365` — the F3–F6 build, confirmed byte-reproducible across two consecutive builds. The pre-fix artifact was `19d1eb0f84f2b084d2a6b845a8ea5df215cc3a5d31ff9edc5c6ae570080bde7b` and is what production still serves. **Superseded note:** `19d1eb0f84f2b084d2a6b845a8ea5df215cc3a5d31ff9edc5c6ae570080bde7b` — this is the **fixed, uncommitted** build. `yaslogist.me` still serves `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725`, the pre-fix artifact. They will match again once §0's outstanding commit and deploy happen. |
 | Console errors on load | **0** (last measured 2026-08-15) |
 | Mounted components | `canvases: 2` · `videoElements: 0` · `solutionCards: 5` · `.nf: 1` · `.bay: 1` · `.radar-scope: 1` · `chainNodes: 7` · `.clock-value: 3` (last measured 2026-08-15) |
 
@@ -177,6 +182,18 @@ in the sheet at equal specificity and will silently replace it, which is exactly
 what had already happened to the rim-and-falloff those two wells thought they
 had (§4, Bug D).
 
+**The same trap applies to every state variant, and it had already caught three
+more surfaces** (§4, F5/F6). `box-shadow` is a single property: a `:hover` or a
+compound rule that sets it restates the entire list and cannot add a layer, so
+any rule that outranks `.glass` or `.glass-strong` silently discards the pane
+material unless it restates that too. The two lit edges now live in one token,
+**`--glass-edges`**, and every rule that sets `box-shadow` on a glass surface
+starts with it. **If you add a state rule to a glass surface, its `box-shadow`
+must open with `var(--glass-edges)`** — and if the class it hangs on is also
+worn by a non-glass element, scope the restatement so that element does not
+inherit edges it never had. `.card-lift` is exactly that case: the Hero
+micro-card is `.glass`, the four Stats tiles are not.
+
 ### 3.6 Declared viewport floor: 360 px
 The site supports **≥360 px normally** and deliberately degrades below that. The
 floor is expressed as `max-[360px]:` arbitrary variants — Tailwind emits
@@ -186,6 +203,31 @@ floor is expressed as `max-[360px]:` arbitrary variants — Tailwind emits
 width below 360 px and no sizing tweak reaches 320 px (§4, B6). **If you add
 anything to the header bar or that panel, re-check 320 px** — the floor is what
 keeps the mobile menu button reachable there.
+
+### 3.8 Footer ground (`--footer-ground`)
+The footer declares no surface of its own, so its copy composites straight onto
+the scroll-scrubbed footage. That is fine in dark and **measured**: with
+`.bg-night-veil` in front of the sequence, the brightest tenth of the night
+frames still leaves `--c-text` at **14.9:1** and `--c-muted` at **7.7:1**, so
+`--footer-ground` is `none` there and the dark footer renders byte-identically
+to how it always has. Light has no such veil at mid-viewport — the veil
+gradient's middle stop is `transparent` — and the same copy measured **3.7:1**
+over the mean of the day sequence, **1.6:1** over its darkest tenth. Light
+therefore supplies an opaque ground on `--c-bg`, which restores **9.5:1**, the
+same figure the muted tier already gets on a light card.
+
+The ramp is **2rem — the footer's own top padding** — so the ground reaches
+full strength exactly at the hairline above the first column (both measured at
+32 px in the browser) and no copy ever lands on a partial ground. Same shape as
+`--well-base` one level up, and the same reason: only one theme has a backdrop
+of its own.
+
+**`.site-footer` sets `background-image` and nothing else.** No `contain`, no
+`isolation`, no `z-index`, no `transform` — `LegalModal` is a DOM child of the
+footer and escapes to the viewport on `position: fixed`, and any one of those
+would make the footer a containing block or a stacking context and trap it.
+Verified after the change: the dialog root still measures exactly
+`innerWidth × innerHeight`, hit-tests as itself, and holds focus.
 
 ### 3.7 Brand asset resolution (`src/assets/brand.ts`)
 `import.meta.glob` with `eager: true`, enumerating **only the basenames actually
@@ -203,6 +245,15 @@ gate. Current values, for comparison: `founder.jpg` **34,727 B**,
 ---
 
 ## 4 · CLOSED — with technical cause
+
+| Item | Cause and fix |
+|---|---|
+| **F3 — the footer had no ground in either theme** (2026-08-22) | The largest ungrounded surface on the site: `<footer>` computed `background-color: rgba(0, 0, 0, 0)` and `background-image: none` over **971 px**, so four link columns, the blurb, the phone number, the legal line and three 40 × 40 social keys at `bg-chrome/[0.04]` (4% opaque, no blur) all sat on raw footage. Same defect class as Bug D, on a surface Bug D never looked at. Measured before fixing: light theme, viewport centre, `--c-muted` **3.7:1** falling to **1.6:1** over the darkest tenth of the day sequence, against a 4.5:1 threshold — and screenshots show the hull cutting through the copyright line. Dark measured **14.9:1 / 7.7:1** at its own worst case, so it needs nothing. Fixed with `--footer-ground` (§3.8): `none` in dark, a 2rem ramp into an opaque `--c-bg` in light, restoring **9.5:1**. `background-image` only — see §3.8 for why nothing else may go on that element. |
+| **F4 — four surfaces shipped a `backdrop-filter` Chrome cannot parse** (2026-08-22) | `.nf`, `.bay`, `.brand-mark` and `.lang-pill` each declared the standard property and the vendor spelling by hand, so Lightning CSS kept only the vendor line and all four computed `none` — the mechanism §6.2 documents. Resolved in **two different directions, deliberately**. `.nf` and `.bay` are opaque instrument screens whose blur would buy a dark-theme-only softening of the card gradient behind an already dark panel and pay a compositor surface for it, so **both declarations were deleted**: rendering is unchanged, the source now says what the browser does, and nobody can "restore" an effect that was never wanted. `.brand-mark` and `.lang-pill` are the opposite case — §6.2's rationale never covered them — because at scroll 0 the header and its inner bar are both fully see-through, making these two pills the only surfaces between the reader and the footage at 38% (dark) and 28% (light) transmission. For those, **only the hand-written `-webkit-` line was removed**, and the minifier now emits both spellings. Verified in Chrome: `.nf` and `.bay` compute `none`; `.brand-mark` computes `blur(8px) saturate(1.4)` and `.lang-pill` `blur(12px) saturate(1.4)`. |
+| **F5 — two hover states deleted the shared glass material** (2026-08-22) | Bug D's latent defect again, on surfaces that pass did not examine. `.solution-card:hover` (0,2,0) and `.card-lift:hover` / `[data-theme="light"] .card-lift:hover` (0,2,0 and 0,3,0) all outrank `.glass` (0,1,0), and `box-shadow` is one property, so the five Solutions cards and the Hero micro-card threw away both lit edges the moment the pointer arrived. Fixed by restating `var(--glass-edges)` first in `.solution-card:hover`, and — because `.card-lift` is also worn by the four Stats tiles, which are **not** `.glass` and never had edges to lose — by adding `.glass.card-lift:hover` (0,3,0) and `[data-theme="light"] .glass.card-lift:hover` (0,4,0) rather than touching the base pair. The (0,4,0) rule is what keeps the light variant from being beaten by the (0,3,0) `[data-theme="light"] .card-lift:hover` above it; that tie is the whole reason the light rule exists separately. Verified by reproducing the cascade against the shipped stylesheet with `:hover` forced on and resolving every `var()` from the element's own computed properties: both glass surfaces keep two inset layers on hover in both themes, and the Stats tile's hover value is **unchanged, character for character**. |
+| **F6 — the Closing card was permanently missing its under-edge** (2026-08-22) | `.connect-card.glass-strong` (0,2,0) restated the head rim so its added glow would not lose it, but omitted `inset 0 -1px 0 var(--glass-edge)` — one inset layer where every other glass surface has two. Not hover-only; it had always rendered that way. Fixed by the same `var(--glass-edges)` restatement. Verified: the computed shadow now carries both edges in both themes. |
+| **Root cause behind F5 and F6** | Three separate rules had drifted into dropping the pane material because each restated it by hand. The two lit edges are now a single token, `--glass-edges`, used by `.glass`, `.glass-strong`, `.connect-card.glass-strong`, `.solution-card:hover` and both `.glass.card-lift:hover` rules. The token refactor is a **rendering no-op** — the resolved `box-shadow` on `.glass` and `.glass-strong` is identical to the pre-change build in both themes — so the only behavioural change is on the three surfaces that were losing layers. |
+
 
 Each row is a defect that is fixed, verified, and must not be re-opened without
 new evidence.
@@ -317,8 +368,18 @@ vendor line, which Chrome cannot parse.
 so `.nf` and `.bay` have nothing left to blur there even if the property were
 fixed. Any value in restoring it would be dark-theme only.
 
-**Still open, deliberately:** `.nf`, `.bay`, `.brand-mark` and `.lang-pill` are
-still prefixed-only and therefore still flat. They were left out of scope by an
+**CLOSED 2026-08-22 — see §4, F4.** All four are resolved, in two directions:
+`.brand-mark` and `.lang-pill` now genuinely blur (the hand-written `-webkit-`
+line was deleted and the minifier emits both spellings), because they are the
+only surfaces between the reader and the footage while the page sits at the
+head of the document. `.nf` and `.bay` had **both** declarations deleted
+instead — the entry below is the reasoning, and it holds; removing the dead
+code was preferred to repairing an effect nobody wanted, so no compositor
+surface was added. What follows is the original entry, kept because its
+reasoning is still the reason those two wells stay flat.
+
+**Was open, deliberately:** `.nf`, `.bay`, `.brand-mark` and `.lang-pill` were
+prefixed-only and therefore flat. They were left out of scope by an
 explicit call — the two instrument wells are opaque dark screens by design
 (§3.5) and gain almost nothing from a blur they would pay a compositor surface
 for. The one-line fix, if it is ever wanted, is to **delete the hand-written
@@ -512,7 +573,16 @@ background. Verified live 2026-08-21: all four sets serve `image/jpeg` at HTTP
 | Live artifact SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
 | Local `dist/index.html` SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
 
-**`main`, `origin/main` and production are the same code**, confirmed by hashing
+**Superseded 2026-08-22 by the uncommitted F3–F6 work (§4).** `main`,
+`origin/main` and production are still the same code as each other, but the
+working tree is now ahead of all three: `src/index.css` and
+`src/components/Footer.tsx` are modified, and the local `dist/index.html`
+hashes to `0514d01e…6365` against the `19d1eb0f…de7b` production still serves.
+That is expected, not drift — it resolves on the next commit and deploy (§8,
+step 1). The parity statement below was true as of 2026-08-21 and is what the
+tree returns to once the work lands.
+
+**`main`, `origin/main` and production were the same code**, confirmed by hashing
 the live response rather than by trusting deployment status. Production
 deployment `dpl_Bc6NLQjfRC7Ghw9WgtBh5AgGh3oP` (commit `3504b74`) is **READY**,
 and `yaslogist.me` returned **896872 bytes** with SHA-256
@@ -557,8 +627,10 @@ report scan results that were never produced.
    **unexplained**, not as diagnosed.
 3. **Confirm the mobile frame work on a real phone** (§6.6). Needs a human with
    a handset.
-4. **Decide B3** (§6.2) — restore backdrop blur, or accept its absence. A
-   visual-fidelity call, informed by step 2. Not a bug fix.
+4. **Commit and deploy the F3–F6 work.** It is built, gated and verified but
+   uncommitted, so `main`, `origin/main` and production are all still on the
+   pre-fix artifact (§7.4). Until that lands, the SHA-256 in §2 will not match
+   the live one. *(B3, formerly this slot, is closed — §6.2 and §4, F4.)*
 5. **Decide B8** (§6.3) — 7.2 px bearing labels against an 8 px floor. Needs a
    judgement call before any code.
 6. **Plan the `vite` bump** (§6.5) if the advisories matter to you. Deliberate
