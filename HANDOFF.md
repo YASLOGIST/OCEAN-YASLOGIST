@@ -20,13 +20,8 @@ cd ~/Desktop/.claude/yaslogist && npm run gate
 Expect `41/41 assertions passed`, `dist/index.html 896.87 kB`, and
 `✓ dist/index.html: 0 academic references (4 tokens checked)`, exit 0.
 
-The working tree carries **two modified files** — `src/index.css` and
-`src/components/Footer.tsx` — holding the F3/F4/F5/F6 layer fixes in §4. They
-are built, gated and verified in all four EN/AR × dark/light combinations, and
-they are **not committed and not deployed**, so the live site still serves the
-pre-fix artifact. Before this work the tree was clean, `main` equalled
-`origin/main`, and the live site
-served a byte-identical copy of the local build — confirmed by hashing the
+The working tree is **clean**, `main` equals `origin/main` at `9a6512a`, and the
+live site serves a byte-identical copy of the local build — confirmed by hashing the
 response, not by trusting deployment status. The Bug A/B/C/D, legibility and
 glass work in §4 is **shipped**.
 Nothing is currently broken in production. The only open work is §6.
@@ -573,16 +568,19 @@ background. Verified live 2026-08-21: all four sets serve `image/jpeg` at HTTP
 | Live artifact SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
 | Local `dist/index.html` SHA-256 | `1365502a6ee110f2504aed7cba40ef8177dfa8fc492a6f269217d6c7a9ea1725` |
 
-**Superseded 2026-08-22 by the uncommitted F3–F6 work (§4).** `main`,
-`origin/main` and production are still the same code as each other, but the
-working tree is now ahead of all three: `src/index.css` and
-`src/components/Footer.tsx` are modified, and the local `dist/index.html`
-hashes to `0514d01e…6365` against the `19d1eb0f…de7b` production still serves.
-That is expected, not drift — it resolves on the next commit and deploy (§8,
-step 1). The parity statement below was true as of 2026-08-21 and is what the
-tree returns to once the work lands.
+**Re-established 2026-08-22 after the F3–F6 work (§4) shipped.** `ebb8c5c`
+(the fix) and `9a6512a` (this document) are pushed, `main` equals `origin/main`,
+the tree is clean, and `yaslogist.me` returns **897279 bytes** hashing to
+`0514d01ec7b86a0630204a12dce45c9691600bdd5e64617d17ffab1ef486b365` — identical
+to the local artifact. Verified in the served HTML rather than inferred from
+deployment status: `.site-footer` is present, `--footer-ground` is `none` in
+dark and the ramp in light, `.nf` and `.bay` carry no `backdrop-filter` while
+`.brand-mark` and `.lang-pill` carry the unprefixed form, both
+`.glass.card-lift:hover` rules exist, `.connect-card.glass-strong` opens with
+`var(--glass-edges)`, and `.card-lift:hover` is unchanged. All four frame sets
+re-checked live at HTTP 200 `image/jpeg`, first and last frame of each.
 
-**`main`, `origin/main` and production were the same code**, confirmed by hashing
+**`main`, `origin/main` and production are the same code**, confirmed by hashing
 the live response rather than by trusting deployment status. Production
 deployment `dpl_Bc6NLQjfRC7Ghw9WgtBh5AgGh3oP` (commit `3504b74`) is **READY**,
 and `yaslogist.me` returned **896872 bytes** with SHA-256
@@ -627,10 +625,10 @@ report scan results that were never produced.
    **unexplained**, not as diagnosed.
 3. **Confirm the mobile frame work on a real phone** (§6.6). Needs a human with
    a handset.
-4. **Commit and deploy the F3–F6 work.** It is built, gated and verified but
-   uncommitted, so `main`, `origin/main` and production are all still on the
-   pre-fix artifact (§7.4). Until that lands, the SHA-256 in §2 will not match
-   the live one. *(B3, formerly this slot, is closed — §6.2 and §4, F4.)*
+4. **Nothing here — this slot is clear.** It held B3 (restore backdrop blur or
+   accept its absence), which is closed in §6.2 and §4, F4. The F3–F6 work that
+   briefly occupied it is committed (`ebb8c5c`, `9a6512a`), deployed, and
+   confirmed live by hash (§7.4).
 5. **Decide B8** (§6.3) — 7.2 px bearing labels against an 8 px floor. Needs a
    judgement call before any code.
 6. **Plan the `vite` bump** (§6.5) if the advisories matter to you. Deliberate
