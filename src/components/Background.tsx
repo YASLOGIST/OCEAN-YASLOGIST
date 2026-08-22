@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { subscribeScroll } from "../lib/scroll";
 import { useTheme } from "../lib/theme";
+import BrandPlate from "./BrandPlate";
 
 /**
  * Scroll-scrubbed background — canvas frame sequence, no <video> element.
@@ -308,6 +309,11 @@ export default function Background() {
       <div className="scanline animate-scan absolute left-0 right-0 top-0 h-40" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/50 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-[radial-gradient(60%_100%_at_50%_100%,var(--veil-glow),transparent_70%)]" />
+
+      {/* Last child on purpose: it paints over the footage and every veil above
+          it, but still inside this `z-[-1]` stacking context, so page content,
+          the HUD and the header all draw over the plate rather than under it. */}
+      <BrandPlate />
     </div>
   );
 }

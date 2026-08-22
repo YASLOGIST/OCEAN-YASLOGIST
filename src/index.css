@@ -1329,6 +1329,59 @@ input:focus-visible,
   transition: opacity 0.7s ease;
 }
 
+/* ═══════════════════════ Corner brand plate (TRIAL) ═══════════════════════
+   Covers the generation watermark baked into the trial footage — see
+   BrandPlate.tsx for why it sits in the background layer. Delete both once the
+   clean re-export lands.
+
+   Hidden by default and revealed only where the mark is actually on screen.
+   Under `object-fit: cover` a 16:9 frame is cropped horizontally on anything
+   narrower than about 3:2, which pushes the watermark region off the viewport
+   completely — measured as fully cropped at 1024×768, 768×1024, 414×896 and
+   375×812, and visible from ~1200px wide at 3:2 or wider. Below that the plate
+   would be decoration standing in for nothing, so it does not render.
+
+   Physical `right`/`bottom`, deliberately NOT logical properties: the footage
+   is the same footage in Arabic, so the mark stays bottom-RIGHT under `dir=rtl`
+   and a logical inset would flip the plate away from it. */
+.brand-plate {
+  display: none;
+}
+
+@media (min-width: 1200px) and (min-aspect-ratio: 3 / 2) {
+  .brand-plate {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    /* The union of the watermark's scroll sweep measured from the corner, worst
+       case 175×222 at 1920×1080, plus margin. Sized to the sweep rather than to
+       the 78×97 mark because `.bg-camera` pans and zooms it while scrolling. */
+    width: 184px;
+    height: 232px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 1.15rem;
+    /* Flush to the corner: the mark reaches the viewport edge at 1280 and 1440,
+       so any inset would leave the right point of the sparkle showing. Rounding
+       only the inward corner is what reads as a corner plate rather than a card
+       that has drifted off the edge. */
+    border-radius: var(--card-radius) 0 0 0;
+    border-right: 0;
+    border-bottom: 0;
+    /* `.glass-strong` is only 78-90% opaque, which is the right call for a card
+       floating over the page but not enough here: measured through the built
+       page, the sparkle still read +8 to +13 luma against its surroundings
+       through the glass. This longhand overrides the transparent
+       background-color the `.glass-strong` shorthand sets while leaving its
+       gradient, border and shadow intact, so the plate keeps the card language
+       and simply stops transmitting what is behind it. `--c-bg` is the existing
+       page-ground token in both themes — no new colour enters the palette. */
+    background-color: var(--c-bg);
+  }
+}
+
 /* ═══════════════════════ Page footer ═══════════════════════
    The one region of the document that carried no surface of its own — see
    `--footer-ground` in the theme blocks for the measurements and for why
