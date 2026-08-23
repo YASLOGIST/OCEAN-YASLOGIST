@@ -1368,11 +1368,19 @@ input:focus-visible,
    clean re-export lands.
 
    Hidden by default and revealed only where the mark is actually on screen.
-   Under `object-fit: cover` a 16:9 frame is cropped horizontally on anything
-   narrower than about 3:2, which pushes the watermark region off the viewport
-   completely — measured as fully cropped at 1024×768, 768×1024, 414×896 and
-   375×812, and visible from ~1200px wide at 3:2 or wider. Below that the plate
-   would be decoration standing in for nothing, so it does not render.
+   Visibility is decided by ASPECT RATIO ALONE, not by width. Under
+   `object-fit: cover` a 16:9 frame is cropped horizontally, and the crop is what
+   pushes the watermark off-screen — so a short wide viewport exposes it at any
+   width. Swept at a fixed 800px height, the mark first appears at exactly 3:2:
+
+     AR 1.475 and below  cropped out
+     AR 1.500            visible, needs   8w × 164h from the corner
+     AR 1.600            visible, needs  48w × 164h
+
+   An earlier `min-width: 1200px` conjunct here was wrong and left the mark
+   uncovered on three real viewports: 1024×600 (AR 1.71), and phone landscape at
+   896×414 and 812×375 (AR 2.16/2.17), all of which show it. Gating on 3/2 alone
+   is exact in both directions — no gap above it, no orphan plate below it.
 
    Physical `right`/`bottom`, deliberately NOT logical properties: the footage
    is the same footage in Arabic, so the mark stays bottom-RIGHT under `dir=rtl`
@@ -1381,21 +1389,26 @@ input:focus-visible,
   display: none;
 }
 
-@media (min-width: 1200px) and (min-aspect-ratio: 3 / 2) {
+@media (min-aspect-ratio: 3 / 2) {
   .brand-plate {
     position: fixed;
     right: 0;
     bottom: 0;
     display: flex;
-    /* The union of the watermark's scroll sweep measured from the corner, worst
-       case 175×222 at 1920×1080, plus margin. Sized to the sweep rather than to
-       the 78×97 mark because `.bg-camera` pans and zooms it while scrolling. */
-    width: 184px;
-    height: 232px;
+    /* Sized to the union of the watermark's scroll sweep, which `.bg-camera`
+       pans and zooms, so it is much larger than the 78×97 mark itself. Measured
+       across nine viewports the requirement is a near-constant FRACTION of the
+       viewport — at most 9.1% of width and 20.5% of height — so clamp() tracks
+       it continuously instead of stepping at breakpoints, and the plate grows
+       and shrinks smoothly as the window is resized. 11vw / 23vh carry the
+       margin; the floors keep it usable on phone landscape (89×86 at 812×375)
+       and the ceilings stop it dominating an ultrawide. */
+    width: clamp(88px, 11vw, 22rem);
+    height: clamp(72px, 23vh, 20rem);
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.55rem;
-    padding: 1.15rem;
+    gap: clamp(0.2rem, 0.9vh, 0.55rem);
+    padding: clamp(0.45rem, 1.5vh, 1.15rem);
     /* Flush to the corner: the mark reaches the viewport edge at 1280 and 1440,
        so any inset would leave the right point of the sparkle showing. Rounding
        only the inward corner is what reads as a corner plate rather than a card
@@ -1412,6 +1425,29 @@ input:focus-visible,
        and simply stops transmitting what is behind it. `--c-bg` is the existing
        page-ground token in both themes — no new colour enters the palette. */
     background-color: var(--c-bg);
+    overflow: hidden;
+  }
+
+  /* Contents track the plate so the lockup stays proportional rather than
+     overflowing a short plate. Same tokens and type tiers as before — only the
+     sizes are now fluid. */
+  .brand-plate-mark {
+    width: clamp(20px, 3.6vh, 40px);
+    height: clamp(20px, 3.6vh, 40px);
+  }
+  .brand-plate-word {
+    font-size: clamp(8px, 1.5vh, 15px);
+  }
+  .brand-plate-sub {
+    font-size: clamp(6px, 0.95vh, 9px);
+  }
+  /* Below this the plate is under ~120px tall and the third line stops being
+     legible before it stops fitting — the mark and wordmark alone still read as
+     an intentional lockup, which a clipped caption would not. */
+  @media (max-height: 520px) {
+    .brand-plate-sub {
+      display: none;
+    }
   }
 }
 

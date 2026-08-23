@@ -33,9 +33,9 @@ import { BrandMark } from "./Brand";
 export default function BrandPlate() {
   return (
     <div className="brand-plate glass-strong" aria-hidden="true">
-      <BrandMark id="plate" className="h-10 w-10" />
-      <p className="font-display text-[15px] font-bold leading-none tracking-[0.14em] text-ice">YASLOGIST</p>
-      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-ghost">Core · Cairo Ops</p>
+      <BrandMark id="plate" className="brand-plate-mark" />
+      <p className="brand-plate-word font-display font-bold leading-none tracking-[0.14em] text-ice">YASLOGIST</p>
+      <p className="brand-plate-sub font-mono uppercase tracking-[0.22em] text-ghost">Core · Cairo Ops</p>
     </div>
   );
 }
