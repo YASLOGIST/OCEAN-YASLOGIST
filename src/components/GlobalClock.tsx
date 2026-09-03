@@ -4,8 +4,8 @@ import { cn } from "../utils/cn";
 
 /* ═══════════════════════ Global logistics clock ═══════════════════════
    Three critical logistics timezones, Cairo always first (corporate branch —
-   Dokki), then the world's busiest transshipment hub and Europe's largest
-   port.
+   New Cairo), then the world's busiest container port (Shanghai, the origin
+   of the site's own Far East lane) and Europe's largest port.
 
    CLS discipline: the value is rendered in a fixed `ch` box with tabular
    figures, so the box cannot resize as digits tick. Offsets come from
@@ -16,7 +16,7 @@ import { cn } from "../utils/cn";
 
 const ZONES = [
   { key: "cairo", tz: "Africa/Cairo" },
-  { key: "singapore", tz: "Asia/Singapore" },
+  { key: "shanghai", tz: "Asia/Shanghai" },
   { key: "rotterdam", tz: "Europe/Amsterdam" },
 ] as const;
 
