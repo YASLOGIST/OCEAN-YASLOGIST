@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../utils/cn";
+import { useLang } from "../lib/i18n";
 import { subscribeScroll } from "../lib/scroll";
 import { useInView } from "../hooks/useInView";
 
@@ -294,6 +295,33 @@ export function SectionTag({ children, className }: { children: ReactNode; class
 }
 
 /* ── Small icons ────────────────────────────────────────────────────── */
+/* ── Calibration badge ───────────────────────────────────────────────────
+   Marks a figure, panel or widget as an illustrative digital-twin model
+   rather than a live operational feed. The Terms modal already carried that
+   statement, but a disclaimer behind a click does not travel with the number
+   it qualifies — a visitor reading "2,148 sensors" never sees it. This puts
+   the same claim inline, in whichever language the page is in.
+────────────────────────────────────────────────────────────────────────── */
+export function ModelBadge({ short = false, className }: { short?: boolean; className?: string }) {
+  const { t } = useLang();
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-300/[0.07]",
+        "px-2.5 py-1 font-mono text-[8px] uppercase leading-none tracking-[0.16em] text-amber-200/85",
+        className
+      )}
+    >
+      <svg viewBox="0 0 24 24" className="h-2.5 w-2.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 9v4" />
+        <path d="M12 17h.01" />
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+      </svg>
+      {short ? t("model.badgeShort") : t("model.badge")}
+    </span>
+  );
+}
+
 export function ArrowRight({ className }: { className?: string }) {
   return (
     <svg
