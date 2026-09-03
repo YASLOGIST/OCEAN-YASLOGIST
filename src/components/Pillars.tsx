@@ -6,7 +6,7 @@ import FleetRadar from "./FleetRadar";
 import FulfillmentBay from "./FulfillmentBay";
 import NeuralForecast from "./NeuralForecast";
 import VoyageProfile from "./VoyageProfile";
-import { CheckIcon, CountUp, GlassCard, Parallax, Reveal, SectionTag } from "./ui";
+import { CheckIcon, CountUp, GlassCard, ModelBadge, Parallax, Reveal, SectionTag } from "./ui";
 
 /* ═══════════════════════════ shared panel ═══════════════════════════ */
 
@@ -20,6 +20,9 @@ function Panel({ title, status, children }: { title: string; status: string; chi
           {status}
         </div>
       </div>
+      {/* Every engine panel is a model, not a feed. Stated on the panel rather
+          than only in the Terms modal, which a visitor has to open to reach. */}
+      <ModelBadge />
       <div className="relative">{children}</div>
       <div className="pointer-events-none absolute right-4 top-4 h-6 w-6 border-r border-t border-neon/30" />
       <div className="pointer-events-none absolute bottom-4 left-4 h-6 w-6 border-b border-l border-neon/30" />
@@ -41,9 +44,9 @@ function VisualAnalytics() {
 /* ════════════════════════ 02 · IOT FLEET ════════════════════════════ */
 
 const FLEET_ROWS = [
-  { id: "IQ-4271", route: "SIN → LAX", speed: "18.6 kn", temp: "24°C", load: "92%" },
-  { id: "IQ-3188", route: "ROT → NYC", speed: "21.2 kn", temp: "21°C", load: "78%" },
-  { id: "IQ-5094", route: "SHA → DBN", speed: "17.9 kn", temp: "26°C", load: "85%" },
+  { id: "IQ-4271", route: "SHA → SUZ → PSD", speed: "18.6 kn", temp: "24°C", load: "92%" },
+  { id: "IQ-3188", route: "ROT → ALX", speed: "21.2 kn", temp: "21°C", load: "78%" },
+  { id: "IQ-5094", route: "JEA → SKH", speed: "17.9 kn", temp: "26°C", load: "85%" },
 ];
 
 function VisualFleet() {

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useLang } from "../lib/i18n";
 import { subscribeScroll } from "../lib/scroll";
 import { FounderAvatar } from "./Brand";
-import { GlassCard, NeonButton, Parallax, Reveal, SectionTag, ArrowRight } from "./ui";
+import { GlassCard, ModelBadge, NeonButton, Parallax, Reveal, SectionTag, ArrowRight } from "./ui";
 
 /* ══════════════════ 2 · PLATFORM FOUNDER — authority through restraint ══════════════════
    Four rows and nothing else: portrait, role, name, discipline, and the
@@ -54,6 +54,12 @@ function VesselCard() {
         </span>
       </header>
 
+      {/* The card carries a vessel identifier, a speed and an ETA, all of which
+          read as a live AIS feed. It is a model; the badge says so beside them. */}
+      <div className="mt-4 flex justify-start">
+        <ModelBadge />
+      </div>
+
       {/* tier 2 — the primary metric, highest contrast on the card */}
       <div className="mt-6 flex items-end justify-between gap-4 max-[360px]:flex-col max-[360px]:items-start max-[360px]:gap-3">
         <div className="min-w-0">
@@ -88,7 +94,7 @@ function VesselCard() {
       <div className="mt-6 rounded-xl border border-neon/20 bg-neon/[0.05] p-4">
         <div className="flex items-center justify-between gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-ghost/80">
           <span>{t("hero.telemetry.route")}</span>
-          <span className="shrink-0 text-neon">SIN → LAX → ROT</span>
+          <span className="shrink-0 text-neon">SHA → SUZ → PSD</span>
         </div>
         <div className="mt-3 h-1 rounded-full bg-chrome/10">
           <div className="grad-bar h-full w-[64%] rounded-full" />

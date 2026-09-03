@@ -11,6 +11,7 @@ import Solutions from "./components/Solutions";
 import Simulator from "./components/Simulator";
 import Pillars from "./components/Pillars";
 import Closing from "./components/Closing";
+import CrossModalHandoff from "./components/CrossModalHandoff";
 import Footer from "./components/Footer";
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
             <Simulator />
             <Pillars />
           </main>
+          <CrossModalHandoff />
           <Closing />
           <Footer />
         </div>

@@ -1,3 +1,4 @@
+import { useLang } from "../lib/i18n";
 import { BrandMark } from "./Brand";
 
 /* ══════════════════ Corner brand plate ══════════════════
@@ -31,11 +32,12 @@ import { BrandMark } from "./Brand";
    sparkle. See the `.brand-plate` rules in index.css for the geometry and for
    why it is gated on aspect ratio. */
 export default function BrandPlate() {
+  const { t } = useLang();
   return (
     <div className="brand-plate glass-strong" aria-hidden="true">
-      <BrandMark id="plate" className="brand-plate-mark" />
+      <BrandMark className="brand-plate-mark" />
       <p className="brand-plate-word font-display font-bold leading-none tracking-[0.14em] text-ice">YASLOGIST</p>
-      <p className="brand-plate-sub font-mono uppercase tracking-[0.22em] text-ghost">Core · Cairo Ops</p>
+      <p className="brand-plate-sub font-mono uppercase tracking-[0.22em] text-ghost">{t("brandPlate.sub")}</p>
     </div>
   );
 }
