@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useMemo, useCallback, type ReactNode } from "react";
 
 export type Lang = "en" | "ar" | "zh" | "tr" | "fr";
 export type Dir = "ltr" | "rtl";
@@ -1867,24 +1867,29 @@ export function LangProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("oq-lang", lang);
   }, [lang, dir]);
 
-  const t = (key: string): string => {
+  const t = useCallback((key: string): string => {
     const dict = DICTIONARIES[lang] || en;
     const v = resolve(dict, key);
     if (typeof v === "string") return v;
     const fallback = resolve(en, key);
     return typeof fallback === "string" ? fallback : key;
-  };
+  }, [lang]);
 
-  const ta = (key: string): string[] => {
+  const ta = useCallback((key: string): string[] => {
     const dict = DICTIONARIES[lang] || en;
     const v = resolve(dict, key);
     if (Array.isArray(v)) return v as string[];
     const fallback = resolve(en, key);
     return Array.isArray(fallback) ? (fallback as string[]) : [];
-  };
+  }, [lang]);
+
+  const value = useMemo(
+    () => ({ lang, dir, t, ta, setLang }),
+    [lang, dir, t, ta]
+  );
 
   return (
-    <I18nCtx.Provider value={{ lang, dir, t, ta, setLang }}>{children}</I18nCtx.Provider>
+    <I18nCtx.Provider value={value}>{children}</I18nCtx.Provider>
   );
 }
 

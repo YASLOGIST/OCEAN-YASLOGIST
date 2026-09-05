@@ -17,6 +17,9 @@
         if (l === "ar") {
           document.documentElement.lang = "ar";
           document.documentElement.dir = "rtl";
+        } else if (l === "zh" || l === "tr" || l === "fr" || l === "en") {
+          document.documentElement.lang = l;
+          document.documentElement.dir = "ltr";
         }
       } catch (e) {}
     </script>

@@ -55,10 +55,10 @@ export default function GlobalClock({ className }: { className?: string }) {
       aria-label={lang === "ar" ? "التوقيت العالمي" : "Global logistics time"}
     >
       {ZONES.map((z, i) => (
-        <div key={z.key} className="flex flex-col items-start leading-none">
+        <div key={z.key} className="flex flex-col items-start leading-none whitespace-nowrap">
           <span
             className={cn(
-              "block text-[8px] uppercase tracking-[0.18em] text-ghost",
+              "block text-[8px] uppercase tracking-[0.18em] text-ghost whitespace-nowrap",
               /* Ruq'ah is scoped to the Cairo label in Arabic only. */
               z.key === "cairo" && lang === "ar" ? "clock-ruqaa" : "font-mono"
             )}
