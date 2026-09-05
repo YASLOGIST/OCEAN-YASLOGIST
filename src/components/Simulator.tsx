@@ -201,50 +201,90 @@ function MetricTile({
   );
 }
 
+/* Real Egyptian gateway geography. Coastline, delta, Suez Canal, Gulf of Suez
+   and Sinai are projected from actual lat/long (equirectangular) into the
+   400×230 box, and the five gateways sit at their true relative positions:
+   Alexandria + El Dekheila on the north-west delta, Damietta and East Port Said
+   on the north-east, Ain Sokhna on the Gulf of Suez below the canal. A vessel
+   runs the real approach lane from the open Mediterranean to a delta berth. */
 function RouteMap({ computing }: { computing: boolean }) {
-  const { t, dir } = useLang();
+  const { dir, lang } = useLang();
   const rtl = dir === "rtl";
-  const origin = svgTextProps("center", rtl, 1);
-  const dest = svgTextProps("center", rtl, 1);
+  const lab = svgTextProps("center", rtl, 0.9);
+  const L = (en: string, ar: string, zh?: string, tr?: string, fr?: string) => {
+    if (lang === "ar") return ar;
+    if (lang === "zh" && zh) return zh;
+    if (lang === "tr" && tr) return tr;
+    if (lang === "fr" && fr) return fr;
+    return en;
+  };
 
   return (
-    <svg viewBox="0 0 400 230" className={cn("route-map w-full", computing && "is-computing")}>
+    <svg viewBox="0 0 400 230" className={cn("route-map w-full", computing && "is-computing")} role="img" aria-label="Egyptian sea gateways: Alexandria, El Dekheila, Damietta, East Port Said and Ain Sokhna, with the Suez Canal and an approach lane from the Mediterranean.">
       <defs>
         <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#22e4ff" />
-          <stop offset="1" stopColor="#7c3aed" />
+          <stop offset="0" stopColor="var(--c-neon)" stopOpacity="0.25" />
+          <stop offset="1" stopColor="var(--c-neon)" stopOpacity="1" />
         </linearGradient>
-        <pattern id="routeGrid" width="28" height="28" patternUnits="userSpaceOnUse">
-          <path d="M28 0H0v28" fill="none" stroke="var(--grid-line)" strokeWidth="1" />
+        <pattern id="routeGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+          <path d="M30 0H0v30" fill="none" stroke="var(--grid-line)" strokeWidth="1" />
         </pattern>
       </defs>
+
+      {/* sea: a faint accent wash under the grid, so water reads as water */}
+      <rect width="400" height="230" fill="color-mix(in srgb, var(--c-neon) 5%, transparent)" />
       <rect width="400" height="230" fill="url(#routeGrid)" />
-      <ellipse cx="200" cy="230" rx="260" ry="60" fill="color-mix(in srgb, var(--c-neon) 6%, transparent)" />
 
-      {/* route arc */}
-      <path d="M40 190 Q 200 40 360 70" fill="none" stroke="url(#routeGrad)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="640" className="animate-dash" />
-      <path d="M40 190 Q 200 40 360 70" fill="none" stroke="url(#routeGrad)" strokeWidth="8" strokeLinecap="round" opacity="0.1" />
-
-      {/* origin */}
-      <circle cx="40" cy="190" r="6" fill="#22e4ff" className="glow-dot" />
-      <circle cx="40" cy="190" r="11" fill="none" stroke="#22e4ff" strokeOpacity="0.5" className="animate-ping" style={{ transformBox: "fill-box", transformOrigin: "center" }} />
-      <text x="40" y="215" fill="var(--c-muted)" fontSize="10" textAnchor={origin.textAnchor} style={origin.style}>
-        {t("sim.origin")}
-      </text>
-
-      {/* destination */}
-      <circle cx="360" cy="70" r="6" fill="#a78bfa" />
-      <circle cx="360" cy="70" r="11" fill="none" stroke="#a78bfa" strokeOpacity="0.5" className="animate-ping" style={{ animationDelay: "0.8s", transformBox: "fill-box", transformOrigin: "center" }} />
-      <text x="360" y="46" fill="var(--c-muted)" fontSize="10" textAnchor={dest.textAnchor} style={dest.style}>
-        {t("sim.dest")}
-      </text>
-
-      {/* vessel under way */}
-      <g className="animate-floaty" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
-        <path d="M200 85 l-7 -6 v-4 h14 v4 z" fill="#fff" />
-        <rect x="192" y="72" width="16" height="4" rx="1" fill="#22e4ff" opacity="0.85" />
+      {/* land: mainland Egypt with the Nile-delta bulge + Sinai, the Gulf of
+          Suez as the water channel between them, Ain Sokhna on its west shore */}
+      <g stroke="color-mix(in srgb, var(--c-neon) 60%, transparent)" strokeWidth="1.2" strokeLinejoin="round">
+        <path d="M0 80 L70 76 L136 72 L175 60 L207 55 L240 57 L258 60 L278 65 L292 69 L299 96 L303 124 L305 148 L300 168 L296 196 L295 232 L0 232 Z"
+              fill="color-mix(in srgb, var(--c-muted) 22%, transparent)" />
+        <path d="M306 74 L392 80 L392 232 L338 232 L330 196 L322 168 L316 144 L311 120 L308 96 Z"
+              fill="color-mix(in srgb, var(--c-muted) 22%, transparent)" />
       </g>
-      <circle cx="200" cy="85" r="14" fill="none" stroke="#22e4ff" strokeOpacity="0.35" className="animate-ping" style={{ transformBox: "fill-box", transformOrigin: "center" }} />
+
+      {/* Suez Canal — the waterway the record follows from Med to Red Sea */}
+      <path d="M292 69 L299 96 L303 124 L305 148" fill="none" stroke="var(--c-neon)" strokeWidth="1.6" strokeOpacity="0.85" strokeDasharray="2 2.5" strokeLinecap="round" />
+
+      {/* approach lane: open Mediterranean → delta berth */}
+      <path d="M26 26 Q 150 34 292 69" fill="none" stroke="var(--c-neon)" strokeWidth="7" strokeLinecap="round" opacity="0.07" />
+      <path d="M26 26 Q 150 34 292 69" fill="none" stroke="url(#routeGrad)" strokeWidth="2.2" strokeLinecap="round" strokeDasharray="430" className="animate-dash" />
+
+      {/* vessel under way — accent fill, reads in light and dark */}
+      <g className="animate-floaty" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
+        <path d="M182 45 l-6 -5 v-3.5 h12 v3.5 z" fill="var(--c-neon)" />
+        <rect x="175" y="34" width="14" height="3.4" rx="1" fill="var(--c-neon)" opacity="0.55" />
+      </g>
+
+      {/* Cairo — inland reference */}
+      <circle cx="222" cy="150" r="2.6" fill="none" stroke="var(--c-muted)" strokeWidth="1.4" />
+      <text x="222" y="164" fill="var(--c-muted)" fontSize="8" textAnchor={lab.textAnchor} style={lab.style}>{L("Cairo", "القاهرة", "开罗", "Kahire", "Le Caire")}</text>
+
+      {/* gateways */}
+      {([
+        { x: 136, y: 72, en: "Alexandria", ar: "الإسكندرية", zh: "亚历山大港", tr: "İskenderiye", fr: "Alexandrie", ly: 64, arrive: false },
+        { x: 122, y: 82, en: "El Dekheila", ar: "الدخيلة", zh: "德海拉港", tr: "El Dekheila", fr: "El Dekheila", ly: 96, arrive: false },
+        { x: 258, y: 60, en: "Damietta", ar: "دمياط", zh: "杜姆亚特港", tr: "Dimyat", fr: "Damiette", ly: 50, arrive: false },
+        { x: 292, y: 69, en: "E. Port Said", ar: "شرق بورسعيد", zh: "塞得东港", tr: "Doğu Port Said", fr: "Port-Saïd Est", ly: 88, arrive: true },
+        { x: 298, y: 161, en: "Sokhna", ar: "السخنة", zh: "苏赫奈港", tr: "Ayn Suhna", fr: "Sokhna", ly: 176, arrive: false },
+      ] as const).map((g) => (
+        <g key={g.en}>
+          {g.arrive && (
+            <circle cx={g.x} cy={g.y} r="11" fill="none" stroke="var(--c-neon)" strokeOpacity="0.5" className="animate-ping" style={{ transformBox: "fill-box", transformOrigin: "center" }} />
+          )}
+          <circle cx={g.x} cy={g.y} r={g.arrive ? 5.5 : 4} fill="var(--c-neon)" className={g.arrive ? "glow-dot" : undefined} />
+          <circle cx={g.x} cy={g.y} r={g.arrive ? 5.5 : 4} fill="none" stroke="var(--c-bg)" strokeWidth="1" />
+          <text x={g.x} y={g.ly} fill={g.arrive ? "var(--c-neon)" : "var(--c-muted)"} fontSize="8.5" textAnchor={lab.textAnchor} style={lab.style}>
+            {L(g.en, g.ar, g.zh, g.tr, g.fr)}
+          </text>
+        </g>
+      ))}
+
+      {/* sea labels */}
+      <text x="96" y="20" fill="var(--c-muted)" fontSize="8.5" opacity="0.75" textAnchor={lab.textAnchor} style={lab.style}>{L("Mediterranean Sea", "البحر المتوسط", "地中海", "Akdeniz", "Mer Méditerranée")}</text>
+      <text transform="translate(311 198) rotate(78)" fill="var(--c-muted)" fontSize="7.5" opacity="0.75" textAnchor="middle" style={lab.style}>{L("Gulf of Suez", "خليج السويس", "苏伊士湾", "Süveyş Körfezi", "Golfe de Suez")}</text>
+      <text x="330" y="108" fill="var(--c-neon)" fontSize="7.5" opacity="0.8" textAnchor={lab.textAnchor} style={lab.style}>{L("Suez Canal", "قناة السويس", "苏伊士运河", "Süveyş Kanalı", "Canal de Suez")}</text>
     </svg>
   );
 }

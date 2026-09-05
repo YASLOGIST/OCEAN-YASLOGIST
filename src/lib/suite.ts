@@ -24,6 +24,9 @@ export type Surface = {
   glow: string;
   en: { name: string; note: string };
   ar: { name: string; note: string };
+  zh: { name: string; note: string };
+  tr: { name: string; note: string };
+  fr: { name: string; note: string };
 };
 
 export const SURFACES: Surface[] = [
@@ -35,6 +38,9 @@ export const SURFACES: Surface[] = [
     glow: "rgba(195, 203, 209, 0.35)",
     en: { name: "Hub", note: "Corporate" },
     ar: { name: "الرئيسية", note: "المنصة الأم" },
+    zh: { name: "主枢纽", note: "集团门户" },
+    tr: { name: "Merkez", note: "Kurumsal Hub" },
+    fr: { name: "Hub", note: "Siège & Portail" },
   },
   {
     id: "land",
@@ -44,6 +50,9 @@ export const SURFACES: Surface[] = [
     glow: "rgba(232, 179, 23, 0.4)",
     en: { name: "Land", note: "Road freight" },
     ar: { name: "البري", note: "الشحن البري" },
+    zh: { name: "陆运", note: "重载干线物流" },
+    tr: { name: "Karayolu", note: "Ağır Yük Karayolu" },
+    fr: { name: "Terrestre", note: "Fret Routier Lourd" },
   },
   {
     id: "ocean",
@@ -53,6 +62,9 @@ export const SURFACES: Surface[] = [
     glow: "rgba(34, 228, 255, 0.45)",
     en: { name: "Ocean", note: "Maritime" },
     ar: { name: "البحري", note: "الشحن البحري" },
+    zh: { name: "海运", note: "远洋与近海航运" },
+    tr: { name: "Denizyolu", note: "Deniz Taşımacılığı" },
+    fr: { name: "Maritime", note: "Fret Maritime" },
   },
   {
     id: "air",
@@ -62,10 +74,16 @@ export const SURFACES: Surface[] = [
     glow: "rgba(155, 176, 188, 0.3)",
     en: { name: "Air", note: "CAI Cargo Village" },
     ar: { name: "الجوي", note: "قرية البضائع CAI" },
+    zh: { name: "空运", note: "开罗货运村航空港" },
+    tr: { name: "Havayolu", note: "CAI Kargo Köyü" },
+    fr: { name: "Aérien", note: "CAI Village Fret" },
   },
 ];
 
 export const SUITE_LABEL = {
   en: "Logistics Suite",
   ar: "منظومة الخدمات",
+  zh: "物流服务体系",
+  tr: "Lojistik Hizmet Ağı",
+  fr: "Suite Logistique",
 };

@@ -5,12 +5,30 @@ import LegalModal from "./LegalModal";
 
 type LegalKey = "terms" | "privacy" | "security";
 
+/* The company's verified channels, matching main/index.html's footer. */
+const SOCIAL = [
+  { label: "X", name: "X", href: "https://x.com/yaslogist" },
+  { label: "in", name: "LinkedIn", href: "https://www.linkedin.com/company/yaslogist" },
+  { label: "WA", name: "WhatsApp", href: "https://wa.me/201041139910" },
+] as const;
+
 export default function Footer() {
   const { t, ta } = useLang();
   const [legal, setLegal] = useState<LegalKey | null>(null);
+  /* Column links all resolved to `#connect`, which made the Company column's
+     "Investors" entry a dead anchor implying a funding round that does not
+     exist. It now addresses a real inbox instead; the rest keep the on-page
+     target. Keyed by position, not by label, so it survives the locale swap. */
+  const HREFS: Record<string, string> = {
+    "0.3": "mailto:contact@yaslogist.me?subject=Enquiry%20%E2%80%94%20YASLOGIST",
+  };
+
   const cols = [0, 1, 2].map((i) => ({
     head: t(`footer.cols.${i}.head`),
-    links: [0, 1, 2, 3].map((j) => t(`footer.cols.${i}.links.${j}`)),
+    links: [0, 1, 2, 3].map((j) => ({
+      label: t(`footer.cols.${i}.links.${j}`),
+      href: HREFS[`${i}.${j}`] ?? "#connect",
+    })),
   }));
 
   return (
@@ -19,7 +37,7 @@ export default function Footer() {
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-10 border-t border-chrome/10 pt-14 md:grid-cols-5">
         <div className="col-span-2">
           <div className="flex items-center gap-3">
-            <BrandMark id="foot" className="h-11 w-11" />
+            <BrandMark className="h-11 w-11" />
             <span className="leading-none">
               <span className="flex items-center gap-1.5 font-display text-lg font-bold tracking-[0.1em] text-ice">
                 YASLOGIST
@@ -34,21 +52,25 @@ export default function Footer() {
           </div>
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-ghost">{t("footer.blurb")}</p>
 
+          {/* Live channels. X and "in" previously resolved to `#connect`, so two
+              of the three chips scrolled the page instead of leaving it. Same
+              accounts main links to. */}
           <div className="mt-6 flex items-center gap-3">
-            {["X", "in", "WA"].map((s) => (
+            {SOCIAL.map((s) => (
               <a
-                key={s}
-                href={s === "WA" ? "https://wa.me/201002029997" : "#connect"}
-                target={s === "WA" ? "_blank" : undefined}
-                rel={s === "WA" ? "noopener noreferrer" : undefined}
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.name}
                 className="grid h-10 w-10 place-items-center rounded-xl border border-chrome/10 bg-chrome/[0.04] font-mono text-[10px] uppercase text-ghost transition-all duration-300 hover:border-neon/50 hover:text-neon hover:shadow-[0_0_16px_var(--glow-soft)]"
               >
-                {s}
+                {s.label}
               </a>
             ))}
           </div>
           <a
-            href="tel:+201002029997"
+            href="tel:+201041139910"
             className="mt-5 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] text-ghost transition-colors hover:text-neon"
           >
             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -65,9 +87,9 @@ export default function Footer() {
             <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-neon">{c.head}</div>
             <ul className="mt-5 space-y-3">
               {c.links.map((l) => (
-                <li key={l}>
-                  <a href="#connect" className="text-sm text-ghost transition-colors hover:text-ice">
-                    {l}
+                <li key={l.label}>
+                  <a href={l.href} className="text-sm text-ghost transition-colors hover:text-ice">
+                    {l.label}
                   </a>
                 </li>
               ))}

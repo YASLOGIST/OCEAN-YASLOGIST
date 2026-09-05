@@ -1,6 +1,6 @@
 import { useLang } from "../lib/i18n";
 import { cn } from "../utils/cn";
-import { GlassCard } from "./ui";
+import { GlassCard, ModelBadge } from "./ui";
 
 /* ═══════════════════════ Engine 05 · Blockchain Smart Contracts ═══════════════════════
    Self-contained panel (own chrome, no cross-import from Pillars) so this file
@@ -40,6 +40,8 @@ function Panel({ title, status, children }: { title: string; status: string; chi
           {status}
         </div>
       </div>
+      {/* Ledger visuals settle no real transaction; say so on the panel. */}
+      <ModelBadge />
       <div className="relative">{children}</div>
       <div className="pointer-events-none absolute right-4 top-4 h-6 w-6 border-r border-t border-neon/30" />
       <div className="pointer-events-none absolute bottom-4 left-4 h-6 w-6 border-b border-l border-neon/30" />

@@ -41,46 +41,13 @@ function VisualAnalytics() {
   );
 }
 
-/* ════════════════════════ 02 · IOT FLEET ════════════════════════════ */
-
-const FLEET_ROWS = [
-  { id: "IQ-4271", route: "SHA → SUZ → PSD", speed: "18.6 kn", temp: "24°C", load: "92%" },
-  { id: "IQ-3188", route: "ROT → ALX", speed: "21.2 kn", temp: "21°C", load: "78%" },
-  { id: "IQ-5094", route: "JEA → SKH", speed: "17.9 kn", temp: "26°C", load: "85%" },
-];
+/* ════════════════════ 02 · GATEWAY BERTH VIEW ════════════════════════ */
 
 function VisualFleet() {
   const { t } = useLang();
-  const n = (k: string) => t(`pillars.1.notes.${k}`);
   return (
     <Panel title={t("pillars.1.panel.title")} status={t("pillars.1.panel.status")}>
       <FleetRadar />
-
-      <div className="mt-5 space-y-2">
-        <div className="grid grid-cols-6 gap-3 px-3.5 font-mono text-[8px] uppercase tracking-[0.18em] text-ghost/70">
-          <span className="col-span-2">{n("vessel")}</span>
-          <span className="hidden sm:block">{n("route")}</span>
-          <span>{n("speed")}</span>
-          <span className="hidden md:block">{n("temp")}</span>
-          <span className="text-end">{n("load")}</span>
-        </div>
-        {FLEET_ROWS.map((r) => (
-          <div key={r.id} className="grid grid-cols-6 items-center gap-3 rounded-lg border border-chrome/5 bg-chrome/[0.03] px-3.5 py-2.5 font-mono text-[10px]">
-            <span className="col-span-2 flex items-center gap-2.5 text-ice">
-              <span className="glow-dot h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              {r.id}
-            </span>
-            <span className="hidden text-ghost sm:block">{r.route}</span>
-            <span className="text-neon">{r.speed}</span>
-            <span className="hidden text-ghost md:block">{r.temp}</span>
-            <span className="flex justify-end">
-              <span className="block h-1 w-14 overflow-hidden rounded bg-chrome/10">
-                <span className="grad-bar block h-full rounded" style={{ width: r.load }} />
-              </span>
-            </span>
-          </div>
-        ))}
-      </div>
     </Panel>
   );
 }
@@ -245,7 +212,7 @@ export default function Pillars() {
         t("pillars.1.chips.1"),
         t("pillars.1.chips.2"),
       ],
-      stat: { to: 2148, suffix: "", label: t("pillars.1.statLabel") },
+      stat: { to: 60, suffix: "s", label: t("pillars.1.statLabel") },
       visual: <VisualFleet />,
     },
     {
@@ -266,7 +233,7 @@ export default function Pillars() {
         t("pillars.2.chips.1"),
         t("pillars.2.chips.2"),
       ],
-      stat: { to: 12480, suffix: "", label: t("pillars.2.statLabel") },
+      stat: { to: 2, suffix: "s", label: t("pillars.2.statLabel") },
       visual: <VisualWarehouse />,
     },
     {
@@ -287,7 +254,7 @@ export default function Pillars() {
         t("pillars.3.chips.1"),
         t("pillars.3.chips.2"),
       ],
-      stat: { to: 42, suffix: "%", label: t("pillars.3.statLabel") },
+      stat: { to: 7, suffix: "", label: t("pillars.3.statLabel") },
       visual: <VisualGreen />,
     },
     {

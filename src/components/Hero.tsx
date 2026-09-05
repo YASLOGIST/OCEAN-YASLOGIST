@@ -73,7 +73,7 @@ function VesselCard() {
         </div>
         <div className="shrink-0 text-end font-mono text-[9px] uppercase leading-relaxed tracking-[0.18em] text-ghost/70">
           <p>{t("hero.telemetry.flag")}</p>
-          <p className="tabular text-ice/50">IMO 9928117</p>
+          <p className="tabular text-ice/50">IMO · sample</p>
         </div>
       </div>
 

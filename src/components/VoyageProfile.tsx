@@ -1,65 +1,75 @@
 import { useLang } from "../lib/i18n";
-import { cn } from "../utils/cn";
 
-/* ═══════════════ Engine 04 · Low-Carbon Voyage Profile ═══════════════
-   Comprehension first. One shared baseline, one direction of "good" (shorter =
-   cleaner, stated once), direct labels on every bar so there is no legend to
-   cross-reference, and a single headline figure that carries the story. No
-   gridlines, no axis furniture, no chart junk.
-──────────────────────────────────────────────────────────────────── */
+/* ═══════════════ Engine 04 · ACID & B/L Reference Reconciliation ═══════════════
+   The references a shipment carries — booking, B/L, container, ACID, gate pass —
+   stitched onto one record and cross-checked before the vessel sails. Four line
+   up; the ACID filing is rejected, and it surfaces here at booking rather than
+   at the gate. The customer or their licensed broker files the declaration; this
+   panel only watches the references line up (its ModelBadge says so).
 
-const BARS = [
-  { key: "fuel", pct: 61, tone: "from-cyan-400 to-emerald-400" },
-  { key: "shore", pct: 100, tone: "from-emerald-400 to-emerald-300" },
-  { key: "eco", pct: 76, tone: "from-cyan-400 to-emerald-400" },
-] as const;
+   NOTE: the file keeps its original name/export (VoyageProfile) so the Pillars
+   import is untouched; the low-carbon voyage chart it used to render was removed
+   — YASLOGIST is not a carrier and makes no emissions claim.
+──────────────────────────────────────────────────────────────────────────── */
 
 export default function VoyageProfile() {
   const { t } = useLang();
   const n = (k: string) => t(`pillars.3.notes.${k}`);
 
+  const refs = [
+    { label: n("ref0"), bad: false },
+    { label: n("ref1"), bad: false },
+    { label: n("ref2"), bad: false },
+    { label: n("ref3"), bad: true },
+    { label: n("ref4"), bad: false },
+  ];
+
   return (
     <div>
-      {/* headline — the one number that matters, with its direction spelled out */}
-      <div className="flex items-baseline gap-4 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-5 py-4 max-[360px]:flex-col max-[360px]:items-start max-[360px]:gap-2">
-        <div className="tabular font-display text-4xl font-bold leading-none text-emerald-400">
-          −42<span className="text-xl">%</span>
-        </div>
-        <div className="min-w-0">
-          <div className="font-mono text-[9px] uppercase leading-relaxed tracking-[0.2em] text-emerald-300/90">
-            {n("co2")}
-          </div>
-          <div className="mt-1 text-[11px] leading-snug text-ghost">{n("since")}</div>
-        </div>
-      </div>
+      <div className="mb-3 font-mono text-[9px] uppercase tracking-[0.22em] text-ice">{n("head")}</div>
 
-      {/* three drivers — directly labelled, shared baseline, value at the end */}
-      <div className="mt-5 space-y-4">
-        {BARS.map((b) => (
-          <div key={b.key}>
-            <div className="flex items-baseline justify-between gap-3">
-              <span className="text-[12px] leading-snug text-ice/85">{n(b.key)}</span>
-              <span className="tabular shrink-0 font-mono text-[12px] text-emerald-300" dir="ltr">
-                {b.key === "eco" ? n("ecoV") : `${b.pct}%`}
-              </span>
-            </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-chrome/10">
-              <div
-                className={cn("voyage-bar h-full rounded-full bg-gradient-to-r", b.tone)}
-                style={{ width: `${b.pct}%` }}
+      <div className="card-inset rounded-xl p-4">
+        <ol className="relative space-y-2.5 border-s border-dashed border-neon/25 ps-4">
+          {refs.map((r) => (
+            <li
+              key={r.label}
+              className="relative flex items-center justify-between gap-3 rounded-lg border border-chrome/5 bg-chrome/[0.03] px-3 py-2"
+            >
+              <span
+                className={
+                  "absolute -start-[9px] top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-abyss " +
+                  (r.bad ? "bg-rose-400" : "bg-emerald-400")
+                }
               />
-            </div>
-          </div>
-        ))}
+              <span className="min-w-0 font-mono text-[11px] text-ice/90">{r.label}</span>
+              {r.bad ? (
+                <span className="inline-flex max-w-[52%] items-center justify-end gap-1.5 text-end font-mono text-[8px] uppercase leading-snug tracking-[0.12em] text-rose-300">
+                  <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                  </svg>
+                  {n("flag")}
+                </span>
+              ) : (
+                <span className="inline-flex shrink-0 items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-emerald-300/90">
+                  <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                  {n("ok")}
+                </span>
+              )}
+            </li>
+          ))}
+        </ol>
       </div>
 
-      <p className="mt-5 flex items-center gap-2 border-t border-chrome/10 pt-4 font-mono text-[9px] uppercase leading-relaxed tracking-[0.18em] text-emerald-400/90">
-        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <path d="M12 22c4-3 7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 3 8 7 11Z" />
-          <path d="M9.5 11.5c1 1.5 4 1.5 5-1.5" />
-        </svg>
-        {n("offset")}
-      </p>
+      <div className="mt-4 flex items-center gap-4 rounded-xl border border-neon/20 bg-neon/[0.05] px-4 py-3">
+        <span className="tabular font-display text-3xl font-bold leading-none text-neon">{n("countV")}</span>
+        <span className="font-mono text-[9px] uppercase leading-snug tracking-[0.2em] text-ghost">{n("countK")}</span>
+      </div>
+
+      <p className="mt-3 border-t border-chrome/10 pt-3 text-[11px] leading-relaxed text-ghost">{n("foot")}</p>
     </div>
   );
 }

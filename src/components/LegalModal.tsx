@@ -100,7 +100,7 @@ export default function LegalModal({
         <div className="flex items-start justify-between gap-6 border-b border-chrome/10 px-6 py-5 sm:px-8">
           <div className="min-w-0">
             <p className="font-mono text-[9px] uppercase leading-relaxed tracking-[0.28em] text-neon">
-              YASLOGIST · DOKKI, CAIRO
+              YASLOGIST · NEW CAIRO, CAIRO
             </p>
             <h2 className="mt-2 font-display text-xl font-bold leading-snug text-ice sm:text-2xl">{title}</h2>
           </div>

@@ -1,27 +1,41 @@
 import { useLang } from "../lib/i18n";
-import { CountUp, Reveal } from "./ui";
+import { CountUp, ModelBadge, Reveal } from "./ui";
 
+/* Lanes that actually terminate at the gateways this surface covers. The
+   previous set (Singapore→LA, Rotterdam→NY, Busan→Long Beach …) advertised a
+   global liner network and contradicted the Egyptian-gateway positioning of
+   every claim above it. */
 const LANES = [
-  { from: "Singapore", to: "Los Angeles", eta: "14:32" },
-  { from: "Rotterdam", to: "New York", eta: "09:47" },
-  { from: "Shanghai", to: "Dubai", eta: "22:10" },
-  { from: "Hamburg", to: "Singapore", eta: "06:05" },
-  { from: "Busan", to: "Long Beach", eta: "18:26" },
-  { from: "Jebel Ali", to: "Felixstowe", eta: "11:58" },
+  { from: "Shanghai", to: "East Port Said", eta: "14:32" },
+  { from: "Jebel Ali", to: "Sokhna", eta: "09:47" },
+  { from: "Rotterdam", to: "Alexandria", eta: "22:10" },
+  { from: "Istanbul", to: "Damietta", eta: "06:05" },
+  { from: "Piraeus", to: "El Dekheila", eta: "18:26" },
+  { from: "Jeddah", to: "Sokhna", eta: "11:58" },
 ];
 
 export default function Stats() {
   const { t } = useLang();
   const stats = [
-    { to: 4.9, decimals: 1, suffix: "M", label: t("stats.items.0.label"), note: t("stats.items.0.note") },
-    { to: 240, suffix: "+", label: t("stats.items.1.label"), note: t("stats.items.1.note") },
-    { to: 86, suffix: "", label: t("stats.items.2.label"), note: t("stats.items.2.note") },
-    { to: 99.98, decimals: 2, suffix: "%", label: t("stats.items.3.label"), note: t("stats.items.3.note") },
+    { to: 5, suffix: "", label: t("stats.items.0.label"), note: t("stats.items.0.note") },
+    { to: 7, suffix: "", label: t("stats.items.1.label"), note: t("stats.items.1.note") },
+    { to: 60, suffix: "s", label: t("stats.items.2.label"), note: t("stats.items.2.note") },
+    { to: 94.2, decimals: 1, suffix: "%", label: t("stats.items.3.label"), note: t("stats.items.3.note") },
   ];
 
   return (
     <section id="stats" className="relative px-8 pb-10 pt-6 lg:px-10">
       <div className="mx-auto max-w-7xl">
+        {/* These four tiles carry the page's headline figures — gateways covered,
+            reference types stitched, AIS refresh, predictive ETA accuracy. They
+            are model outputs, and the label sits above them rather than in a
+            modal. (They previously read TEU moved / vessels / ports / on-time
+            rate, which described a carrier rather than a software platform.) */}
+        <Reveal>
+          <div className="mb-4 flex justify-start">
+            <ModelBadge />
+          </div>
+        </Reveal>
         <Reveal>
           <div className="glass grid grid-cols-2 gap-px overflow-hidden rounded-2xl lg:grid-cols-4">
             {/* Below `sm` the tile padding and the figure both come down. The grid is

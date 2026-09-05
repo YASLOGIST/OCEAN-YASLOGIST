@@ -1,200 +1,121 @@
 import { useLang } from "../lib/i18n";
-import { svgNumProps } from "../lib/svgText";
 
-/* ═══════════════════════ Fleet radar (Engine 02 · IoT Fleet) ═══════════════════════
-   A PPI-style radar scope. The sweep is one rotating conic gradient (a single
-   GPU transform), and each contact's flash is phase-locked to its own bearing,
-   so a blip ignites exactly as the beam crosses it and then decays — the way a
-   real persistence display behaves. Everything animates on transform/opacity
-   only; no layout, no paint, no JS per frame.
+/* ═══════════════════════ Engine 02 · Gateway Berth View ═══════════════════════
+   The five Egyptian sea gateways as a live berth board, not a radar. Each row
+   reads left→right: gateway → berth occupancy (filled = vessel alongside, hollow
+   = free) → vessels waiting → demurrage status. Two gateways show a queue
+   building, which is exactly the moment this engine exists to catch: a queue at
+   the quay flagged before it turns into a demurrage invoice.
 
-   The scope is north-up in every language: a bearing of 090 must sit east of
-   centre whether the page reads left-to-right or right-to-left, so the compass
-   labels are pinned LTR while the surrounding readouts localise normally.
-──────────────────────────────────────────────────────────────────────────────── */
+   Everything is read from vessel AIS and terminal berth status — the panel
+   observes; it does not run the terminal. The ModelBadge on the panel says the
+   figures are an illustrative model, not a live operational feed. Bilingual by a
+   small inline map so no radar-era i18n keys are needed; RTL falls out of the
+   logical-property layout.
+──────────────────────────────────────────────────────────────────────────── */
 
-const SWEEP_SECONDS = 4;
+type Gate = { en: string; ar: string; zh: string; tr: string; fr: string; berths: number; used: number; queue: number; warn: boolean };
 
-/* bearing = degrees clockwise from north; range = 0..1 of scope radius */
-const CONTACTS = [
-  { id: "IQ-4271", bearing: 38, range: 0.55, tone: "neon" },
-  { id: "IQ-3188", bearing: 142, range: 0.78, tone: "sky" },
-  { id: "IQ-5094", bearing: 214, range: 0.42, tone: "emerald" },
-  { id: "IQ-7730", bearing: 300, range: 0.68, tone: "neon" },
-] as const;
-
-const TONE: Record<string, { dot: string; glow: string }> = {
-  neon: { dot: "#22e4ff", glow: "rgba(34,228,255,0.95)" },
-  sky: { dot: "#38bdf8", glow: "rgba(56,189,248,0.95)" },
-  emerald: { dot: "#34d399", glow: "rgba(52,211,153,0.95)" },
-};
-
-/* Polar → cartesian in a 0..100 box, north-up. */
-function place(bearing: number, range: number) {
-  const rad = ((bearing - 90) * Math.PI) / 180;
-  return { x: 50 + Math.cos(rad) * range * 46, y: 50 + Math.sin(rad) * range * 46 };
-}
-
-/* Corner readout. The value is always latin-digit and LTR — a range or a sweep
-   period must not reorder under RTL — while the label follows the document. */
-function Readout({ label, value, className }: { label: string; value: string; className?: string }) {
-  return (
-    <div className={`radar-readout pointer-events-none absolute ${className ?? ""}`}>
-      <div className="radar-readout-key">{label}</div>
-      <div className="radar-readout-val" dir="ltr" style={{ unicodeBidi: "isolate" }}>
-        {value}
-      </div>
-    </div>
-  );
-}
+const GATES: Gate[] = [
+  { en: "Alexandria", ar: "الإسكندرية", zh: "亚历山大港", tr: "İskenderiye", fr: "Alexandrie", berths: 3, used: 3, queue: 2, warn: true },
+  { en: "El Dekheila", ar: "الدخيلة", zh: "德海拉港", tr: "El Dekheila", fr: "El Dekheila", berths: 2, used: 1, queue: 0, warn: false },
+  { en: "Damietta", ar: "دمياط", zh: "杜姆亚特港", tr: "Dimyat", fr: "Damiette", berths: 3, used: 2, queue: 1, warn: false },
+  { en: "E. Port Said", ar: "شرق بورسعيد", zh: "塞得东港", tr: "Doğu Port Said", fr: "Port-Saïd Est", berths: 4, used: 3, queue: 1, warn: false },
+  { en: "Ain Sokhna", ar: "السخنة", zh: "艾因苏赫奈港", tr: "Ayn Suhna", fr: "Ain Sokhna", berths: 2, used: 2, queue: 3, warn: true },
+];
 
 export default function FleetRadar() {
-  const { t } = useLang();
-  const n = (k: string) => t(`pillars.1.notes.${k}`);
-  const bearing = svgNumProps("center");
+  const { lang } = useLang();
+  const L = (en: string, ar: string, zh?: string, tr?: string, fr?: string) => {
+    if (lang === "ar") return ar;
+    if (lang === "zh" && zh) return zh;
+    if (lang === "tr" && tr) return tr;
+    if (lang === "fr" && fr) return fr;
+    return en;
+  };
 
   return (
-    <div className="radar-scope card-inset relative h-64 overflow-hidden rounded-xl">
-      {/* range grid, spokes, bearing ticks */}
-      <svg viewBox="0 0 100 100" className="absolute left-1/2 top-1/2 h-[15rem] w-[15rem] -translate-x-1/2 -translate-y-1/2" aria-hidden>
-        <defs>
-          <radialGradient id="radarFloor" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="var(--c-neon)" stopOpacity="0.16" />
-            <stop offset="60%" stopColor="var(--c-neon)" stopOpacity="0.05" />
-            <stop offset="100%" stopColor="var(--c-neon)" stopOpacity="0" />
-          </radialGradient>
-        </defs>
+    <div>
+      {/* column header */}
+      <div className="mb-2 grid grid-cols-[1.35fr_1fr_auto] items-center gap-3 px-3 font-mono text-[8px] uppercase tracking-[0.18em] text-ghost/70">
+        <span>{L("Gateway", "المنفذ", "核心口岸", "Liman Kapısı", "Portail")}</span>
+        <span>{L("Berths", "الأرصفة", "泊位占用", "Rıhtımlar", "Postes")}</span>
+        <span className="text-end">{L("Queue · Demurrage", "الطابور · الأرضيات", "排队 · 滞期预警", "Kuyruk · Demoraj", "File · Surestaries")}</span>
+      </div>
 
-        <circle cx="50" cy="50" r="46" fill="url(#radarFloor)" />
-
-        {[46, 34.5, 23, 11.5].map((r) => (
-          <circle key={r} cx="50" cy="50" r={r} fill="none" stroke="var(--c-neon)" strokeOpacity="0.22" strokeWidth="0.3" />
-        ))}
-
-        {/* spokes every 30°, longer ticks on the cardinals */}
-        {Array.from({ length: 12 }, (_, i) => i * 30).map((deg) => {
-          const rad = ((deg - 90) * Math.PI) / 180;
-          const cardinal = deg % 90 === 0;
-          const inner = cardinal ? 0 : 40;
-          return (
-            <line
-              key={deg}
-              x1={50 + Math.cos(rad) * inner}
-              y1={50 + Math.sin(rad) * inner}
-              x2={50 + Math.cos(rad) * 46}
-              y2={50 + Math.sin(rad) * 46}
-              stroke="var(--c-neon)"
-              strokeOpacity={cardinal ? 0.18 : 0.28}
-              strokeWidth={cardinal ? 0.25 : 0.4}
-            />
-          );
-        })}
-
-        {/* fine bearing ticks every 7.5° */}
-        {Array.from({ length: 48 }, (_, i) => i * 7.5).map((deg) => {
-          const rad = ((deg - 90) * Math.PI) / 180;
-          return (
-            <line
-              key={deg}
-              x1={50 + Math.cos(rad) * 43.5}
-              y1={50 + Math.sin(rad) * 43.5}
-              x2={50 + Math.cos(rad) * 46}
-              y2={50 + Math.sin(rad) * 46}
-              stroke="var(--c-neon)"
-              strokeOpacity="0.3"
-              strokeWidth="0.25"
-            />
-          );
-        })}
-
-        {/* centre reticle */}
-        <circle cx="50" cy="50" r="1.1" fill="var(--c-neon)" />
-        <circle cx="50" cy="50" r="3" fill="none" stroke="var(--c-neon)" strokeOpacity="0.5" strokeWidth="0.25" />
-
-        {/* Range-ring calibration. The outer ring is the RANGE readout, so the
-            inner rings are its even divisions — the rings meant something
-            already, this states what. Offset off the 180 spoke so the numerals
-            never sit on a line. */}
-        {[
-          { r: 11.5, v: "3" },
-          { r: 23, v: "6" },
-          { r: 34.5, v: "9" },
-        ].map(({ r, v }) => (
-          <text key={v} x="51.8" y={50 + r - 1.1} fill="var(--well-muted)" fillOpacity="0.7"
-                fontSize="2.6" textAnchor="start" style={bearing.style}>
-            {v}
-          </text>
-        ))}
-
-        {["000", "090", "180", "270"].map((lbl, i) => {
-          const rad = ((i * 90 - 90) * Math.PI) / 180;
-          return (
-            <text
-              key={lbl}
-              x={50 + Math.cos(rad) * 40}
-              y={50 + Math.sin(rad) * 40 + 1.2}
-              fill="var(--well-muted)"
-              fontSize="3"
-              textAnchor={bearing.textAnchor}
-              style={bearing.style}
-            >
-              {lbl}
-            </text>
-          );
-        })}
-      </svg>
-
-      {/* sweep — one rotating conic gradient, GPU transform only */}
-      <div
-        className="radar-sweep absolute left-1/2 top-1/2 h-[15rem] w-[15rem] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ animationDuration: `${SWEEP_SECONDS}s` }}
-        aria-hidden
-      />
-
-      {/* contacts — each phase-locked to its own bearing */}
-      {CONTACTS.map((c) => {
-        const { x, y } = place(c.bearing, c.range);
-        const tone = TONE[c.tone];
-        /* the beam reaches this bearing at this fraction of the revolution */
-        const delay = `${(-(c.bearing / 360) * SWEEP_SECONDS).toFixed(2)}s`;
-        return (
+      <div className="space-y-2">
+        {GATES.map((g) => (
           <div
-            key={c.id}
-            className="pointer-events-none absolute"
-            style={{
-              left: `calc(50% + ${((x - 50) / 100) * 15}rem)`,
-              top: `calc(50% + ${((y - 50) / 100) * 15}rem)`,
-            }}
-            aria-hidden
+            key={g.en}
+            className="grid grid-cols-[1.35fr_1fr_auto] items-center gap-3 rounded-lg border border-chrome/5 bg-chrome/[0.03] px-3 py-2.5"
           >
-            <span
-              className="radar-trail absolute rounded-full"
-              style={{ background: tone.glow, animationDuration: `${SWEEP_SECONDS}s`, animationDelay: delay }}
-            />
-            <span
-              className="radar-blip absolute rounded-full"
-              style={{
-                background: tone.dot,
-                boxShadow: `0 0 8px ${tone.glow}, 0 0 16px ${tone.glow}`,
-                animationDuration: `${SWEEP_SECONDS}s`,
-                animationDelay: delay,
-              }}
-            />
+            {/* gateway */}
+            <span className="truncate font-mono text-[11px] text-ice">
+              {L(g.en, g.ar, g.zh, g.tr, g.fr)}
+            </span>
+
+            {/* berth occupancy */}
+            <span className="flex items-center gap-1.5" aria-hidden>
+              {Array.from({ length: g.berths }).map((_, i) => (
+                <span
+                  key={i}
+                  className={
+                    "h-2.5 w-2.5 rounded-[3px] border " +
+                    (i < g.used
+                      ? "border-neon/50 bg-neon/80 shadow-[0_0_6px_rgba(34,228,255,0.4)]"
+                      : "border-chrome/20 bg-transparent")
+                  }
+                />
+              ))}
+            </span>
+
+            {/* queue + demurrage status */}
+            <span className="flex items-center justify-end gap-2.5">
+              <span className="tabular font-mono text-[11px] text-ice/80" dir="ltr" style={{ unicodeBidi: "isolate" }}>
+                {g.queue > 0 ? `+${g.queue}` : "—"}
+              </span>
+              <span
+                className={
+                  "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.12em] " +
+                  (g.warn
+                    ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
+                    : "border-emerald-400/30 bg-emerald-400/10 text-emerald-300")
+                }
+              >
+                <span className={"h-1.5 w-1.5 rounded-full " + (g.warn ? "bg-amber-400" : "bg-emerald-400")} />
+                {g.warn
+                  ? L("Building", "يتراكم", "拥堵预警", "Yığılma", "Engorgement")
+                  : L("Clear", "منتظم", "通畅正常", "Açık", "Dégagé")}
+              </span>
+            </span>
           </div>
-        );
-      })}
+        ))}
+      </div>
 
-      {/* micro-telemetry — logical inset so it mirrors cleanly with the document */}
-      <Readout label={n("sector")} value={n("sectorV")} className="start-3 top-3" />
-      <Readout label={n("range")} value={n("rangeV")} className="end-3 top-3 text-end" />
-      <Readout label={n("contacts")} value={String(CONTACTS.length)} className="start-3 bottom-3" />
-      <Readout label={n("sweep")} value={`${SWEEP_SECONDS}.0 s`} className="end-3 bottom-3 text-end" />
-
-      {/* corner brackets */}
-      <span className="pointer-events-none absolute left-1.5 top-1.5 h-3 w-3 border-l border-t border-neon/40" />
-      <span className="pointer-events-none absolute right-1.5 top-1.5 h-3 w-3 border-r border-t border-neon/40" />
-      <span className="pointer-events-none absolute bottom-1.5 left-1.5 h-3 w-3 border-b border-l border-neon/40" />
-      <span className="pointer-events-none absolute bottom-1.5 right-1.5 h-3 w-3 border-b border-r border-neon/40" />
+      {/* legend + honest note */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-chrome/10 pt-3 font-mono text-[8px] uppercase tracking-[0.14em] text-ghost/70">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-[3px] border border-neon/50 bg-neon/80" />
+          {L("Occupied", "مشغول", "占用中", "Dolu", "Occupé")}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-[3px] border border-chrome/20" />
+          {L("Free", "فارغ", "空闲", "Boş", "Libre")}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+          {L("Queue building", "طابور يتراكم", "排队积压", "Kuyruk artıyor", "File croissante")}
+        </span>
+      </div>
+      <p className="mt-2 text-[11px] leading-relaxed text-ghost">
+        {L(
+          "Berth occupancy and vessels waiting, read from AIS and terminal status. A queue building at the quay is flagged before the demurrage clock starts.",
+          "إشغال الأرصفة والسفن المنتظرة، مقروءة من AIS وحالة المحطة. تكدّس الطابور عند الرصيف يُرصد قبل أن يبدأ عدّاد الأرضيات.",
+          "整合船舶 AIS 与码头作业状态实时追踪泊位占用与候泊船只。在码头排队演变为滞期费账单前提前预警。",
+          "AIS ve terminal durumundan okunan rıhtım doluluğu ve bekleyen gemiler. Rıhtımdaki yığılma, demoraj saati başlamadan tespit edilir.",
+          "Occupation des postes à quai et navires en attente d'après l'AIS et le terminal. L'attente au quai est alertée avant les surestaries."
+        )}
+      </p>
     </div>
   );
 }

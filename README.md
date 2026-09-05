@@ -1,282 +1,90 @@
-[README_Version3.md](https://github.com/user-attachments/files/31126374/README_Version3.md)
-[README.md](https://github.com/user-attachments/files/31126279/README.md)
-# YASLOGIST
+# YASLOGIST — Ocean
 
-[![Project: YASLOGIST](https://img.shields.io/badge/project-YASLOGIST-blue)]()
 [![Language: TypeScript](https://img.shields.io/badge/language-TypeScript-3178c6)]()
-[![License](https://img.shields.io/badge/license-See%20REPO-lightgrey)]()
+[![Build: Vite](https://img.shields.io/badge/build-Vite-646cff)]()
+[![Surface: ocean.yaslogist.me](https://img.shields.io/badge/live-ocean.yaslogist.me-0284c7)]()
 
-A fast, modern frontend scaffold for YASLOGIST built with React, Vite, TypeScript and Tailwind CSS. This repository contains the UI/application code and tooling to develop, test, and build the web frontend.
+The **Ocean** surface of YASLOGIST — the Egyptian sea-freight view of a single shipment record.
 
-Table of contents
-- [Why this repo](#why-this-repo)# YASLOGIST
+A shipment carries many identities on its way through a port: a booking reference, a bill of lading, a container number, an ACID, a gate pass, a truck plate. YASLOGIST reads those references onto **one record** and keeps it intact across the handover from sea to road. This repository is the front end for the ocean view of that record.
 
-[![Project: YASLOGIST](https://img.shields.io/badge/project-YASLOGIST-blue)]()
-[![Language: TypeScript](https://img.shields.io/badge/language-TypeScript-3178c6)]()
-[![License](https://img.shields.io/badge/license-See%20REPO-lightgrey)]()
+---
 
-A fast, modern frontend scaffold for YASLOGIST built with React, Vite, TypeScript and Tailwind CSS. This repository contains the UI/application code and tooling to develop, test, and build the web frontend.
+## What this is — and what it is not
 
-Table of contents
-- [Why this repo](#why-this-repo)
-- [Features](#features)
-- [Tech stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Quick start](#quick-start)
-- [Scripts](#scripts)
-- [Development notes](#development-notes)
-- [Building & deploying](#building--deploying)
-- [Testing & type checking](#testing--type-checking)
-- [Code style & linting](#code-style--linting)
-- [Contributing](#contributing)
-- [Troubleshooting](#troubleshooting)
-- [License & credits](#license--credits)
-- [Contact](#contact)
+YASLOGIST **observes and unifies shipment data. It does not move cargo, and it does not file declarations.**
 
-Why this repo
--------------
-YASLOGIST is intended as a performant, accessible, and maintainable frontend. This repository provides:
-- A TypeScript React app using Vite for fast dev experience
-- Tailwind CSS for utility-first styling
-- Small, modern dependencies to keep the app lean
-- Tooling for type checking and a simple test harness
+- Not a freight forwarder, a shipping agent, or a customs broker.
+- No fleet, no vessels, no warehouses, no customs filing on anyone's behalf.
+- Customs milestones reach YASLOGIST through the customer or their licensed broker — never by direct authority access.
 
-Features
---------
-- Fast dev server (Vite)
-- Type-safe code (TypeScript)
-- Tailwind CSS-based styling and theming
-- Single-file build optimization (vite-plugin-singlefile configured)
+The boundary is a design constraint, not a disclaimer. Every claim on the site is written to stay inside it.
 
-Tech stack
-----------
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS
-- Bun (used for the provided test harness script)
-- Utilities: clsx, tailwind-merge, @vercel/speed-insights
+## The five engines
 
-Prerequisites
--------------
-- Node.js 18+ (or the version you use across the org)
-- npm (or pnpm/yarn if preferred) — npm commands shown below
-- Bun if you want to run the included Bun-based test harness (`bun` binary required for `npm run test`)
-- Recommended: a modern browser for dev preview
+The page frames five recurring, costly bottlenecks in Egyptian ocean freight, and pairs each with the capability that reads it — one to one:
 
-Quick start
------------
-1. Clone the repo
-   - git clone https://github.com/YasauraTeam/YASLOGIST.git
-2. Install dependencies
-   - npm install
-3. Start dev server
-   - npm run dev
-4. Open http://localhost:5173 (or the URL printed by Vite)
+| # | Bottleneck | Engine (what the record reads) |
+|---|------------|--------------------------------|
+| 1 | Empty repositioning cost | Predictive ETA & repositioning signal |
+| 2 | Berth queue & demurrage | Vessel AIS & berth visibility |
+| 3 | Pharma cold-chain breaks | Cold-chain monitoring (2–8 °C) |
+| 4 | ACID & B/L rejections | ACID & B/L reference stitching |
+| 5 | Document & release fraud | Tamper-evident shared record |
 
-Scripts
--------
-The project exposes these npm scripts (see package.json):
-- npm run dev — start Vite dev server
-- npm run build — build the production bundle
-- npm run preview — locally preview production build
-- npm run test — run the test harness (this repo uses `bun tests/scroll-harness.ts`)
-- npm run typecheck — run `tsc --noEmit` to type-check the codebase
-- npm run gate — run `typecheck`, `test`, then `build` (CI-style gate sequence)
+Every figure shown on these engines is an **illustrative model output**, marked inline with a model badge rather than presented as a live operational feed. You will not find shipment counts, container volumes, customer counts, or uptime figures here — because they would not be true yet.
 
-Development notes
------------------
-- TypeScript: This repo uses strict typing. Run `npm run typecheck` before opening PRs.
-- Tailwind: Tailwind is configured as a PostCSS/Vite plugin. If you add classes dynamically, ensure they are included in your content globs so PurgeCSS (Tailwind) keeps them.
-- CSS: Keep utility classes concise. Use `tailwind-merge` to safely merge classes when needed.
-- Single-file builds: The repository includes `vite-plugin-singlefile` — useful for generating self-contained artifacts for simple deployments.
+## Tech stack
 
-Building & deploying
---------------------
-- Build for production:
-  - npm run build
-- Preview build locally:
-  - npm run preview
-- Deploy:
-  - Deploy the output in `dist/` to your static host (Vercel, Netlify, S3+CloudFront, or any static file host).
-  - If you use server-side integration or a backend API, ensure environment variables and base paths are configured in `vite.config.ts` or at deploy time.
+- **React 19** + **TypeScript**
+- **Vite** with `vite-plugin-singlefile` (the production build inlines to a single HTML file)
+- **Tailwind CSS v4** (`@tailwindcss/vite`)
+- `clsx` + `tailwind-merge` for class composition
+- `@vercel/analytics` + `@vercel/speed-insights`
 
-Testing & type checking
------------------------
-- Type checking:
-  - npm run typecheck
-- Tests:
-  - npm run test (uses Bun for `tests/scroll-harness.ts`). If you don't have Bun installed, either install Bun or replace the test script with your preferred test runner (Vitest, Jest, Playwright, etc.) depending on the scope you need.
+## Design system
 
-Code style & linting
---------------------
-- This repo does not include an opinionated linter by default. Recommended additions:
-  - ESLint with TypeScript parser
-  - Prettier for formatting
-- Suggested minimal setup:
-  - Install ESLint + Prettier and add pre-commit hooks (husky) for formatting and linting on commit.
+- **Bilingual** English / Arabic, switched by paired `lang` spans with CSS visibility — never JS text swapping — with full RTL via logical properties.
+- **Light / dark** themes via `[data-theme]` with a pre-paint head script; every color is a token, and both theme blocks define an identical token set with documented contrast ratios.
+- Identifiers are the imagery: no stock photography, no world map, no fabricated dashboards. One accent, used sparingly.
 
-Contributing
-------------
-Thanks for contributing! Suggested workflow:
-1. Create a descriptive branch: feature/my-feature or fix/issue-123
-2. Commit changes with clear messages
-3. Run `npm run typecheck` and `npm run test` locally
-4. Open a pull request with a description of the change and any environment updates
-5. If the PR changes UI/UX, include screenshots and short reproduction steps
+## Quick start
 
-A note about PRs: include the steps to build and run the feature if special environment variables are required.
+```bash
+git clone https://github.com/YASLOGIST/OCEAN-YASLOGIST.git
+cd OCEAN-YASLOGIST
+npm install
+npm run dev        # Vite dev server, http://localhost:5173
+```
 
-Troubleshooting
----------------
-- Dev server fails to start:
-  - Ensure no other process is using the dev port (default 5173). Kill conflicting process or set VITE_PORT.
-- Tests failing under Bun:
-  - Confirm Bun is installed (`bun -v`) and that the test harness expects Bun APIs. Consider replacing with Node-based runner if required.
-- Tailwind classes stripped in production:
-  - Ensure your dynamic class strings are included in content globs in `tailwind.config.js`.
+## Scripts
 
-License & credits
------------------
-If this repository already contains a LICENSE file, that license applies. If not, add a LICENSE (MIT is a common permissive choice). Also add any third-party license attribution where required.
+| Script | What it does |
+|--------|--------------|
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` | Production build (single-file output in `dist/`) |
+| `npm run preview` | Serve the production build locally |
+| `npm run typecheck` | `tsc --noEmit` — types, JSX and imports |
+| `npm run test` | Scroll-harness checks (requires `bun`) |
+| `npm run check:bundle` | Bundle-size gate |
+| `npm run gate` | Full gate: typecheck → test → build → bundle check |
 
-Contact
--------
-Maintained by YasauraTeam.
-- Repo: https://github.com/YasauraTeam/YASLOGIST
-- For issues and feature requests: open a GitHub issue
+Run `npm run gate` before every push. Ship only when it is clean.
 
-Acknowledgments
----------------
-Thanks to the open source projects that make this stack possible: React, Vite, TypeScript, Tailwind CSS, Bun and the many community contributors.
+## Building & deploying
 
-- [Features](#features)
-- [Tech stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Quick start](#quick-start)
-- [Scripts](#scripts)
-- [Development notes](#development-notes)
-- [Building & deploying](#building--deploying)
-- [Testing & type checking](#testing--type-checking)
-- [Code style & linting](#code-style--linting)
-- [Contributing](#contributing)
-- [Troubleshooting](#troubleshooting)
-- [License & credits](#license--credits)
-- [Contact](#contact)
+`npm run build` emits a single-file production build to `dist/`. The site is deployed on Vercel and is Git-connected on `main`, so a push to `main` triggers a production build and deploy. Verify locally with `npm run preview` first.
 
-Why this repo
--------------
-YASLOGIST is intended as a performant, accessible, and maintainable frontend. This repository provides:
-- A TypeScript React app using Vite for fast dev experience
-- Tailwind CSS for utility-first styling
-- Small, modern dependencies to keep the app lean
-- Tooling for type checking and a simple test harness
+## Verification
 
-Features
---------
-- Fast dev server (Vite)
-- Type-safe code (TypeScript)
-- Tailwind CSS-based styling and theming
-- Single-file build optimization (vite-plugin-singlefile configured)
+Beyond `npm run gate`, every visual change is checked across **5 viewports (360 / 375 / 390 / 412 / 430) × 2 languages × 2 themes** for document overflow, element spill, sub-44px tap targets, caption collisions, and text truncation. A change ships only at zero issues.
 
-Tech stack
-----------
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS
-- Bun (used for the provided test harness script)
-- Utilities: clsx, tailwind-merge, @vercel/speed-insights
+## Credits & contact
 
-Prerequisites
--------------
-- Node.js 18+ (or the version you use across the org)
-- npm (or pnpm/yarn if preferred) — npm commands shown below
-- Bun if you want to run the included Bun-based test harness (`bun` binary required for `npm run test`)
-- Recommended: a modern browser for dev preview
+Built from scratch by **Ahmed Yasser Ali** — supply chain & logistics, New Cairo, Cairo, Egypt.
 
-Quick start
------------
-1. Clone the repo
-   - git clone https://github.com/YasauraTeam/YASLOGIST.git
-2. Install dependencies
-   - npm install
-3. Start dev server
-   - npm run dev
-4. Open http://localhost:5173 (or the URL printed by Vite)
+- Web: [yaslogist.me](https://yaslogist.me) · Ocean: [ocean.yaslogist.me](https://ocean.yaslogist.me)
+- New enquiries: `contact@yaslogist.me` · Existing shipments: `support@yaslogist.me`
+- WhatsApp: +20 104 113 9910
 
-Scripts
--------
-The project exposes these npm scripts (see package.json):
-- npm run dev — start Vite dev server
-- npm run build — build the production bundle
-- npm run preview — locally preview production build
-- npm run test — run the test harness (this repo uses `bun tests/scroll-harness.ts`)
-- npm run typecheck — run `tsc --noEmit` to type-check the codebase
-- npm run gate — run `typecheck`, `test`, then `build` (CI-style gate sequence)
-
-Development notes
------------------
-- TypeScript: This repo uses strict typing. Run `npm run typecheck` before opening PRs.
-- Tailwind: Tailwind is configured as a PostCSS/Vite plugin. If you add classes dynamically, ensure they are included in your content globs so PurgeCSS (Tailwind) keeps them.
-- CSS: Keep utility classes concise. Use `tailwind-merge` to safely merge classes when needed.
-- Single-file builds: The repository includes `vite-plugin-singlefile` — useful for generating self-contained artifacts for simple deployments.
-
-Building & deploying
---------------------
-- Build for production:
-  - npm run build
-- Preview build locally:
-  - npm run preview
-- Deploy:
-  - Deploy the output in `dist/` to your static host (Vercel, Netlify, S3+CloudFront, or any static file host).
-  - If you use server-side integration or a backend API, ensure environment variables and base paths are configured in `vite.config.ts` or at deploy time.
-
-Testing & type checking
------------------------
-- Type checking:
-  - npm run typecheck
-- Tests:
-  - npm run test (uses Bun for `tests/scroll-harness.ts`). If you don't have Bun installed, either install Bun or replace the test script with your preferred test runner (Vitest, Jest, Playwright, etc.) depending on the scope you need.
-
-Code style & linting
---------------------
-- This repo does not include an opinionated linter by default. Recommended additions:
-  - ESLint with TypeScript parser
-  - Prettier for formatting
-- Suggested minimal setup:
-  - Install ESLint + Prettier and add pre-commit hooks (husky) for formatting and linting on commit.
-
-Contributing
-------------
-Thanks for contributing! Suggested workflow:
-1. Create a descriptive branch: feature/my-feature or fix/issue-123
-2. Commit changes with clear messages
-3. Run `npm run typecheck` and `npm run test` locally
-4. Open a pull request with a description of the change and any environment updates
-5. If the PR changes UI/UX, include screenshots and short reproduction steps
-
-A note about PRs: include the steps to build and run the feature if special environment variables are required.
-
-Troubleshooting
----------------
-- Dev server fails to start:
-  - Ensure no other process is using the dev port (default 5173). Kill conflicting process or set VITE_PORT.
-- Tests failing under Bun:
-  - Confirm Bun is installed (`bun -v`) and that the test harness expects Bun APIs. Consider replacing with Node-based runner if required.
-- Tailwind classes stripped in production:
-  - Ensure your dynamic class strings are included in content globs in `tailwind.config.js`.
-
-License & credits
------------------
-If this repository already contains a LICENSE file, that license applies. If not, add a LICENSE (MIT is a common permissive choice). Also add any third-party license attribution where required.
-
-Contact
--------
-Maintained by YasauraTeam.
-- Repo: https://github.com/YasauraTeam/YASLOGIST
-- For issues and feature requests: open a GitHub issue
-
-Acknowledgments
----------------
-Thanks to the open source projects that make this stack possible: React, Vite, TypeScript, Tailwind CSS, Bun and the many community contributors.
+The YASLOGIST name, mark and interface are the founder's work. Please ask before reusing them.

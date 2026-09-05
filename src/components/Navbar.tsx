@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { subscribeScroll } from "../lib/scroll";
-import { useLang } from "../lib/i18n";
+import { SUPPORTED_LANGUAGES, useLang, type Lang } from "../lib/i18n";
 import { useTheme } from "../lib/theme";
 import { cn } from "../utils/cn";
 import { BrandMark } from "./Brand";
+import SuiteSwitcher from "./SuiteSwitcher";
 import GlobalClock from "./GlobalClock";
 
 function Logo() {
   const { t } = useLang();
   return (
     <a href="#hero" className="group flex items-center gap-2 sm:gap-3">
-      <BrandMark id="nav" className="h-10 w-10 sm:h-11 sm:w-11" />
+      <BrandMark className="h-10 w-10 sm:h-11 sm:w-11" />
       {/* Below the 360px floor the bar is 46.7px over budget and the menu button
           goes off-screen. The wordmark is the only thing here that is decoration
           rather than function — the mark still identifies the site, while the
@@ -55,38 +56,69 @@ function ThemeToggle() {
   );
 }
 
-/* ── Language pill ───────────────────────────────────────────────────────
-   Both languages are always visible, so the control reads as a state switch
-   rather than a mystery button — you can see what you are on and what you would
-   get. The knob is a single translated pseudo-element, so switching costs one
-   compositor transform and no layout.
-
-   "عربي" is set in Aref Ruqaa. Ruq'ah is the everyday Arabic hand — a native
-   reader recognises it instantly as Arabic-for-Arabs rather than a translation
-   afterthought, which is exactly the signal a premium localisation should send.
-──────────────────────────────────────────────────────────────────────── */
+/* ── Multi-Language Segmented Switcher (Desktop & Tablets) ───────────────── */
 function LangToggle() {
   const { lang, setLang } = useLang();
-  const isAr = lang === "ar";
+  return (
+    <div
+      dir="ltr"
+      role="radiogroup"
+      aria-label="Language selection"
+      className="hidden sm:inline-flex items-center rounded-full border border-chrome/15 bg-abyss/85 p-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+    >
+      {SUPPORTED_LANGUAGES.map((item) => {
+        const isSelected = lang === item.code;
+        return (
+          <button
+            key={item.code}
+            type="button"
+            role="radio"
+            aria-checked={isSelected}
+            onClick={() => setLang(item.code)}
+            className={cn(
+              "relative px-2.5 py-1 text-[10.5px] font-bold select-none rounded-full transition-all duration-200",
+              isSelected
+                ? "bg-gradient-to-r from-neon to-cyan-400 text-abyss font-black shadow-[0_0_14px_rgba(34,228,255,0.7)]"
+                : "text-ghost hover:text-ice hover:bg-chrome/5"
+            )}
+            style={item.code === "ar" ? { fontFamily: "var(--font-ruqaa)", fontSize: "12.5px", lineHeight: "1" } : undefined}
+            title={item.nativeName}
+            aria-label={`Switch language to ${item.nativeName}`}
+          >
+            {item.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Mobile Compact Language Button ─────────────────────────────────────── */
+function MobileLangButton() {
+  const { lang, setLang } = useLang();
+  const nextLang: Record<Lang, Lang> = {
+    en: "ar",
+    ar: "zh",
+    zh: "tr",
+    tr: "fr",
+    fr: "en",
+  };
+  const current = SUPPORTED_LANGUAGES.find((l) => l.code === lang) || SUPPORTED_LANGUAGES[0];
   return (
     <button
       type="button"
-      onClick={() => setLang(isAr ? "en" : "ar")}
-      role="switch"
-      aria-checked={isAr}
-      aria-label={isAr ? "Switch to English" : "التبديل إلى العربية"}
-      className="lang-pill"
-      data-on={isAr ? "ar" : "en"}
+      onClick={() => setLang(nextLang[lang])}
+      aria-label={`Current language: ${current.nativeName}. Tap to cycle.`}
+      className="sm:hidden glass gpu grid h-10 min-w-10 px-2 cursor-pointer place-items-center rounded-xl border border-neon/30 text-neon font-display text-[11px] font-bold transition-all active:scale-95"
+      style={lang === "ar" ? { fontFamily: "var(--font-ruqaa)", fontSize: "13px" } : undefined}
     >
-      <span className="lang-knob" aria-hidden />
-      <span className={cn("lang-opt", !isAr && "lang-opt-on")}>EN</span>
-      <span className={cn("lang-opt lang-opt-ar", isAr && "lang-opt-on")}>عربي</span>
+      <span>{current.label}</span>
     </button>
   );
 }
 
 export default function Navbar() {
-  const { t, ta, lang } = useLang();
+  const { t, ta, lang, setLang } = useLang();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -95,7 +127,7 @@ export default function Navbar() {
   const links = ta("nav.links");
   const menuIds = ["hero", "solutions", "simulator", "p1", "p2", "p3", "p4", "p5", "connect"];
   const menuLabels: Record<string, string> = {
-    hero: lang === "ar" ? "نظرة عامة" : "Overview",
+    hero: lang === "ar" ? "نظرة عامة" : lang === "zh" ? "走廊概览" : lang === "tr" ? "Genel Bakış" : lang === "fr" ? "Aperçu" : "Overview",
     solutions: t("hud.dots.1"),
     simulator: t("hud.dots.2"),
     p1: t("hud.dots.3"),
@@ -128,8 +160,14 @@ export default function Navbar() {
                the defect; widening the bar to the section content grid (1280px)
                is what gives the row its natural width back. Arabic's labels are
                narrower and already fit with 176px to spare, so it keeps the 7xl
-               cap and its geometry is untouched. */
-            lang === "en" && "2xl:max-w-[85rem]"
+               cap and its geometry is untouched.
+
+               xl fix: at xl the status pill + suite switcher appear while the cap
+               is still 7xl, and the wider English labels overflowed the row so
+               the theme toggle spilled outside the bar. The cap now widens at xl
+               too (the status pill is also deferred to 2xl below), which returns
+               the row's natural width one breakpoint earlier. */
+            lang === "en" && "xl:max-w-[84rem] 2xl:max-w-[85rem]"
           )}
         >
           <div
@@ -168,7 +206,7 @@ export default function Navbar() {
               <GlobalClock className="hidden 2xl:flex" />
               <span className="hidden h-8 w-px bg-chrome/15 2xl:block" />
 
-              <span className="hidden items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-emerald-300 xl:inline-flex">
+              <span className="hidden items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-emerald-300 2xl:inline-flex">
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -176,6 +214,13 @@ export default function Navbar() {
                 {t("nav.status")}
               </span>
 
+              {/* Suite switcher. `xl` and up only: at `lg` this row has ~50px
+                  of slack and the switcher is ~112px, so showing it there
+                  would re-open the overflow the CTA removal closed. Phones get
+                  the grid in the drawer below. */}
+              <SuiteSwitcher current="ocean" className="hidden xl:flex" />
+
+              <MobileLangButton />
               <LangToggle />
               <ThemeToggle />
 
@@ -221,6 +266,58 @@ export default function Navbar() {
           WebkitBackdropFilter: "blur(24px)",
         }}
       >
+        {/* Suite grid first: a visitor who opened this menu to leave for another
+            surface should not have to scroll nine section links to find the
+            way out. `.nav-menu` is `overflow-y: auto` with `safe center`
+            (HANDOFF Bug B), so the added height degrades to a scroll on the
+            shortest viewports rather than clipping a row. */}
+        <SuiteSwitcher
+          current="ocean"
+          variant="grid"
+          onNavigate={() => setOpen(false)}
+          className="mb-3 border-b border-chrome/10 pb-4"
+        />
+
+        {/* 5-Language selection in mobile drawer */}
+        <div className="mb-3 border-b border-chrome/10 pb-4">
+          <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.25em] text-neon">
+            {lang === "ar"
+              ? "اختر لغة المنصة"
+              : lang === "zh"
+              ? "选择平台语言"
+              : lang === "tr"
+              ? "Platform Dilini Seçin"
+              : lang === "fr"
+              ? "Choisir la Langue"
+              : "Select Platform Language"}
+          </p>
+          <div className="grid grid-cols-5 gap-1.5 p-1 rounded-xl border border-chrome/15 bg-chrome/[0.03]">
+            {SUPPORTED_LANGUAGES.map((item) => {
+              const isSelected = lang === item.code;
+              return (
+                <button
+                  key={item.code}
+                  type="button"
+                  onClick={() => {
+                    setLang(item.code);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex flex-col items-center justify-center py-2 px-1 rounded-lg text-center transition-all",
+                    isSelected
+                      ? "bg-neon text-abyss font-bold shadow-[0_0_12px_var(--glow)]"
+                      : "text-ghost hover:text-ice hover:bg-chrome/5"
+                  )}
+                  style={item.code === "ar" ? { fontFamily: "var(--font-ruqaa)" } : undefined}
+                >
+                  <span className="text-[11px] font-bold leading-tight">{item.label}</span>
+                  <span className="text-[8px] opacity-75 leading-tight truncate max-w-full">{item.nativeName}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {menuIds.map((id, i) => (
           <a
             key={id}

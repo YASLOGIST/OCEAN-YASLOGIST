@@ -20,7 +20,7 @@ function PhoneIcon({ className }: { className?: string }) {
 
 export default function Closing() {
   const { t } = useLang();
-  const WA_LINK = "https://wa.me/201002029997";
+  const WA_LINK = "https://wa.me/201041139910";
 
   return (
     <section id="connect" className="section-iso cv-auto relative scroll-mt-24 px-8 pb-12 pt-6 lg:px-10">
@@ -69,7 +69,7 @@ export default function Closing() {
                 </a>
 
                 <a
-                  href="tel:+201002029997"
+                  href="tel:+201041139910"
                   className="cta-secondary btn-ghost gpu inline-flex items-center gap-2.5 rounded-2xl px-6 py-4 font-display text-sm font-semibold tracking-wide"
                 >
                   <PhoneIcon className="h-5 w-5 shrink-0 text-neon" />
@@ -80,7 +80,7 @@ export default function Closing() {
               {/* phone — dir locked so RTL never reverses it */}
               <div className="mt-8">
                 <a
-                  href="tel:+201002029997"
+                  href="tel:+201041139910"
                   className="cta-phone tabular font-display text-2xl font-bold tracking-wide text-ice sm:text-3xl"
                 >
                   <span dir="ltr" style={{ unicodeBidi: "isolate" }}>

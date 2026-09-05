@@ -14,14 +14,11 @@ export default function Hud() {
   const { t } = useLang();
   const [active, setActive] = useState("hero");
   const flowRef = useRef<HTMLDivElement>(null);
-  const depthRef = useRef<HTMLDivElement>(null);
   const flowLabelRef = useRef<HTMLSpanElement>(null);
-  const depthLabelRef = useRef<HTMLSpanElement>(null);
   const topBarRef = useRef<HTMLDivElement>(null);
   const topLeftRef = useRef<HTMLDivElement>(null);
   const topRightRef = useRef<HTMLDivElement>(null);
   const botLeftRef = useRef<HTMLDivElement>(null);
-  const botRightRef = useRef<HTMLDivElement>(null);
 
   /* velocity + depth + top progress — direct DOM writes, no re-render */
   useEffect(
@@ -30,11 +27,9 @@ export default function Hud() {
         const v = Math.min(1, Math.abs(f.vel) * 0.5);
         if (flowRef.current) flowRef.current.style.width = `${(v * 100).toFixed(1)}%`;
         if (flowLabelRef.current) flowLabelRef.current.textContent = `×${(1 + v * 0.4).toFixed(2)}`;
-        if (depthRef.current) depthRef.current.style.width = `${(f.progress * 100).toFixed(1)}%`;
-        if (depthLabelRef.current) depthLabelRef.current.textContent = `${Math.round(f.progress * 100)}%`;
         if (topBarRef.current) topBarRef.current.style.width = `${(f.progress * 100).toFixed(2)}%`;
 
-        /* All four corner readouts are ambient chrome for the hero video. They
+        /* The corner readouts are ambient chrome for the hero video. They
            are fixed to the viewport, so anywhere past the hero they sit on top
            of section content and, at the end of the page, on the footer links.
            One fade curve retires the whole set as you enter content — measured
@@ -45,7 +40,6 @@ export default function Hud() {
         if (topLeftRef.current) topLeftRef.current.style.opacity = o;
         if (topRightRef.current) topRightRef.current.style.opacity = o;
         if (botLeftRef.current) botLeftRef.current.style.opacity = o;
-        if (botRightRef.current) botRightRef.current.style.opacity = o;
       }),
     []
   );
@@ -114,20 +108,6 @@ export default function Hud() {
           <div ref={flowRef} className="grad-bar h-full" style={{ width: 0 }} />
         </div>
         <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.25em] text-ice/40">{t("hud.camNote")}</p>
-      </div>
-
-      {/* bottom-right: depth */}
-      <div ref={botRightRef} className="pointer-events-none fixed bottom-8 right-8 z-40 hidden w-48 text-end md:block">
-        <div className="mb-1.5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.25em] text-ghost">
-          <span>{t("hud.depth")}</span>
-          <span ref={depthLabelRef} className="text-neon">
-            0%
-          </span>
-        </div>
-        <div className="h-[3px] w-full overflow-hidden rounded bg-chrome/10">
-          <div ref={depthRef} className="ms-auto h-full grad-bar" style={{ width: 0 }} />
-        </div>
-        <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.25em] text-ice/40">{t("hud.depthNote")}</p>
       </div>
 
       {/* right dot navigation */}

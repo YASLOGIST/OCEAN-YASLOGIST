@@ -4,7 +4,10 @@
 
    Expected basenames:
      founder         — founder portrait, square-ish, ≥512px
-     yaslogist-logo  — YASLOGIST "YL" globe mark
+
+   `yaslogist-logo` was removed from the glob: the mark is now drawn as inline
+   vector in Brand.tsx (matching main/media/logo.svg), so leaving the basename
+   here would keep inlining a 192×192 PNG as a data URI that nothing renders.
 
    A glob is used rather than static imports so that a missing file
    degrades to the built-in SVG fallback instead of failing the build.
@@ -18,7 +21,7 @@
    (issue #1). Adding a slot means adding its basename below.
 ────────────────────────────────────────────────────────────────────── */
 
-const files = import.meta.glob("./brand/{founder,yaslogist-logo}.{png,jpg,jpeg,webp,svg,PNG,JPG,JPEG,WEBP,SVG}", {
+const files = import.meta.glob("./brand/founder.{png,jpg,jpeg,webp,svg,PNG,JPG,JPEG,WEBP,SVG}", {
   eager: true,
   query: "?url",
   import: "default",
@@ -33,4 +36,3 @@ function pick(basename: string): string | undefined {
 }
 
 export const founderPhoto = pick("founder");
-export const brandLogo = pick("yaslogist-logo");

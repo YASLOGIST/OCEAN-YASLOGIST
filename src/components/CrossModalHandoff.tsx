@@ -12,7 +12,7 @@ import { ModelBadge, Reveal } from "./ui";
    terminal feed.
 ────────────────────────────────────────────────────────────────────────── */
 
-const COPY = {
+const COPY: Record<string, { tag: string; head: string; sub: string; status: string; cta: string }> = {
   en: {
     tag: "Intermodal handoff",
     head: "Cargo discharged at port? Seamless inland handshake.",
@@ -26,6 +26,27 @@ const COPY = {
     sub: "سجل الرحلة لا ينتهي عند الرصيف. أرقام الحاوية والحجز والتخليص تنتقل مباشرة إلى المرحلة البرية، لتعرف الشاحنة التي تستلم ما الذي تستلمه بالضبط.",
     status: "الرصيف جاهز · تحويل فوري إلى أسطول الحمولات الكاملة والمجزأة والمبرّدة",
     cta: "أرسل عبر YASLOGIST البري",
+  },
+  zh: {
+    tag: "多式联运无缝交接",
+    head: "货物抵港卸船？即刻触发陆运干线接载。",
+    sub: "货运航程并不终结于海港码头。集装箱号、订舱单及通关凭证直通公路干线，接载集卡在到场前已精准获知货况与装卸要求。",
+    status: "码头泊位卸载完毕 · 即时转运至 FTL/LTL 重载及冷链车队",
+    cta: "通过 YASLOGIST 陆运系统调度",
+  },
+  tr: {
+    tag: "Çok modlu aktarma",
+    head: "Yük limana indi mi? Karayolu ile kesintisiz el sıkışma.",
+    sub: "Sefer kaydı rıhtımda bitmez. Konteyner, rezervasyon ve gümrükleme referansları doğrudan karayolu bacağına aktarılır; böylece teslim alan araç ne aldığını önceden bilir.",
+    status: "Liman terminal rıhtımı boş · FTL/LTL frigofirik filoya anında transfer",
+    cta: "YASLOGIST Kara Üzerinden Sevk Et",
+  },
+  fr: {
+    tag: "Relais intermodal",
+    head: "Cargaison déchargée au port ? Relais routier immédiat.",
+    sub: "Le registre de voyage ne s'arrête pas au quai. Conteneur, réservation et références douanières sont transmis directement au tronçon routier : le camion de collecte sait exactement ce qu'il prend en charge.",
+    status: "Poste à quai dégagé · Transfert instantané vers la flotte FTL/LTL réfrigérée",
+    cta: "Expédier via YASLOGIST Terrestre",
   },
 };
 
