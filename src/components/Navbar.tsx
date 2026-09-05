@@ -11,15 +11,15 @@ function Logo() {
   const { t } = useLang();
   return (
     <a href="#hero" className="group flex shrink-0 items-center gap-2 sm:gap-3 select-none">
-      <BrandMark className="h-10 w-10 sm:h-11 sm:w-11 shrink-0" />
+      <BrandMark className="h-9 w-9 sm:h-10 sm:w-10 xl:h-11 xl:w-11 shrink-0" />
       <span className="leading-none max-[360px]:hidden">
-        <span className="flex items-center gap-1.5 font-display text-[13px] font-bold tracking-[0.1em] text-ice sm:text-lg whitespace-nowrap">
+        <span className="flex items-center gap-1.5 font-display text-[13px] font-bold tracking-[0.1em] text-ice sm:text-base xl:text-lg whitespace-nowrap">
           YASLOGIST
           <span className="hidden rounded-md border border-neon/40 bg-neon/10 px-1.5 py-0.5 font-mono text-[7px] font-normal tracking-[0.2em] text-neon sm:inline-block">
             CORE
           </span>
         </span>
-        <span className="mt-1 hidden max-w-[250px] font-mono text-[6.5px] uppercase leading-[1.6] tracking-[0.12em] text-ghost sm:block whitespace-nowrap truncate">
+        <span className="mt-1 hidden max-w-[160px] xl:max-w-[210px] 2xl:max-w-[250px] font-mono text-[6.5px] uppercase leading-[1.6] tracking-[0.12em] text-ghost lg:block whitespace-nowrap truncate">
           {t("nav.sub")}
         </span>
       </span>
@@ -69,7 +69,7 @@ function LangToggle() {
             aria-checked={isSelected}
             onClick={() => setLang(item.code)}
             className={cn(
-              "relative px-2 xl:px-2.5 py-1 text-[10px] xl:text-[10.5px] font-bold select-none rounded-full transition-all duration-200 cursor-pointer",
+              "relative px-1.5 sm:px-2 xl:px-2.5 py-0.5 xl:py-1 text-[9.5px] xl:text-[10.5px] font-bold select-none rounded-full transition-all duration-200 cursor-pointer",
               isSelected
                 ? "bg-gradient-to-r from-neon to-cyan-400 text-abyss font-black shadow-[0_0_14px_rgba(34,228,255,0.7)]"
                 : "text-ghost hover:text-ice hover:bg-chrome/5"
@@ -144,12 +144,12 @@ export default function Navbar() {
       >
         <div
           className={cn(
-            "mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-5 lg:px-6 xl:px-8 xl:max-w-[84rem] 2xl:max-w-[86rem]"
+            "mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-5 lg:px-6 xl:px-8 xl:max-w-[84rem] 2xl:max-w-[88rem]"
           )}
         >
           <div
             className={cn(
-              "flex w-full items-center justify-between gap-1.5 sm:gap-4 md:gap-6 rounded-2xl px-2.5 sm:px-4 md:px-5 py-2 sm:py-2.5 transition-all duration-500",
+              "flex w-full items-center justify-between gap-1.5 sm:gap-3 md:gap-4 lg:gap-6 rounded-2xl px-2.5 sm:px-4 md:px-5 py-2 sm:py-2.5 transition-all duration-500",
               scrolled ? "glass-strong" : "border border-transparent bg-transparent"
             )}
           >
@@ -157,12 +157,12 @@ export default function Navbar() {
               <Logo />
             </div>
 
-            <nav className="hidden items-center gap-3.5 lg:flex xl:gap-5 2xl:gap-7">
+            <nav className="hidden items-center gap-2.5 lg:flex xl:gap-4 2xl:gap-6 shrink-0">
               {links.map((l, i) => (
                 <a
                   key={l}
                   href={`#p${i + 1}`}
-                  className="group relative font-mono text-[10.5px] xl:text-[11px] uppercase tracking-[0.14em] xl:tracking-[0.22em] text-ghost transition-colors hover:text-neon whitespace-nowrap select-none"
+                  className="group relative font-mono text-[10px] xl:text-[10.5px] uppercase tracking-[0.12em] xl:tracking-[0.18em] text-ghost transition-colors hover:text-neon whitespace-nowrap select-none"
                 >
                   {l}
                   <span className="absolute -bottom-1.5 start-0 h-px w-0 bg-neon shadow-[0_0_8px_var(--glow)] transition-all duration-300 group-hover:w-full" />
@@ -170,19 +170,11 @@ export default function Navbar() {
               ))}
             </nav>
 
-            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:gap-2.5">
-              {/* Global logistics clock — Cairo first. Fixed-width numerals, so
-                  the header height never moves as the digits tick. */}
-              <GlobalClock className="hidden 2xl:flex" />
-              <span className="hidden h-8 w-px bg-chrome/15 2xl:block" />
-
-              <span className="hidden shrink-0 items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-emerald-300 whitespace-nowrap 2xl:inline-flex">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                </span>
-                {t("nav.status")}
-              </span>
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 xl:gap-3">
+              {/* Global logistics clock — rendered only on ultra-wide screens (>= 1720px)
+                  where horizontal budget is abundant, eliminating any chance of row overflow. */}
+              <GlobalClock className="hidden min-[1720px]:flex" />
+              <span className="hidden h-8 w-px bg-chrome/15 min-[1720px]:block" />
 
               {/* Suite switcher */}
               <SuiteSwitcher current="ocean" className="hidden xl:flex" />
