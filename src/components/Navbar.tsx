@@ -5,7 +5,6 @@ import { useTheme } from "../lib/theme";
 import { cn } from "../utils/cn";
 import { BrandMark } from "./Brand";
 import SuiteSwitcher from "./SuiteSwitcher";
-import GlobalClock from "./GlobalClock";
 
 function Logo() {
   const { t } = useLang();
@@ -170,12 +169,7 @@ export default function Navbar() {
               ))}
             </nav>
 
-            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 xl:gap-3">
-              {/* Global logistics clock — rendered only on ultra-wide screens (>= 1720px)
-                  where horizontal budget is abundant, eliminating any chance of row overflow. */}
-              <GlobalClock className="hidden min-[1720px]:flex" />
-              <span className="hidden h-8 w-px bg-chrome/15 min-[1720px]:block" />
-
+            <div className="flex shrink-0 items-center gap-2 sm:gap-2.5 xl:gap-3">
               {/* Suite switcher */}
               <SuiteSwitcher current="ocean" className="hidden xl:flex" />
 

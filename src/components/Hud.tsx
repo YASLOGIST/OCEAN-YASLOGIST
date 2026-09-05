@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { subscribeScroll } from "../lib/scroll";
 import { useLang } from "../lib/i18n";
 import { cn } from "../utils/cn";
+import GlobalClock from "./GlobalClock";
 
 /* Observed for the active-section highlight. */
 const SECTION_IDS = ["hero", "stats", "solutions", "simulator", "p1", "p2", "p3", "p4", "p5", "connect"];
@@ -89,9 +90,9 @@ export default function Hud() {
         <p className="text-ice/40">{t("hud.sys")}</p>
       </div>
 
-      {/* top-right status — the clock moved to the header (GlobalClock), so this
-          block carries only fleet health, no duplicated timekeeping. */}
+      {/* top-right status and global logistics clock */}
       <div ref={topRightRef} className="pointer-events-none fixed right-8 top-20 z-40 hidden text-end font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] text-ghost md:block">
+        <GlobalClock className="flex justify-end gap-3.5 mb-2.5" />
         <p>{t("hud.utc")}</p>
         <p className="text-ice/40">{t("hud.health")}</p>
       </div>
