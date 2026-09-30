@@ -24,25 +24,35 @@ import BrandPlate from "./BrandPlate";
 
 const FRAME_COUNT = 60;
 
-/* Two encodes of the same footage. The canvas is a full-viewport COVER layer,
-   so the pixels it genuinely needs are (viewport width × DPR) — nothing more.
-   Shipping the 1280×720 master to a 375pt phone measured 2,902 KB of transfer
-   and ~211 MB of retained decoded bitmap (60 × 1280 × 720 × 4 B), which is the
-   dominant cost on mobile. The small set is a straight 640×360 re-encode. */
+/* Three encodes of the same footage. The canvas is a full-viewport COVER layer.
+   The 640×360 set stays available for genuinely small/1x screens; 960×540 is
+   the quality/performance tier for modern phones; 1280×720 remains the large
+   canvas. Only the active theme + selected tier is fetched. */
 const FRAME_SETS = {
   sm: { w: 640, h: 360, suffix: "-sm" },
+  md: { w: 960, h: 540, suffix: "-md" },
   lg: { w: 1280, h: 720, suffix: "" },
 } as const;
 type FrameSetKey = keyof typeof FRAME_SETS;
 
 /* Chosen once per load, not per resize: swapping mid-session would throw away a
    warm sequence and re-download the other one. DPR is capped at 2 because past
-   that the extra density is invisible under the veil while bitmap memory keeps
-   growing linearly. */
+   that the transfer/decode cost rises faster than the visible gain. */
 function pickFrameSet(): FrameSetKey {
   if (typeof window === "undefined") return "lg";
-  const needed = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
-  return needed <= 900 ? "sm" : "lg";
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  /* On portrait screens the 16:9 footage is cover-scaled by HEIGHT, not width.
+     Width-only selection therefore sent Retina phones the 640x360 set and
+     enlarged its 360px height across the whole display. Fold a bounded share
+     of viewport height into the demand so phones land on the 960x540 tier,
+     while small 1x displays can still keep the lean 640px set. */
+  const demand = Math.max(
+    window.innerWidth * dpr,
+    Math.min(window.innerHeight, 960) * 1.1
+  );
+  if (demand <= 720) return "sm";
+  if (demand <= 1180) return "md";
+  return "lg";
 }
 
 /* Frames fetched before the page has painted. Enough that the canvas has
@@ -72,6 +82,19 @@ function whenIdle(fn: () => void) {
 
 const frameUrl = (base: string, i: number) => `${base}${String(i + 1).padStart(3, "0")}.jpg`;
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+
+/* Preserve 1:1 scroll response through most of the sequence, then decelerate
+   continuously into the final frame. The cubic has slope 1 at the join and 0
+   at the endpoint, so there is no speed discontinuity and no visible "cut"
+   when the sequence reaches frame 60. */
+const END_EASE_START = 0.82;
+function cinematicEndEase(value: number) {
+  const x = clamp01(value);
+  if (x <= END_EASE_START) return x;
+  const t = (x - END_EASE_START) / (1 - END_EASE_START);
+  const eased = t + t * t - t * t * t;
+  return END_EASE_START + (1 - END_EASE_START) * eased;
+}
 
 type Seq = {
   imgs: HTMLImageElement[];
@@ -223,7 +246,7 @@ function FrameCanvas({
            actually moves. f.y is the engine's LERPed position, which is what
            carries the inertia. */
         const span = SCRUB_SCREENS * (f.vh || 1);
-        scrubRef.current = clamp01(f.y / span);
+        scrubRef.current = cinematicEndEase(f.y / span);
         /* Scrubbing tracks the user's own scroll 1:1, so it is direct
            manipulation rather than autonomous motion and stays enabled under
            prefers-reduced-motion. The differential camera pan/zoom IS the
