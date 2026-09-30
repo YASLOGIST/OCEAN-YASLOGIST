@@ -2,14 +2,9 @@ import { founderPhoto } from "../assets/brand";
 import { cn } from "../utils/cn";
 
 /* ── Canonical platform mark ─────────────────────────────────────────────
-   The YASLOGIST monogram, identical to main/media/logo.svg, main's inline
-   header mark and land's navbar mark: a ruled globe behind a "YL" ligature.
-
-   This replaced two competing marks. `yaslogist-logo.png` was a 192×192
-   raster inlined as a data URI, and behind it sat `BrandGlyph`, a bespoke
-   mast-and-swell cargo glyph used whenever that file was absent — so the
-   surface could render either of two logos, neither of which was the one on
-   the corporate hub. Vector, currentColor, one definition.
+   Current YASLOGIST monogram: the YL ligature inside a single outer circle.
+   The retired globe latitude/longitude lines are intentionally absent.
+   Vector + currentColor keeps the mark crisp and theme-aware at every DPR.
 ────────────────────────────────────────────────────────────────────────── */
 function BrandGlyph({ className }: { className?: string }) {
   return (
@@ -23,10 +18,6 @@ function BrandGlyph({ className }: { className?: string }) {
       role="img"
       aria-label="YASLOGIST"
     >
-      <g strokeWidth="1.6" opacity="0.55">
-        <ellipse cx="32" cy="32" rx="12.5" ry="29" />
-        <path d="M3 32h58M8 17.5h48M8 46.5h48" />
-      </g>
       <circle cx="32" cy="32" r="29" strokeWidth="2.2" />
       <g strokeWidth="5" strokeLinecap="square">
         <path d="M16 16 L27.5 31.5 L27.5 49" />

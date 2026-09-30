@@ -6,7 +6,7 @@
      founder         — founder portrait, square-ish, ≥512px
 
    `yaslogist-logo` was removed from the glob: the mark is now drawn as inline
-   vector in Brand.tsx (matching main/media/logo.svg), so leaving the basename
+   vector in Brand.tsx (current YL-in-circle mark), so leaving the basename
    here would keep inlining a 192×192 PNG as a data URI that nothing renders.
 
    A glob is used rather than static imports so that a missing file

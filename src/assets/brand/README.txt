@@ -6,7 +6,6 @@ be .png, .jpg, .jpeg, .webp or .svg — the resolver matches on basename only,
 so no code needs to change.
 
   founder.jpg           the founder portrait  (square crop, 512x512 or larger)
-  yaslogist-logo.png    the YASLOGIST "YL" globe mark  (transparent PNG preferred)
 
 Until a file is present, that slot falls back to the built-in SVG mark or
 the "AY" monogram, so the site always builds and runs.

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { subscribeScroll } from "../lib/scroll";
 import { useTheme } from "../lib/theme";
-import BrandPlate from "./BrandPlate";
 
 /**
  * Scroll-scrubbed background — canvas frame sequence, no <video> element.
@@ -24,35 +23,21 @@ import BrandPlate from "./BrandPlate";
 
 const FRAME_COUNT = 60;
 
-/* Three encodes of the same footage. The canvas is a full-viewport COVER layer.
-   The 640×360 set stays available for genuinely small/1x screens; 960×540 is
-   the quality/performance tier for modern phones; 1280×720 remains the large
-   canvas. Only the active theme + selected tier is fetched. */
-const FRAME_SETS = {
-  sm: { w: 640, h: 360, suffix: "-sm" },
-  md: { w: 960, h: 540, suffix: "-md" },
-  lg: { w: 1280, h: 720, suffix: "" },
+/* Use masters that match the viewport orientation instead of enlarging and
+   heavily cropping a 16:9 frame on portrait screens. Both profiles keep the
+   source's full available raster: 1280×720 landscape and 720×1280 portrait.
+   Only the active theme + selected orientation is fetched. */
+const FRAME_PROFILES = {
+  landscape: { w: 1920, h: 1080, suffix: "" },
+  portrait: { w: 1080, h: 1920, suffix: "-phone" },
 } as const;
-type FrameSetKey = keyof typeof FRAME_SETS;
+type FrameProfileKey = keyof typeof FRAME_PROFILES;
 
-/* Chosen once per load, not per resize: swapping mid-session would throw away a
-   warm sequence and re-download the other one. DPR is capped at 2 because past
-   that the transfer/decode cost rises faster than the visible gain. */
-function pickFrameSet(): FrameSetKey {
-  if (typeof window === "undefined") return "lg";
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  /* On portrait screens the 16:9 footage is cover-scaled by HEIGHT, not width.
-     Width-only selection therefore sent Retina phones the 640x360 set and
-     enlarged its 360px height across the whole display. Fold a bounded share
-     of viewport height into the demand so phones land on the 960x540 tier,
-     while small 1x displays can still keep the lean 640px set. */
-  const demand = Math.max(
-    window.innerWidth * dpr,
-    Math.min(window.innerHeight, 960) * 1.1
-  );
-  if (demand <= 720) return "sm";
-  if (demand <= 1180) return "md";
-  return "lg";
+/* Resolved once per load so a browser resize never throws away a warm sequence.
+   Portrait uses a dedicated 9:16 master; landscape keeps the full 16:9 master. */
+function pickFrameProfile(): FrameProfileKey {
+  if (typeof window === "undefined") return "landscape";
+  return window.innerHeight > window.innerWidth ? "portrait" : "landscape";
 }
 
 /* Frames fetched before the page has painted. Enough that the canvas has
@@ -66,8 +51,8 @@ const EAGER_FRAMES = 6;
    matter how the page's measured height fluctuates. */
 const SCRUB_SCREENS = 10;
 
-const seqBase = (name: "night" | "day", set: FrameSetKey) =>
-  `${import.meta.env.BASE_URL}frames/${name}${FRAME_SETS[set].suffix}/`;
+const seqBase = (name: "night" | "day", profile: FrameProfileKey) =>
+  `${import.meta.env.BASE_URL}frames/${name}${FRAME_PROFILES[profile].suffix}/`;
 
 /* Defer until the page has had its first paint, then until the main thread is
    idle. This is what keeps the remaining 54 frames off the critical path. */
@@ -273,10 +258,10 @@ export default function Background() {
   const { theme } = useTheme();
   const moverRef = useRef<HTMLDivElement>(null);
   const nightActive = theme === "dark";
-  /* Resolved once and held: see pickFrameSet on why this must not react to
+  /* Resolved once and held: see pickFrameProfile on why this must not react to
      resize. */
-  const setKey = useRef(pickFrameSet()).current;
-  const { w: frameW, h: frameH } = FRAME_SETS[setKey];
+  const profileKey = useRef(pickFrameProfile()).current;
+  const { w: frameW, h: frameH } = FRAME_PROFILES[profileKey];
 
   /* The ONLY scroll-driven layout work: a GPU transform on the camera
      container. Writes `transform` only — no layout, no paint. */
@@ -307,14 +292,14 @@ export default function Background() {
             covers the moment before the first frame decodes, and the stock
             aerial that used to sit here matched neither sequence. */}
         <FrameCanvas
-          base={seqBase("day", setKey)}
+          base={seqBase("day", profileKey)}
           active={!nightActive}
           width={frameW}
           height={frameH}
           className="bg-video bg-video-day absolute inset-0 h-full w-full object-cover select-none"
         />
         <FrameCanvas
-          base={seqBase("night", setKey)}
+          base={seqBase("night", profileKey)}
           active={nightActive}
           width={frameW}
           height={frameH}
@@ -333,10 +318,7 @@ export default function Background() {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/50 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-[radial-gradient(60%_100%_at_50%_100%,var(--veil-glow),transparent_70%)]" />
 
-      {/* Last child on purpose: it paints over the footage and every veil above
-          it, but still inside this `z-[-1]` stacking context, so page content,
-          the HUD and the header all draw over the plate rather than under it. */}
-      <BrandPlate />
+
     </div>
   );
 }

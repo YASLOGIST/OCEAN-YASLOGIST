@@ -132,9 +132,6 @@ type Dict = {
      numbers read as live to anyone who never opened it. This carries the same
      statement inline, on the widget itself. */
   model: { badge: string; badgeShort: string };
-  /* The corner watermark-cover plate (see BrandPlate.tsx). Previously hardcoded
-     English only, so it rendered in Latin script inside an RTL layout. */
-  brandPlate: { sub: string };
 };
 
 const en: Dict = {
@@ -468,9 +465,6 @@ const en: Dict = {
   model: {
     badge: "Illustrative model · not live data",
     badgeShort: "Simulated",
-  },
-  brandPlate: {
-    sub: "Core · Cairo",
   },
 };
 
@@ -806,9 +800,6 @@ const ar: Dict = {
     badge: "نموذج توضيحي · ليست بيانات مباشرة",
     badgeShort: "محاكاة",
   },
-  brandPlate: {
-    sub: "المقر · القاهرة",
-  },
 };
 
 const zh: Dict = {
@@ -1142,9 +1133,6 @@ const zh: Dict = {
   model: {
     badge: "推演仿真模型 · 非现场运营实测数据",
     badgeShort: "仿真模型",
-  },
-  brandPlate: {
-    sub: "总部 · 开罗",
   },
 };
 
@@ -1481,9 +1469,6 @@ const tr: Dict = {
     badge: "Gösterge modeli · canlı veri değildir",
     badgeShort: "Simüle",
   },
-  brandPlate: {
-    sub: "Merkez · Kahire",
-  },
 };
 
 
@@ -1818,9 +1803,6 @@ const fr: Dict = {
   model: {
     badge: "Modèle illustratif · données non réelles",
     badgeShort: "Simulé",
-  },
-  brandPlate: {
-    sub: "Siège · Le Caire",
   },
 };
 

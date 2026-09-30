@@ -1369,7 +1369,7 @@ input:focus-visible,
 /* Only the day layer gets the light-theme lift; the night layer is graded
    in-file and must not be brightened. */
 [data-theme="light"] .bg-video-day {
-  filter: brightness(1.22) saturate(1.08);
+  filter: contrast(1.02) saturate(1.02);
 }
 /* Stack the two videos; the background gradient sits beneath both. */
 .bg-video-day {
@@ -1377,6 +1377,7 @@ input:focus-visible,
 }
 .bg-video-night {
   z-index: 2;
+  filter: contrast(1.02) saturate(1.02);
 }
 
 /* Darkening scrim over the night footage — lifts text and glass-card contrast.
@@ -1387,97 +1388,8 @@ input:focus-visible,
      scrim is the only cover at mid-viewport, so it alone sets the worst-case
      contrast for copy on open footage. Lowering it to 0.42/0.54 measured
      3.82:1 for `--c-muted`, well under AA. */
-  background: linear-gradient(180deg, rgba(2, 6, 20, 0.52), rgba(2, 6, 20, 0.68));
+  background: linear-gradient(180deg, rgba(2, 6, 20, 0.28), rgba(2, 6, 20, 0.42));
   transition: opacity 0.7s ease;
-}
-
-/* ═══════════════════════ Corner brand plate (TRIAL) ═══════════════════════
-   Covers the generation watermark baked into the trial footage — see
-   BrandPlate.tsx for why it sits in the background layer. Delete both once the
-   clean re-export lands.
-
-   Hidden by default and revealed only where the mark is actually on screen.
-   Visibility is decided by ASPECT RATIO ALONE, not by width. Under
-   `object-fit: cover` a 16:9 frame is cropped horizontally, and the crop is what
-   pushes the watermark off-screen — so a short wide viewport exposes it at any
-   width. Swept at a fixed 800px height, the mark first appears at exactly 3:2:
-
-     AR 1.475 and below  cropped out
-     AR 1.500            visible, needs   8w × 164h from the corner
-     AR 1.600            visible, needs  48w × 164h
-
-   An earlier `min-width: 1200px` conjunct here was wrong and left the mark
-   uncovered on three real viewports: 1024×600 (AR 1.71), and phone landscape at
-   896×414 and 812×375 (AR 2.16/2.17), all of which show it. Gating on 3/2 alone
-   is exact in both directions — no gap above it, no orphan plate below it.
-
-   Physical `right`/`bottom`, deliberately NOT logical properties: the footage
-   is the same footage in Arabic, so the mark stays bottom-RIGHT under `dir=rtl`
-   and a logical inset would flip the plate away from it. */
-.brand-plate {
-  display: none;
-}
-
-@media (min-aspect-ratio: 3 / 2) {
-  .brand-plate {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    /* Sized to the union of the watermark's scroll sweep, which `.bg-camera`
-       pans and zooms, so it is much larger than the 78×97 mark itself. Measured
-       across nine viewports the requirement is a near-constant FRACTION of the
-       viewport — at most 9.1% of width and 20.5% of height — so clamp() tracks
-       it continuously instead of stepping at breakpoints, and the plate grows
-       and shrinks smoothly as the window is resized. 11vw / 23vh carry the
-       margin; the floors keep it usable on phone landscape (89×86 at 812×375)
-       and the ceilings stop it dominating an ultrawide. */
-    width: clamp(88px, 11vw, 22rem);
-    height: clamp(72px, 23vh, 20rem);
-    flex-direction: column;
-    align-items: flex-start;
-    gap: clamp(0.2rem, 0.9vh, 0.55rem);
-    padding: clamp(0.45rem, 1.5vh, 1.15rem);
-    /* Flush to the corner: the mark reaches the viewport edge at 1280 and 1440,
-       so any inset would leave the right point of the sparkle showing. Rounding
-       only the inward corner is what reads as a corner plate rather than a card
-       that has drifted off the edge. */
-    border-radius: var(--card-radius) 0 0 0;
-    border-right: 0;
-    border-bottom: 0;
-    /* `.glass-strong` is only 78-90% opaque, which is the right call for a card
-       floating over the page but not enough here: measured through the built
-       page, the sparkle still read +8 to +13 luma against its surroundings
-       through the glass. This longhand overrides the transparent
-       background-color the `.glass-strong` shorthand sets while leaving its
-       gradient, border and shadow intact, so the plate keeps the card language
-       and simply stops transmitting what is behind it. `--c-bg` is the existing
-       page-ground token in both themes — no new colour enters the palette. */
-    background-color: var(--c-bg);
-    overflow: hidden;
-  }
-
-  /* Contents track the plate so the lockup stays proportional rather than
-     overflowing a short plate. Same tokens and type tiers as before — only the
-     sizes are now fluid. */
-  .brand-plate-mark {
-    width: clamp(20px, 3.6vh, 40px);
-    height: clamp(20px, 3.6vh, 40px);
-  }
-  .brand-plate-word {
-    font-size: clamp(8px, 1.5vh, 15px);
-  }
-  .brand-plate-sub {
-    font-size: clamp(6px, 0.95vh, 9px);
-  }
-  /* Below this the plate is under ~120px tall and the third line stops being
-     legible before it stops fitting — the mark and wordmark alone still read as
-     an intentional lockup, which a clipped caption would not. */
-  @media (max-height: 520px) {
-    .brand-plate-sub {
-      display: none;
-    }
-  }
 }
 
 /* ═══════════════════════ Page footer ═══════════════════════
