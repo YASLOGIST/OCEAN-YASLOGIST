@@ -318,7 +318,21 @@ export default function Background() {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/50 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-[radial-gradient(60%_100%_at_50%_100%,var(--veil-glow),transparent_70%)]" />
 
-
+      {/* Canonical YASLOGIST motion-background mark. It lives outside the
+          transformed camera layer, so the footage can move while the brand
+          stays optically stable and pixel-sharp on every viewport. */}
+      <img
+        src={`${import.meta.env.BASE_URL}brand/yaslogist-motion-mark.webp`}
+        alt=""
+        className="absolute bottom-[max(1.15rem,env(safe-area-inset-bottom))] end-5 h-10 w-10 select-none object-contain sm:end-7 sm:h-12 sm:w-12 lg:end-9 lg:h-16 lg:w-16"
+        style={{
+          opacity: nightActive ? 0.38 : 0.28,
+          filter: nightActive
+            ? "drop-shadow(0 2px 12px rgba(0,0,0,.42))"
+            : "drop-shadow(0 2px 10px rgba(15,23,42,.20))",
+        }}
+        draggable={false}
+      />
     </div>
   );
 }

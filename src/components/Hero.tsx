@@ -156,7 +156,7 @@ export default function Hero() {
       <Parallax speed={0.22} className="w-full">
         <div className="relative z-[var(--z-section-content)] mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 px-8 lg:grid-cols-[1.12fr_0.88fr] lg:px-10">
           {/* copy */}
-          <div>
+          <div className="copy-readability hero-copy">
             <Reveal>
               <SectionTag>{t("hero.tag")}</SectionTag>
             </Reveal>

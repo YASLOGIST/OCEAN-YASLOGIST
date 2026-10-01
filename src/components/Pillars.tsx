@@ -114,7 +114,7 @@ function PillarSection({ p, flip }: { p: Pillar; flip: boolean }) {
       </div>
 
       <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-14 px-6 lg:grid-cols-12 lg:px-10">
-        <Reveal className={cn("lg:col-span-5", flip && "lg:order-2")}>
+        <Reveal className={cn("copy-readability pillar-copy lg:col-span-5", flip && "lg:order-2")}>
           <SectionTag>{p.tag}</SectionTag>
           <h2 className="h2-display mt-6 pb-1 font-display text-ice">
             {p.pre}
