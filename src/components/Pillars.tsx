@@ -10,13 +10,16 @@ import { CheckIcon, CountUp, GlassCard, ModelBadge, Parallax, Reveal, SectionTag
 
 /* ═══════════════════════════ shared panel ═══════════════════════════ */
 
-function Panel({ title, status, children, variant }: { title: string; status: string; children: ReactNode; variant: "forecast" | "berth" | "cold" | "reference" }) {
+function Panel({ title, status, children, variant, index }: { title: string; status: string; children: ReactNode; variant: "forecast" | "berth" | "cold" | "reference"; index: string }) {
   return (
     <GlassCard strong className={cn("engine-panel clip-angled card-pad relative overflow-hidden", `engine-panel-${variant}`)}>
       <span className="engine-panel-orbit" aria-hidden />
       <span className="engine-panel-scanline" aria-hidden />
-      <div className="card-head">
-        <div className="card-head-title">{title}</div>
+      <div className="card-head engine-panel-head">
+        <div className="engine-panel-ident">
+          <span className="engine-panel-index" aria-hidden>{index}</span>
+          <div><small className="engine-panel-domain">OCEAN · DEMO ENGINE</small><div className="card-head-title">{title}</div></div>
+        </div>
         <div className="live-eyebrow live-eyebrow-ok">
           <span className="live-dot live-dot-ok" />
           {status}
@@ -24,7 +27,7 @@ function Panel({ title, status, children, variant }: { title: string; status: st
       </div>
       {/* Every engine panel is a model, not a feed. Stated on the panel rather
           than only in the Terms modal, which a visitor has to open to reach. */}
-      <ModelBadge className="engine-model-badge" />
+      <ModelBadge short className="engine-model-badge" />
       <div className="engine-panel-body relative">{children}</div>
       <div className="pointer-events-none absolute right-4 top-4 h-6 w-6 border-r border-t border-neon/30" />
       <div className="pointer-events-none absolute bottom-4 left-4 h-6 w-6 border-b border-l border-neon/30" />
@@ -37,7 +40,7 @@ function Panel({ title, status, children, variant }: { title: string; status: st
 function VisualAnalytics() {
   const { t } = useLang();
   return (
-    <Panel title={t("pillars.0.panel.title")} status={t("pillars.0.panel.status")} variant="forecast">
+    <Panel title={t("pillars.0.panel.title")} status={t("pillars.0.panel.status")} variant="forecast" index="01">
       <NeuralForecast />
     </Panel>
   );
@@ -48,7 +51,7 @@ function VisualAnalytics() {
 function VisualFleet() {
   const { t } = useLang();
   return (
-    <Panel title={t("pillars.1.panel.title")} status={t("pillars.1.panel.status")} variant="berth">
+    <Panel title={t("pillars.1.panel.title")} status={t("pillars.1.panel.status")} variant="berth" index="02">
       <FleetRadar />
     </Panel>
   );
@@ -59,7 +62,7 @@ function VisualFleet() {
 function VisualWarehouse() {
   const { t } = useLang();
   return (
-    <Panel title={t("pillars.2.panel.title")} status={t("pillars.2.panel.status")} variant="cold">
+    <Panel title={t("pillars.2.panel.title")} status={t("pillars.2.panel.status")} variant="cold" index="03">
       <FulfillmentBay />
     </Panel>
   );
@@ -70,7 +73,7 @@ function VisualWarehouse() {
 function VisualGreen() {
   const { t } = useLang();
   return (
-    <Panel title={t("pillars.3.panel.title")} status={t("pillars.3.panel.status")} variant="reference">
+    <Panel title={t("pillars.3.panel.title")} status={t("pillars.3.panel.status")} variant="reference" index="04">
       <VoyageProfile />
     </Panel>
   );
@@ -193,7 +196,7 @@ export default function Pillars() {
         t("pillars.0.chips.1"),
         t("pillars.0.chips.2"),
       ],
-      stat: { to: 94.2, decimals: 1, suffix: "%", label: t("pillars.0.statLabel") },
+      stat: { to: 4, suffix: "", label: t("pillars.0.statLabel") },
       visual: <VisualAnalytics />,
     },
     {
@@ -214,7 +217,7 @@ export default function Pillars() {
         t("pillars.1.chips.1"),
         t("pillars.1.chips.2"),
       ],
-      stat: { to: 60, suffix: "s", label: t("pillars.1.statLabel") },
+      stat: { to: 5, suffix: "", label: t("pillars.1.statLabel") },
       visual: <VisualFleet />,
     },
     {
@@ -277,7 +280,7 @@ export default function Pillars() {
         t("pillars.4.chips.1"),
         t("pillars.4.chips.2"),
       ],
-      stat: { to: 2.1, decimals: 1, suffix: "s", label: t("pillars.4.statLabel") },
+      stat: { to: 4, suffix: "", label: t("pillars.4.statLabel") },
       visual: <BlockchainSection />,
     },
   ];

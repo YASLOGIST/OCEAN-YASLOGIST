@@ -9,13 +9,13 @@ import SuiteSwitcher from "./SuiteSwitcher";
 function Logo() {
   const { t } = useLang();
   return (
-    <a href="#hero" className="group flex shrink-0 items-center gap-2 sm:gap-3 select-none">
+    <a href="#hero" aria-label="YASLOGIST Ocean home" className="group flex min-h-11 min-w-11 shrink-0 items-center gap-2 sm:gap-3 select-none">
       <BrandMark className="h-9 w-9 sm:h-10 sm:w-10 xl:h-11 xl:w-11 shrink-0" />
       <span className="leading-none max-[360px]:hidden">
         <span className="flex items-center gap-1.5 font-display text-[13px] font-bold tracking-[0.1em] text-ice sm:text-base xl:text-lg whitespace-nowrap">
           YASLOGIST
-          <span className="hidden rounded-md border border-neon/40 bg-neon/10 px-1.5 py-0.5 font-mono text-[7px] font-normal tracking-[0.2em] text-neon sm:inline-block">
-            CORE
+          <span className="nav-demo-chip hidden rounded-md px-1.5 py-0.5 font-mono text-[7px] font-semibold tracking-[0.18em] sm:inline-block">
+            DEMO
           </span>
         </span>
         <span className="mt-1 hidden max-w-[160px] xl:max-w-[210px] 2xl:max-w-[250px] font-mono text-[6.5px] uppercase leading-[1.6] tracking-[0.12em] text-ghost lg:block whitespace-nowrap truncate">
@@ -30,9 +30,10 @@ function ThemeToggle() {
   const { theme, toggle } = useTheme();
   return (
     <button
+      type="button"
       onClick={toggle}
       aria-label="Toggle theme"
-      className="glass gpu grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-xl text-neon transition-all duration-300 hover:border-neon/40"
+      className="glass gpu grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-xl text-neon transition-all duration-300 hover:border-neon/40"
     >
       {theme === "dark" ? (
         <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -68,7 +69,7 @@ function LangToggle() {
             aria-checked={isSelected}
             onClick={() => setLang(item.code)}
             className={cn(
-              "relative px-1.5 sm:px-2 xl:px-2.5 py-0.5 xl:py-1 text-[9.5px] xl:text-[10.5px] font-bold select-none rounded-full transition-all duration-200 cursor-pointer",
+              "relative min-h-11 px-1.5 sm:px-2 xl:px-2.5 py-0.5 xl:py-1 text-[9.5px] xl:text-[10.5px] font-bold select-none rounded-full transition-all duration-200 cursor-pointer",
               isSelected
                 ? "bg-gradient-to-r from-neon to-cyan-400 text-abyss font-black shadow-[0_0_14px_rgba(34,228,255,0.7)]"
                 : "text-ghost hover:text-ice hover:bg-chrome/5"
@@ -101,7 +102,7 @@ function MobileLangButton() {
       type="button"
       onClick={() => setLang(nextLang[lang])}
       aria-label={`Current language: ${current.nativeName}. Tap to cycle.`}
-      className="sm:hidden glass gpu flex h-10 min-w-10 px-2.5 cursor-pointer items-center justify-center rounded-xl border border-neon/30 text-neon font-display text-[11px] font-bold transition-all active:scale-95 shrink-0"
+      className="sm:hidden glass gpu flex h-11 min-w-11 px-2.5 cursor-pointer items-center justify-center rounded-xl border border-neon/30 text-neon font-display text-[11px] font-bold transition-all active:scale-95 shrink-0"
       style={lang === "ar" ? { fontFamily: "var(--font-ruqaa)", fontSize: "13px" } : undefined}
     >
       <span>{current.label}</span>
@@ -178,8 +179,9 @@ export default function Navbar() {
               <ThemeToggle />
 
               <button
+                type="button"
                 onClick={() => setOpen(!open)}
-                className="glass gpu grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-xl text-neon lg:hidden"
+                className="glass gpu grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-xl text-neon lg:hidden"
                 aria-label="Toggle menu"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
@@ -201,7 +203,8 @@ export default function Navbar() {
           02 was the first thing the eye found, 16.5px of it clipped. The row
           padding and type step below `sm` are what bring all nine back inside
           a phone viewport; `.nav-menu` guarantees the rest. */}
-      <div
+      <nav
+        aria-label="Mobile section navigation"
         className={cn(
           "nav-menu fixed inset-0 z-[9998] flex flex-col gap-2 px-8 transition-all duration-500 lg:hidden",
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
@@ -249,7 +252,7 @@ export default function Navbar() {
                     setOpen(false);
                   }}
                   className={cn(
-                    "flex flex-col items-center justify-center py-2 px-1 rounded-lg text-center transition-all",
+                    "flex min-h-11 flex-col items-center justify-center py-2 px-1 rounded-lg text-center transition-all",
                     isSelected
                       ? "bg-neon text-abyss font-bold shadow-[0_0_12px_var(--glow)]"
                       : "text-ghost hover:text-ice hover:bg-chrome/5"
@@ -278,7 +281,7 @@ export default function Navbar() {
             </span>
           </a>
         ))}
-      </div>
+      </nav>
     </>
   );
 }

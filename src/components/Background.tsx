@@ -21,15 +21,11 @@ import { useTheme } from "../lib/theme";
  *   read smoother than a hard frame switch would at twice the count.
  */
 
-const FRAME_COUNT = 60;
-
-/* Use masters that match the viewport orientation instead of enlarging and
-   heavily cropping a 16:9 frame on portrait screens. Both profiles keep the
-   source's full available raster: 1280×720 landscape and 720×1280 portrait.
-   Only the active theme + selected orientation is fetched. */
+/* Phones retain the lighter sequence even when loaded in landscape. CSS cover
+   crops that portrait master instead of decoding the desktop sequence. */
 const FRAME_PROFILES = {
-  landscape: { w: 1920, h: 1080, suffix: "" },
-  portrait: { w: 1080, h: 1920, suffix: "-phone" },
+  landscape: { w: 1440, h: 810, suffix: "-lite", count: 60 },
+  portrait: { w: 540, h: 960, suffix: "-phone-lite", count: 30 },
 } as const;
 type FrameProfileKey = keyof typeof FRAME_PROFILES;
 
@@ -37,6 +33,7 @@ type FrameProfileKey = keyof typeof FRAME_PROFILES;
    Portrait uses a dedicated 9:16 master; landscape keeps the full 16:9 master. */
 function pickFrameProfile(): FrameProfileKey {
   if (typeof window === "undefined") return "landscape";
+  if (window.matchMedia("(max-width: 767px), (pointer: coarse)").matches) return "portrait";
   return window.innerHeight > window.innerWidth ? "portrait" : "landscape";
 }
 
@@ -44,18 +41,24 @@ function pickFrameProfile(): FrameProfileKey {
    something to show immediately; `nearestLoaded` covers the rest of the range
    until the deferred batch arrives, so the picture sharpens rather than
    appearing late. */
-const EAGER_FRAMES = 6;
+const EAGER_FRAMES = 4;
+const MAX_IN_FLIGHT = 4;
 
 /* Scroll distance that plays the whole sequence, in viewport heights. Kept in
    screen units rather than document percent so the mapping is identical no
    matter how the page's measured height fluctuates. */
-const SCRUB_SCREENS = 10;
+const SCRUB_SCREENS = 8;
+
+/* Background only: close roughly half the visual lag without making the rest
+   of the page snap. The shared scroll engine keeps its conservative glide;
+   footage responds sooner by blending that smoothed value toward native scroll. */
+const BG_RESPONSE = 0.46;
 
 const seqBase = (name: "night" | "day", profile: FrameProfileKey) =>
   `${import.meta.env.BASE_URL}frames/${name}${FRAME_PROFILES[profile].suffix}/`;
 
-/* Defer until the page has had its first paint, then until the main thread is
-   idle. This is what keeps the remaining 54 frames off the critical path. */
+/* Defer the rest of the sequence until the page has loaded and the main
+   thread is idle, so opening content and fonts get priority. */
 function whenIdle(fn: () => void) {
   const go = () => {
     if (typeof requestIdleCallback === "function") requestIdleCallback(fn, { timeout: 2000 });
@@ -86,19 +89,21 @@ type Seq = {
   loaded: boolean[];
   anyLoaded: boolean;
   started: boolean;
+  pending: number[];
+  inFlight: number;
 };
 
 function newSeq(): Seq {
-  return { imgs: [], loaded: [], anyLoaded: false, started: false };
+  return { imgs: [], loaded: [], anyLoaded: false, started: false, pending: [], inFlight: 0 };
 }
 
-/* Order the deferred batch by binary subdivision instead of 0,1,2,…,59.
+/* Order the deferred batch by binary subdivision instead of sequentially.
    Sequential order leaves the whole tail undecoded for as long as the download
    takes, so `nearestLoaded` can only fall back toward the eager frames at the
    start: measured on a cold 4G load, a scrub to frame 44 painted frame 5 for
    2.8 s. Halving the gap each pass keeps the decoded frames spread across the
    sequence, so the fallback is bounded by the current stride rather than by how
-   far the user scrolled. Same 54 requests, same bytes — only the order differs. */
+   far the user scrolled. The frame set and total bytes stay the same. */
 function deferredOrder(from: number, count: number): number[] {
   const queued = new Array<boolean>(count).fill(false);
   for (let i = 0; i < from; i++) queued[i] = true;
@@ -115,9 +120,9 @@ function deferredOrder(from: number, count: number): number[] {
 }
 
 /** Nearest already-decoded frame to `i`, searching outward. -1 if none yet. */
-function nearestLoaded(seq: Seq, i: number): number {
+function nearestLoaded(seq: Seq, i: number, frameCount: number): number {
   if (seq.loaded[i]) return i;
-  for (let d = 1; d < FRAME_COUNT; d++) {
+  for (let d = 1; d < frameCount; d++) {
     if (seq.loaded[i - d]) return i - d;
     if (seq.loaded[i + d]) return i + d;
   }
@@ -130,31 +135,38 @@ function FrameCanvas({
   width,
   height,
   className,
+  frameCount,
 }: {
   base: string;
   active: boolean;
   width: number;
   height: number;
   className?: string;
+  frameCount: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const seqRef = useRef<Seq>(newSeq());
   const scrubRef = useRef(0);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const activeRef = useRef(active);
+  const loadMoreRef = useRef(() => {});
+  activeRef.current = active;
 
   /* Paint the frame pair for the current scrub position. */
   const draw = useRef((scrub: number) => {
     const canvas = canvasRef.current;
     const seq = seqRef.current;
-    if (!canvas || !seq.anyLoaded) return;
-    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!canvas || !seq.anyLoaded || !activeRef.current || document.hidden) return;
+    const ctx = ctxRef.current ?? canvas.getContext("2d", { alpha: false, desynchronized: true });
     if (!ctx) return;
+    ctxRef.current = ctx;
 
-    const pos = clamp01(scrub) * (FRAME_COUNT - 1);
+    const pos = clamp01(scrub) * (frameCount - 1);
     const i0 = Math.floor(pos);
-    const i1 = Math.min(FRAME_COUNT - 1, i0 + 1);
+    const i1 = Math.min(frameCount - 1, i0 + 1);
     const t = pos - i0;
 
-    const a = nearestLoaded(seq, i0);
+    const a = nearestLoaded(seq, i0, frameCount);
     if (a < 0) return;
     ctx.globalAlpha = 1;
     ctx.drawImage(seq.imgs[a], 0, 0);
@@ -162,7 +174,7 @@ function FrameCanvas({
     /* Blend toward the next frame by the fractional index — this is what makes
        a discrete sequence read as continuous motion. */
     if (t > 0.01) {
-      const b = nearestLoaded(seq, i1);
+      const b = nearestLoaded(seq, i1, frameCount);
       if (b >= 0 && b !== a) {
         ctx.globalAlpha = t;
         ctx.drawImage(seq.imgs[b], 0, 0);
@@ -177,47 +189,77 @@ function FrameCanvas({
     if (!active) return;
     const seq = seqRef.current;
     if (seq.started) {
+      loadMoreRef.current();
       draw.current(scrubRef.current);
       return;
     }
     seq.started = true;
-    seq.imgs = new Array(FRAME_COUNT);
-    seq.loaded = new Array(FRAME_COUNT).fill(false);
+    seq.imgs = new Array(frameCount);
+    seq.loaded = new Array(frameCount).fill(false);
 
-    /* No cancellation flag here on purpose. StrictMode mounts, unmounts and
-       remounts this effect; a flag captured by these onload handlers would be
-       set during that throwaway unmount and permanently silence the only
-       Image objects we create, since `started` short-circuits the remount.
-       Recording a load after unmount is harmless — draw() no-ops on a null
-       canvas ref. The deferred batch below is scheduled without a flag for the
-       same reason. */
+    /* Keep the queue with the sequence so StrictMode's effect remount resumes
+       it. A missing canvas, inactive theme or hidden document stops new work;
+       the bounded requests already in flight can finish warming the cache. */
     const load = (i: number, priority: "high" | "low") => {
       const img = new Image();
       img.decoding = "async";
       /* setAttribute rather than the property: fetchPriority is not in this
          TS lib's HTMLImageElement, and the attribute form is what ships. */
       img.setAttribute("fetchpriority", priority);
-      img.onload = () => {
-        seq.loaded[i] = true;
-        seq.anyLoaded = true;
-        /* Redraw as frames arrive so the picture sharpens progressively even
-           if the loop is asleep. */
-        draw.current(scrubRef.current);
+      img.onload = async () => {
+        // Include decode in the concurrency budget, not just the HTTP request.
+        try { await img.decode(); } catch { /* A drawable load can outlive decode(). */ }
+        try {
+          if (img.naturalWidth > 0) {
+            seq.loaded[i] = true;
+            seq.anyLoaded = true;
+            /* Redraw as frames arrive, even if the scroll loop is asleep. */
+            draw.current(scrubRef.current);
+          }
+        } finally {
+          seq.inFlight--;
+          loadMoreRef.current();
+        }
       };
-      img.src = frameUrl(base, i);
+      img.onerror = () => {
+        seq.inFlight--;
+        loadMoreRef.current();
+      };
       seq.imgs[i] = img;
+      img.src = frameUrl(base, i);
     };
 
-    /* Enough to paint the opening of the sequence right away… */
-    const eager = Math.min(EAGER_FRAMES, FRAME_COUNT);
-    for (let i = 0; i < eager; i++) load(i, "high");
+    loadMoreRef.current = () => {
+      if (!canvasRef.current || !activeRef.current || document.hidden) return;
+      while (seq.inFlight < MAX_IN_FLIGHT && seq.pending.length) {
+        const i = seq.pending.shift()!;
+        seq.inFlight++;
+        load(i, i < EAGER_FRAMES ? "high" : "low");
+      }
+    };
+
+    /* Enough to paint the opening immediately, with a bounded decode queue. */
+    const eager = Math.min(EAGER_FRAMES, frameCount);
+    seq.pending = Array.from({ length: eager }, (_, i) => i);
+    loadMoreRef.current();
 
     /* …and the remainder only once the page has painted and gone idle, at low
        priority so it never competes with the document or the fonts. */
     whenIdle(() => {
-      for (const i of deferredOrder(eager, FRAME_COUNT)) load(i, "low");
+      seq.pending.push(...deferredOrder(eager, frameCount));
+      loadMoreRef.current();
     });
-  }, [active, base]);
+  }, [active, base, frameCount]);
+
+  useEffect(() => {
+    const resume = () => {
+      if (document.hidden) return;
+      loadMoreRef.current();
+      draw.current(scrubRef.current);
+    };
+    document.addEventListener("visibilitychange", resume);
+    return () => document.removeEventListener("visibilitychange", resume);
+  }, []);
 
   /* One subscription to the shared scroll engine. No own rAF loop. */
   useEffect(
@@ -230,8 +272,9 @@ function FrameCanvas({
            still. Pixels are stable, so the sequence only moves when the user
            actually moves. f.y is the engine's LERPed position, which is what
            carries the inertia. */
+        const responsiveY = f.y + (f.raw - f.y) * BG_RESPONSE;
         const span = SCRUB_SCREENS * (f.vh || 1);
-        scrubRef.current = cinematicEndEase(f.y / span);
+        scrubRef.current = cinematicEndEase(responsiveY / span);
         /* Scrubbing tracks the user's own scroll 1:1, so it is direct
            manipulation rather than autonomous motion and stays enabled under
            prefers-reduced-motion. The differential camera pan/zoom IS the
@@ -261,7 +304,7 @@ export default function Background() {
   /* Resolved once and held: see pickFrameProfile on why this must not react to
      resize. */
   const profileKey = useRef(pickFrameProfile()).current;
-  const { w: frameW, h: frameH } = FRAME_PROFILES[profileKey];
+  const { w: frameW, h: frameH, count: frameCount } = FRAME_PROFILES[profileKey];
 
   /* The ONLY scroll-driven layout work: a GPU transform on the camera
      container. Writes `transform` only — no layout, no paint. */
@@ -270,12 +313,14 @@ export default function Background() {
       subscribeScroll((f) => {
         const mover = moverRef.current;
         if (!mover) return;
-        const zoom = f.reduced ? 1.06 : 1.06 + f.progress * 0.14;
+        const responsiveY = f.y + (f.raw - f.y) * BG_RESPONSE;
+        const responsiveProgress = f.progress + (f.rawProgress - f.progress) * BG_RESPONSE;
+        const zoom = f.reduced ? 1.06 : 1.06 + responsiveProgress * 0.14;
         /* Inset-0, scaled from centre: cover above the viewport top is half the
            overhang, (zoom-1)/2 * vh. Pan is capped to it so the footage never
            lifts off the top edge. */
         const overhang = ((zoom - 1) / 2) * f.vh;
-        const ty = f.reduced ? 0 : Math.min(f.y * 0.1, overhang);
+        const ty = f.reduced ? 0 : Math.min(responsiveY * 0.1, overhang);
         mover.style.transform = `translate3d(0, ${ty.toFixed(2)}px, 0) scale(${zoom.toFixed(4)})`;
       }),
     []
@@ -297,6 +342,7 @@ export default function Background() {
           width={frameW}
           height={frameH}
           className="bg-video bg-video-day absolute inset-0 h-full w-full object-cover select-none"
+          frameCount={frameCount}
         />
         <FrameCanvas
           base={seqBase("night", profileKey)}
@@ -304,6 +350,7 @@ export default function Background() {
           width={frameW}
           height={frameH}
           className="bg-video bg-video-night absolute inset-0 h-full w-full object-cover select-none"
+          frameCount={frameCount}
         />
 
         {/* Subtle darkening over the night footage — lifts text/glass contrast

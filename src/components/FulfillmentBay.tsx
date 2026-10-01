@@ -31,7 +31,7 @@ export default function FulfillmentBay() {
     <div className="cold-command">
       <div className="cold-command-grid">
         <div className="cold-dial-wrap">
-          <div className="cold-dial" aria-label={L("Current temperature 5.7 degrees Celsius", "درجة الحرارة الحالية 5.7 مئوية")}>
+          <div className="cold-dial" role="group" aria-label={L("Current temperature 5.7 degrees Celsius", "درجة الحرارة الحالية 5.7 مئوية")}>
             <div className="cold-dial-rings" aria-hidden><i /><i /><i /></div>
             <div className="cold-dial-value"><strong>5.7</strong><span>°C</span></div>
             <div className="cold-dial-state"><i />{L("IN BAND", "داخل النطاق", "范围内", "ARALIKTA", "DANS LA PLAGE")}</div>
@@ -83,7 +83,7 @@ export default function FulfillmentBay() {
         </div>
       </div>
 
-      <div className="cold-event-rail" aria-label={L("Temperature event timeline", "الخط الزمني لحرارة الشحنة")}>
+      <div className="cold-event-rail" role="group" aria-label={L("Temperature event timeline", "الخط الزمني لحرارة الشحنة")}>
         <div className="cold-event-rail-line" aria-hidden><i /><i /><i /><i /><i /></div>
         <div className="cold-event-stages">
           <span><b>00:00</b>{L("Loaded", "تحميل", "装载", "Yüklendi", "Chargé")}</span>

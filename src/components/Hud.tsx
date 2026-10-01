@@ -85,7 +85,7 @@ export default function Hud() {
 
       {/* top-left telemetry */}
       <div ref={topLeftRef} className="pointer-events-none fixed left-8 top-20 z-40 hidden font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] text-ghost md:block">
-        <p className="text-neon/80">YASLOGIST CORE | CAIRO OPS</p>
+        <p className="text-neon/80">YASLOGIST OCEAN | DEMO</p>
         <p>{t("hero.tag")}</p>
         <p className="text-ice/40">{t("hud.sys")}</p>
       </div>

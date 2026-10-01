@@ -32,10 +32,7 @@ const ICONS = [
   </svg>,
 ];
 
-/* One accent per engine, used semantically — the card's hue identifies which
-   engine solves that bottleneck, matching the pillar it links to. It tints only
-   the icon, the hairline rule and the metric; body copy and surface stay on the
-   shared palette so the five read as one system. */
+/* Accent only the icon and metric; every card shares one quiet surface. */
 const ACCENTS = [
   { rule: "rgba(34,211,238,0.55)", tint: "rgba(34,211,238,0.10)", ring: "rgba(34,211,238,0.30)", text: "text-cyan-300" },
   { rule: "rgba(56,189,248,0.55)", tint: "rgba(56,189,248,0.10)", ring: "rgba(56,189,248,0.30)", text: "text-sky-300" },
@@ -65,40 +62,27 @@ export default function Solutions() {
           </Reveal>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="solutions-grid mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {ACCENTS.map((a, i) => (
             <Reveal key={i} delay={i * 90} from="up">
               <article
-                className="solution-card glass group relative flex h-full flex-col rounded-2xl p-6"
-                style={{ ["--accent-rule" as string]: a.rule, ["--accent-ring" as string]: a.ring }}
+                className="solution-card relative flex h-full flex-col rounded-2xl p-5 sm:p-6"
+                style={{ ["--accent-rule" as string]: a.rule, ["--accent-ring" as string]: a.ring, ["--accent-tint" as string]: a.tint }}
               >
-                {/* semantic hairline — the only always-on colour on the card */}
-                <span className="pointer-events-none absolute inset-x-6 top-0 h-px" style={{ background: a.rule }} aria-hidden />
-
-                <div className="flex items-start justify-between gap-3">
-                  <span
-                    className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border transition-transform duration-[var(--dur-base)] ease-[var(--ease-out-expo)] group-hover:scale-105"
-                    style={{ borderColor: a.ring, background: a.tint, color: a.rule }}
-                  >
-                    {ICONS[i]}
-                  </span>
-                  <span className="tabular font-mono text-[10px] text-ghost/50">0{i + 1}</span>
+                <div className="solution-card-top">
+                  <span className={`solution-icon ${a.text}`} aria-hidden="true">{ICONS[i]}</span>
+                  <span className="solution-number" aria-hidden="true">0{i + 1}</span>
                 </div>
 
-                <h3 className="mt-5 font-display text-lg font-semibold leading-snug text-ice">
-                  {t(`solutions.items.${i}.title`)}
-                </h3>
-                <p className="mt-2.5 flex-1 text-[13px] leading-relaxed text-ghost">
-                  {t(`solutions.items.${i}.desc`)}
-                </p>
+                <h3 className="solution-title mt-4 font-display text-lg font-semibold leading-snug text-ice">{t(`solutions.items.${i}.title`)}</h3>
+                <p className="solution-desc mt-2.5 flex-1 text-[13px] leading-relaxed text-ghost">{t(`solutions.items.${i}.desc`)}</p>
 
-                <div className="mt-5 border-t border-chrome/10 pt-4">
-                  <div className={`tabular font-display text-3xl font-bold ${a.text}`}>
-                    {t(`solutions.items.${i}.metric`)}
+                <div className="solution-metric-deck">
+                  <div>
+                    <div className={`solution-metric tabular font-display ${a.text}`}><bdi>{t(`solutions.items.${i}.metric`)}</bdi></div>
+                    <div className="solution-metric-label">{t(`solutions.items.${i}.metricLabel`)}</div>
                   </div>
-                  <div className="mt-1 font-mono text-[9px] uppercase leading-relaxed tracking-[0.18em] text-ghost">
-                    {t(`solutions.items.${i}.metricLabel`)}
-                  </div>
+                  <span className="solution-demo">DEMO</span>
                 </div>
               </article>
             </Reveal>

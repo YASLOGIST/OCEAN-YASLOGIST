@@ -25,7 +25,7 @@ export default function Closing() {
             <div className="founder-portrait-aura" aria-hidden />
             <div className="founder-portrait-beam" aria-hidden />
             <FounderAvatar initials="AY" className="founder-channel-avatar" />
-            <div className="founder-channel-status"><i /> DIRECT CHANNEL</div>
+            <div className="founder-channel-status"><i /> FOUNDER-LED ENQUIRIES</div>
             <div className="founder-channel-identity">
               <small>{t("founder.lead")}</small>
               <strong>{t("founder.name")}</strong>

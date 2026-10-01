@@ -39,7 +39,7 @@ export default function FleetRadar() {
             <p className="berth-overview-copy">{L("Five gateways resolved as one quay-pressure picture.", "خمسة منافذ في صورة موحدة لضغط الأرصفة.", "五大港口统一呈现泊位压力。", "Beş liman tek rıhtım baskısı görünümünde.", "Cinq ports dans une vue unique de pression à quai.")}</p>
           </div>
         </div>
-        <div className="berth-network-kpis" aria-label="Gateway network summary">
+        <div className="berth-network-kpis" role="group" aria-label="Gateway network summary">
           <span><b>{GATES.length}</b>{L("gateways", "منافذ", "港口", "liman", "ports")}</span>
           <span><b>{used}/{totalBerths}</b>{L("occupied", "مشغول", "占用", "dolu", "occupés")}</span>
           <span><b>{queued}</b>{L("waiting", "منتظر", "候泊", "bekleyen", "en attente")}</span>
@@ -50,7 +50,7 @@ export default function FleetRadar() {
         <div className="berth-water-grid" aria-hidden />
         <div className="berth-quay-spine" aria-hidden><span /></div>
         {GATES.map((g, index) => (
-          <article key={g.en} className={`berth-lane ${g.warn ? "is-warning" : "is-clear"}`} role="listitem">
+          <div key={g.en} className={`berth-lane ${g.warn ? "is-warning" : "is-clear"}`} role="listitem">
             <div className="berth-lane-id">
               <span className="berth-lane-index">0{index + 1}</span>
               <strong>{L(g.en, g.ar, g.zh, g.tr, g.fr)}</strong>
@@ -66,7 +66,7 @@ export default function FleetRadar() {
             </div>
 
             <div className="berth-lane-quay">
-              <div className="berth-slot-bank" aria-label={`${g.used} of ${g.berths} berths occupied`}>
+              <div className="berth-slot-bank" role="group" aria-label={`${g.used} of ${g.berths} berths occupied`}>
                 {Array.from({ length: g.berths }).map((_, i) => (
                   <span key={i} className={i < g.used ? "is-used" : "is-free"}><i /></span>
                 ))}
@@ -76,12 +76,12 @@ export default function FleetRadar() {
                 <em>{g.warn ? L("pressure", "ضغط", "压力", "baskı", "pression") : L("clear", "منتظم", "通畅", "açık", "dégagé")}</em>
               </div>
             </div>
-          </article>
+          </div>
         ))}
       </div>
 
       <div className="berth-footer-line">
-        <span><i className="is-live" /> AIS</span>
+        <span><i className="is-live" /> AIS · SAMPLE</span>
         <span><i className="is-terminal" /> {L("terminal status", "حالة المحطة", "码头状态", "terminal durumu", "statut terminal")}</span>
         <p>{L("Queue pressure is surfaced before the demurrage clock starts.", "يظهر ضغط الانتظار قبل بدء عداد الأرضيات.", "在滞期计时开始前显示排队压力。", "Kuyruk baskısı demoraj saati başlamadan görünür.", "La pression d'attente apparaît avant le début des surestaries.")}</p>
       </div>

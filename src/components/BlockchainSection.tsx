@@ -35,15 +35,18 @@ function Panel({ title, status, children }: { title: string; status: string; chi
     <GlassCard strong className="engine-panel engine-panel-ledger ledger-console clip-angled card-pad relative overflow-hidden">
       <span className="engine-panel-orbit" aria-hidden />
       <span className="engine-panel-scanline" aria-hidden />
-      <div className="card-head">
-        <div className="card-head-title">{title}</div>
+      <div className="card-head engine-panel-head">
+        <div className="engine-panel-ident">
+          <span className="engine-panel-index" aria-hidden>05</span>
+          <div><small className="engine-panel-domain">OCEAN · DEMO ENGINE</small><div className="card-head-title">{title}</div></div>
+        </div>
         <div className="live-eyebrow live-eyebrow-ok">
           <span className="live-dot live-dot-ok" />
           {status}
         </div>
       </div>
       {/* Ledger visuals settle no real transaction; say so on the panel. */}
-      <ModelBadge className="engine-model-badge" />
+      <ModelBadge short className="engine-model-badge" />
       <div className="engine-panel-body relative">{children}</div>
       <div className="pointer-events-none absolute right-4 top-4 h-6 w-6 border-r border-t border-neon/30" />
       <div className="pointer-events-none absolute bottom-4 left-4 h-6 w-6 border-b border-l border-neon/30" />

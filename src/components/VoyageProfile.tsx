@@ -11,11 +11,11 @@ export default function VoyageProfile() {
     return en;
   };
   const refs = [
-    { label: n("ref0"), bad: false, x: 18, y: 28, code: "BK", meta: "BOOKING ID", trace: [28, 36, 41, 55, 52, 68, 76] },
-    { label: n("ref1"), bad: false, x: 82, y: 22, code: "BL", meta: "DOC HASH", trace: [44, 50, 47, 59, 64, 63, 72] },
-    { label: n("ref2"), bad: false, x: 86, y: 75, code: "CT", meta: "SEAL / UNIT", trace: [38, 42, 58, 53, 61, 70, 66] },
-    { label: n("ref3"), bad: true, x: 18, y: 78, code: "AC", meta: "CLEARANCE", trace: [66, 59, 62, 47, 39, 31, 24] },
-    { label: n("ref4"), bad: false, x: 50, y: 92, code: "GP", meta: "GATE EVENT", trace: [22, 35, 33, 48, 57, 61, 73] },
+    { label: n("ref0"), bad: false, x: 20, y: 22, code: "BK", meta: "BOOKING ID", trace: [28, 36, 41, 55, 52, 68, 76] },
+    { label: n("ref1"), bad: false, x: 80, y: 22, code: "BL", meta: "DOC HASH", trace: [44, 50, 47, 59, 64, 63, 72] },
+    { label: n("ref2"), bad: false, x: 80, y: 76, code: "CT", meta: "SEAL / UNIT", trace: [38, 42, 58, 53, 61, 70, 66] },
+    { label: n("ref3"), bad: true, x: 20, y: 76, code: "AC", meta: "CLEARANCE", trace: [66, 59, 62, 47, 39, 31, 24] },
+    { label: n("ref4"), bad: false, x: 50, y: 88, code: "GP", meta: "GATE EVENT", trace: [22, 35, 33, 48, 57, 61, 73] },
   ];
 
   return (
@@ -33,7 +33,7 @@ export default function VoyageProfile() {
         <div className="reference-circuit-field" aria-hidden><i /><i /><i /><i /><i /><i /></div>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
           {refs.map((r) => (
-            <line key={r.code} x1="50" y1="52" x2={r.x} y2={r.y} className={r.bad ? "reference-link bad" : "reference-link ok"} />
+            <line key={r.code} x1="50" y1="50" x2={r.x} y2={r.y} className={r.bad ? "reference-link bad" : "reference-link ok"} />
           ))}
         </svg>
         <div className="reference-core-node">

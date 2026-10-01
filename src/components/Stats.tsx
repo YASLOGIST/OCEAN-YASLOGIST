@@ -17,10 +17,10 @@ const LANES = [
 export default function Stats() {
   const { t } = useLang();
   const stats = [
-    { to: 5, suffix: "", label: t("stats.items.0.label"), note: t("stats.items.0.note") },
-    { to: 7, suffix: "", label: t("stats.items.1.label"), note: t("stats.items.1.note") },
-    { to: 60, suffix: "s", label: t("stats.items.2.label"), note: t("stats.items.2.note") },
-    { to: 94.2, decimals: 1, suffix: "%", label: t("stats.items.3.label"), note: t("stats.items.3.note") },
+    { to: 5, decimals: 0, suffix: "", label: t("stats.items.0.label"), note: t("stats.items.0.note") },
+    { to: 7, decimals: 0, suffix: "", label: t("stats.items.1.label"), note: t("stats.items.1.note") },
+    { to: 5, decimals: 0, suffix: "", label: t("stats.items.2.label"), note: t("stats.items.2.note") },
+    { to: 3, decimals: 0, suffix: "", label: t("stats.items.3.label"), note: t("stats.items.3.note") },
   ];
 
   return (
@@ -33,7 +33,7 @@ export default function Stats() {
             rate, which described a carrier rather than a software platform.) */}
         <Reveal>
           <div className="mb-4 flex justify-start">
-            <ModelBadge />
+            <ModelBadge short />
           </div>
         </Reveal>
         <Reveal>
@@ -74,7 +74,7 @@ export default function Stats() {
                       </svg>
                       <span>{l.to}</span>
                       <span className="rounded-full border border-chrome/10 bg-chrome/[0.04] px-2.5 py-1 text-ice/70">
-                        ETA {l.eta} UTC
+                        SCENARIO ETA {l.eta} UTC
                       </span>
                     </div>
                   ))}

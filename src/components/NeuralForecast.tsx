@@ -119,7 +119,7 @@ export default function NeuralForecast() {
         className={cn("nf forecast-core card-inset relative overflow-hidden rounded-xl", live && "nf-live")}
         role="img"
         aria-label={
-          "Neural route forecast: four live signals feed a model layer that scores three candidate " +
+          "Neural route scenario: four simulated inputs feed a model layer that scores three candidate " +
           "routes, and the highest-confidence route is committed."
         }
       >
@@ -277,7 +277,7 @@ export default function NeuralForecast() {
         </svg>
       </div>
 
-      <div className="forecast-signal-deck" aria-label="Model signal contribution">
+      <div className="forecast-signal-deck" role="group" aria-label="Model signal contribution">
         {[82, 74, 91, 68].map((v, i) => (
           <div key={INPUTS[i].key} className="forecast-signal-row">
             <span>{n(`in${i}`)}</span>

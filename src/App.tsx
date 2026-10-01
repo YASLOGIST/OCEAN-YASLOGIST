@@ -20,6 +20,48 @@ export default function App() {
      module swap cannot leave a second engine running. */
   useEffect(() => startScrollLoop(), []);
 
+  /* Hash targets can drift when the browser resolves an anchor against
+     content-visibility placeholders before the real section heights are known.
+     Materialize the target and all preceding lazy sections for one layout pass,
+     then re-scroll once their intrinsic sizes have been learned. */
+  useEffect(() => {
+    const settleHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (!target) return;
+
+      const materialized = Array.from(document.querySelectorAll<HTMLElement>(".cv-auto")).filter(
+        (el) => el === target || Boolean(el.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING),
+      );
+      materialized.forEach((el) => el.style.setProperty("content-visibility", "visible", "important"));
+
+      // Give the browser two layout frames with real content, then persist each
+      // measured height as the section's intrinsic placeholder before restoring
+      // content-visibility. That keeps the target's document offset stable.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          materialized.forEach((el) => {
+            const height = Math.ceil(el.getBoundingClientRect().height);
+            if (height > 0) el.style.setProperty("--cv-h", `${height}px`);
+          });
+          materialized.forEach((el) => el.style.removeProperty("content-visibility"));
+          const alignTarget = () => {
+            const scrollMargin = Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+            const top = target.getBoundingClientRect().top + window.scrollY - scrollMargin;
+            window.scrollTo(0, Math.max(0, top));
+          };
+          alignTarget();
+          requestAnimationFrame(alignTarget);
+        });
+      });
+    };
+
+    settleHash();
+    window.addEventListener("hashchange", settleHash);
+    return () => window.removeEventListener("hashchange", settleHash);
+  }, []);
+
   /* Precision interaction layer for the ten showcase surfaces. It is attached
      only on fine pointers; touch devices keep the exact static composition and
      avoid continuous pointer work. Updates are rAF-throttled and write CSS
@@ -39,23 +81,44 @@ export default function App() {
       ".founder-connect-console",
     ].join(",");
     const panels = Array.from(document.querySelectorAll<HTMLElement>(selector));
+    const lite = window.matchMedia("(max-width: 767px), (pointer: coarse)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const nearby = new Set<Element>();
+    const syncPanel = (panel: Element) => {
+      const visible = nearby.has(panel) && !document.hidden;
+      panel.classList.toggle("showcase-active", visible);
+      panel.querySelectorAll<SVGSVGElement>("svg").forEach((svg) => {
+        if (typeof svg.pauseAnimations !== "function") return;
+        // CSS animation rules do not stop SVG animateMotion timelines.
+        if (visible && !lite.matches && !reduced.matches) svg.unpauseAnimations();
+        else svg.pauseAnimations();
+      });
+    };
+    const syncAll = () => panels.forEach(syncPanel);
+    let observer: IntersectionObserver | undefined;
     if (!("IntersectionObserver" in window)) {
-      panels.forEach((panel) => panel.classList.add("showcase-active"));
-      return;
+      panels.forEach((panel) => nearby.add(panel));
+    } else {
+      observer = new IntersectionObserver(
+        (entries) => entries.forEach((entry) => {
+          if (entry.isIntersecting) nearby.add(entry.target);
+          else nearby.delete(entry.target);
+          syncPanel(entry.target);
+        }),
+        { rootMargin: "22% 0px", threshold: 0.01 },
+      );
+      panels.forEach((panel) => observer!.observe(panel));
     }
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => {
-        entry.target.classList.toggle("showcase-active", entry.isIntersecting);
-        entry.target.querySelectorAll<SVGSVGElement>("svg").forEach((svg) => {
-          if (typeof svg.pauseAnimations !== "function") return;
-          if (entry.isIntersecting) svg.unpauseAnimations();
-          else svg.pauseAnimations();
-        });
-      }),
-      { rootMargin: "22% 0px", threshold: 0.01 },
-    );
-    panels.forEach((panel) => observer.observe(panel));
-    return () => observer.disconnect();
+    syncAll();
+    lite.addEventListener("change", syncAll);
+    reduced.addEventListener("change", syncAll);
+    document.addEventListener("visibilitychange", syncAll);
+    return () => {
+      observer?.disconnect();
+      lite.removeEventListener("change", syncAll);
+      reduced.removeEventListener("change", syncAll);
+      document.removeEventListener("visibilitychange", syncAll);
+    };
   }, []);
 
   useEffect(() => {
@@ -127,9 +190,9 @@ export default function App() {
             <Solutions />
             <Simulator />
             <Pillars />
+            <CrossModalHandoff />
+            <Closing />
           </main>
-          <CrossModalHandoff />
-          <Closing />
           <Footer />
         </div>
       </LangProvider>

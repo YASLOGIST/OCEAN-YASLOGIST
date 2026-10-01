@@ -53,7 +53,7 @@ export function Reveal({
         if (e.target === e.currentTarget) setSettled(true);
       }}
       className={cn(
-        "transition-all duration-1000 ease-[cubic-bezier(.16,1,.3,1)]",
+        "scroll-reveal transition-all duration-1000 ease-[cubic-bezier(.16,1,.3,1)]",
         /* Hold the hint only while this reveal is actually in flight. Applying
            it from mount would pin a compositor layer per Reveal at page load. */
         inView && !settled ? "will-change-transform" : "will-change-auto",
@@ -128,6 +128,8 @@ export function Parallax({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const mobileLite = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+    if (mobileLite) { el.style.transform = "none"; return; }
 
     /* Layout offset of `node` within `stop` (or the document when stop is null). */
     const offsetWithin = (node: HTMLElement, stop: HTMLElement | null) => {
@@ -305,19 +307,14 @@ export function SectionTag({ children, className }: { children: ReactNode; class
 export function ModelBadge({ short = false, className }: { short?: boolean; className?: string }) {
   const { t } = useLang();
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-300/[0.07]",
-        "px-2.5 py-1 font-mono text-[8px] uppercase leading-none tracking-[0.16em] text-amber-200/85",
-        className
-      )}
-    >
-      <svg viewBox="0 0 24 24" className="h-2.5 w-2.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+    <span className={cn("model-disclosure", className)}>
+      <span className="model-disclosure-flag">DEMO</span>
+      <svg viewBox="0 0 24 24" className="model-disclosure-icon" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M12 9v4" />
         <path d="M12 17h.01" />
         <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
       </svg>
-      {short ? t("model.badgeShort") : t("model.badge")}
+      <span className="model-disclosure-copy">{short ? t("model.badgeShort") : t("model.badge")}</span>
     </span>
   );
 }

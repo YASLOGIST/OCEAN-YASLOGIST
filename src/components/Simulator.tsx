@@ -4,11 +4,10 @@ import { svgTextProps } from "../lib/svgText";
 import { cn } from "../utils/cn";
 import { GlassCard, Reveal, SectionTag } from "./ui";
 
-/* ── Real-time math engine ──────────────────────────────────────────────
-   Baselines (IMO DCS-calibrated, conservative):
-   · CO₂  = 31.5 g per TEU per nautical mile  →  AI uplift cuts 18%
-   · Speed ≈ 17.5 kn  →  weather routing + port sync saves ~7% + 12h
-   · Freight+op cost ≈ $0.42 per TEU·NM  →  AI optimisation saves 6%
+/* ── Illustrative scenario engine ───────────────────────────────────────
+   Every coefficient below is a fixed DEMO assumption chosen to make the
+   trade-offs visible in the interface. These are not IMO DCS baselines,
+   validated YASLOGIST performance metrics, carrier rates or voyage advice.
 ────────────────────────────────────────────────────────────────────────── */
 
 const CO2_G_PER_TEU_NM = 31.5;
@@ -26,11 +25,9 @@ const FUEL_PER_CO2 = 1 / 3.15;
    the committed route's figures are untouched, and this only ever renders as a
    comparison beside them.
 
-   HONESTY: unlike the baselines above (IMO DCS-calibrated), these three
-   coefficients are INVENTED to express a plausible trade — buy days, pay in
-   burn. They are surfaced in the UI as a "modelled scenario" for exactly that
-   reason and must not be presented as calibrated. If real corridor data ever
-   arrives, replace these three numbers and delete this note.                */
+   These three coefficients are also illustrative demo assumptions. They
+   express a visible trade-off — buy time, give back some carbon and cost
+   benefit — and must never be presented as calibrated operating data.       */
 const ALT_TIME_GAIN = 0.13; // vs AI_TIME_GAIN 0.07 — faster
 const ALT_CO2_CUT = 0.09; // vs AI_CO2_CUT 0.18 — dirtier
 const ALT_COST_GAIN = 0.04; // vs AI_COST_GAIN 0.06 — less reclaimed
@@ -77,7 +74,7 @@ function useAnimatedNumber(target: number, duration = 700): [number, boolean] {
 const fmtInt = (v: number) => Math.round(v).toLocaleString("en-US");
 const fmtMoney = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : v >= 1e3 ? `$${(v / 1e3).toFixed(0)}K` : `$${v.toFixed(0)}`);
 
-const TEU_VALUES = [5000, 40000, 120000, 240000, 500000];
+const TEU_VALUES = [1500, 3000, 5000, 13000, 24000];
 const NM_VALUES = [1500, 5700, 9900, 12000];
 
 function SliderRow({
@@ -152,9 +149,10 @@ function PresetRow({
         {values.map((v, i) => (
           <button
             key={v}
+            type="button"
             onClick={() => onPick(v)}
             aria-pressed={active === v}
-            className={cn("preset-chip", active === v && "preset-chip-on")}
+            className={cn("preset-chip min-h-11", active === v && "preset-chip-on")}
           >
             <span className="preset-index">0{i + 1}</span>
             <span className="preset-label">{labels[i] ?? String(v)}</span>
@@ -261,14 +259,14 @@ function RouteMap({ computing }: { computing: boolean }) {
         <text x="87" y="24" className="route-sea-label" textAnchor={lab.textAnchor} style={lab.style}>{L("MEDITERRANEAN", "البحر المتوسط", "地中海", "AKDENİZ", "MÉDITERRANÉE")}</text>
       </svg>
       </div>
-      <div className="route-intel-legend"><span><i className="opt" />{L("OPTIMISED", "المسار المحسّن", "优化路线", "OPTİMİZE", "OPTIMISÉ")}</span><span><i className="base" />{L("BASELINE", "المسار الأساسي", "基准路线", "BAZ", "RÉFÉRENCE")}</span><b>{L("AI re-route active", "إعادة توجيه ذكية مفعلة", "AI 改道已启用", "AI yeniden rota aktif", "Re-routage IA actif")}</b></div>
+      <div className="route-intel-legend"><span><i className="opt" />{L("OPTIMISED", "المسار المحسّن", "优化路线", "OPTİMİZE", "OPTIMISÉ")}</span><span><i className="base" />{L("BASELINE", "المسار الأساسي", "基准路线", "BAZ", "RÉFÉRENCE")}</span><b>{L("Scenario route active", "مسار السيناريو نشط", "场景路线已启用", "Senaryo rotası aktif", "Route du scénario active")}</b></div>
     </div>
   );
 }
 
 export default function Simulator() {
   const { t, ta, lang } = useLang();
-  const [teu, setTeu] = useState(120000);
+  const [teu, setTeu] = useState(13000);
   const [nm, setNm] = useState(5700);
 
   /* ── live math ── */
@@ -278,7 +276,7 @@ export default function Simulator() {
   const baseHours = nm / AVG_SPEED_KN;
   const hoursSaved = baseHours * AI_TIME_GAIN + PORT_SYNC_HRS;
   const costSaved = teu * nm * COST_PER_TEU_NM * AI_COST_GAIN;
-  const greenScore = Math.min(99, Math.round(60 + (teu / 500000) * 20 + (nm / 12000) * 20));
+  const greenScore = Math.min(99, Math.round(60 + (teu / 24000) * 20 + (nm / 12000) * 20));
   const optEtaHrs = baseHours - hoursSaved;
   const etaDays = Math.floor(optEtaHrs / 24);
   const etaHrs = Math.round(optEtaHrs % 24);
@@ -343,7 +341,7 @@ export default function Simulator() {
             <Reveal from="up">
               <GlassCard strong className="sim-command-deck card-pad relative overflow-hidden">
                 <div className="sim-command-inner relative space-y-8"><span className="sim-command-orbit" aria-hidden /><span className="sim-command-scan" aria-hidden />
-                  <SliderRow label={t("sim.teuLabel")} unit={t("sim.teuUnit")} min={1000} max={500000} step={1000} value={teu} onChange={setTeu} />
+                  <SliderRow label={t("sim.teuLabel")} unit={t("sim.teuUnit")} min={500} max={24000} step={100} value={teu} onChange={setTeu} />
                   <SliderRow label={t("sim.nmLabel")} unit={t("sim.nmUnit")} min={1000} max={12000} step={50} value={nm} onChange={setNm} />
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

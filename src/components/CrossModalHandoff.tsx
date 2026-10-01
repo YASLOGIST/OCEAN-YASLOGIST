@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { subscribeScroll } from "../lib/scroll";
+import { subscribeScroll, wakeScrollLoop } from "../lib/scroll";
 import { useLang } from "../lib/i18n";
 import { SURFACES } from "../lib/suite";
 import { ModelBadge } from "./ui";
@@ -19,10 +19,74 @@ export default function CrossModalHandoff() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const handoffProgressRef = useRef(0);
+  const nearbyRef = useRef(false);
+  const mobilePlayback = useRef(typeof window !== "undefined" && window.matchMedia("(max-width: 767px), (pointer: coarse)").matches).current;
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const video = videoRef.current;
+    if (!section || !video) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = false;
+
+    const syncPlayback = () => {
+      // Keep the poster until the chapter approaches. A hidden tab and reduced
+      // motion never start a download or an autonomous playback loop.
+      if (document.hidden || motion.matches) {
+        video.pause();
+        return;
+      }
+      if (nearbyRef.current && !video.getAttribute("src")) {
+        video.src = mobilePlayback
+          ? "/media/intermodal-handoff-mobile.mp4"
+          : "/media/intermodal-handoff-scrub.mp4";
+        video.load();
+      }
+      if (mobilePlayback && visible) {
+        void video.play().catch(() => {
+          // Autoplay policies may leave the poster in place; a later visible
+          // or canplay event can retry without breaking the rest of the page.
+        });
+      } else video.pause();
+    };
+
+    let nearby: IntersectionObserver | undefined;
+    let onscreen: IntersectionObserver | undefined;
+    if (typeof IntersectionObserver === "function") {
+      nearby = new IntersectionObserver(([entry]) => {
+        nearbyRef.current = entry.isIntersecting;
+        syncPlayback();
+        if (entry.isIntersecting) wakeScrollLoop();
+      }, { rootMargin: "100% 0px" });
+      onscreen = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        syncPlayback();
+      }, { threshold: 0.01 });
+      nearby.observe(section);
+      onscreen.observe(section);
+    } else {
+      nearbyRef.current = true;
+      visible = true;
+    }
+    document.addEventListener("visibilitychange", syncPlayback);
+    motion.addEventListener("change", syncPlayback);
+    video.addEventListener("canplay", syncPlayback);
+    syncPlayback();
+
+    return () => {
+      nearby?.disconnect();
+      onscreen?.disconnect();
+      document.removeEventListener("visibilitychange", syncPlayback);
+      motion.removeEventListener("change", syncPlayback);
+      video.removeEventListener("canplay", syncPlayback);
+      nearbyRef.current = false;
+      video.pause();
+    };
+  }, [mobilePlayback]);
 
   useEffect(() => subscribeScroll((f) => {
     const el = sectionRef.current;
-    if (!el) return;
+    if (!el || !nearbyRef.current || document.hidden) return;
     const r = el.getBoundingClientRect();
     if (r.bottom < -f.vh * 0.2 || r.top > f.vh * 1.2) return;
     const video = videoRef.current;
@@ -30,7 +94,7 @@ export default function CrossModalHandoff() {
       el.style.setProperty("--handoff-p", "0.5000");
       el.style.setProperty("--handoff-x", "50.00%");
       handoffProgressRef.current = 0.5;
-      if (video && Number.isFinite(video.duration) && video.duration > 0) video.currentTime = video.duration * 0.5;
+      if (!mobilePlayback && video && Number.isFinite(video.duration) && video.duration > 0) video.currentTime = video.duration * 0.5;
       return;
     }
     const travel = Math.max(f.vh * 0.65, r.height - f.vh * 0.72);
@@ -38,7 +102,7 @@ export default function CrossModalHandoff() {
     handoffProgressRef.current = p;
     el.style.setProperty("--handoff-p", p.toFixed(4));
     el.style.setProperty("--handoff-x", `${(8 + p * 84).toFixed(2)}%`);
-    if (video && Number.isFinite(video.duration) && video.duration > 0) {
+    if (!mobilePlayback && video && Number.isFinite(video.duration) && video.duration > 0) {
       const target = Math.min(video.duration - 0.035, Math.max(0, p * video.duration));
       if (Math.abs(video.currentTime - target) > 0.04) video.currentTime = target;
     }
@@ -51,13 +115,14 @@ export default function CrossModalHandoff() {
           <video
             ref={videoRef}
             className="handoff-bg-video"
-            src="/media/intermodal-handoff-scrub.mp4"
             poster="/media/intermodal-handoff-poster.jpg"
             muted
             playsInline
-            preload="metadata"
+            loop={mobilePlayback}
+            preload={mobilePlayback ? "auto" : "metadata"}
             onLoadedMetadata={(event) => {
               const video = event.currentTarget;
+              if (mobilePlayback) return;
               const target = Math.min(video.duration - 0.035, Math.max(0, handoffProgressRef.current * video.duration));
               if (Number.isFinite(target)) video.currentTime = target;
             }}
