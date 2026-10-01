@@ -204,12 +204,11 @@ function MetricTile({
   );
 }
 
-/* Real Egyptian gateway geography. Coastline, delta, Suez Canal, Gulf of Suez
-   and Sinai are projected from actual lat/long (equirectangular) into the
-   400×230 box, and the five gateways sit at their true relative positions:
-   Alexandria + El Dekheila on the north-west delta, Damietta and East Port Said
-   on the north-east, Ain Sokhna on the Gulf of Suez below the canal. A vessel
-   runs the real approach lane from the open Mediterranean to a delta berth. */
+/* Real Egyptian gateway geography over the supplied satellite base map.
+   The visible frame supports the north-coast gateways and the Suez Canal corridor.
+   Alexandria + El Dekheila sit on the north-west delta; Damietta + East Port Said
+   sit on the north-east. Ain Sokhna is intentionally omitted because it falls
+   outside the reliable visible extent of this base image. */
 function RouteMap({ computing }: { computing: boolean }) {
   const { dir, lang } = useLang();
   const rtl = dir === "rtl";
@@ -226,7 +225,6 @@ function RouteMap({ computing }: { computing: boolean }) {
     { x: 118, y: 96, en: "El Dekheila", ar: "الدخيلة", zh: "德海拉港", tr: "El Dekheila", fr: "El Dekheila", ly: 111 },
     { x: 250, y: 73, en: "Damietta", ar: "دمياط", zh: "杜姆亚特港", tr: "Dimyat", fr: "Damiette", ly: 60 },
     { x: 286, y: 82, en: "E. Port Said", ar: "شرق بورسعيد", zh: "塞得东港", tr: "Doğu Port Said", fr: "Port-Saïd Est", ly: 103 },
-    { x: 302, y: 181, en: "Sokhna", ar: "السخنة", zh: "苏赫奈港", tr: "Ayn Suhna", fr: "Sokhna", ly: 197 },
   ];
   return (
     <div className={cn("route-intelligence", computing && "is-computing")}>
