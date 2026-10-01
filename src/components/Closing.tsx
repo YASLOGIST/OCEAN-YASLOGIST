@@ -20,6 +20,9 @@ export default function Closing() {
           <div className="founder-portrait-stage">
             <div className="founder-orbit founder-orbit-a" aria-hidden><i /><i /><i /></div>
             <div className="founder-orbit founder-orbit-b" aria-hidden><i /><i /></div>
+            <div className="founder-orbit founder-orbit-c" aria-hidden><i /><i /><i /><i /></div>
+            <div className="founder-orbit-arc" aria-hidden />
+            <div className="founder-portrait-aura" aria-hidden />
             <div className="founder-portrait-beam" aria-hidden />
             <FounderAvatar initials="AY" className="founder-channel-avatar" />
             <div className="founder-channel-status"><i /> DIRECT CHANNEL</div>
