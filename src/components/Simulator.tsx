@@ -234,23 +234,16 @@ function RouteMap({ computing }: { computing: boolean }) {
         <span><i /> AIS + PORT SYNC</span>
         <span className="tabular">31.2°N · 32.3°E</span>
       </div>
+      <div className="route-map-stage">
+        <div className="route-real-map" aria-hidden />
       <svg viewBox="0 0 400 260" className="route-map-v3" role="img" aria-label="Optimised Egyptian maritime route intelligence view">
         <defs>
-          <linearGradient id="routeSeaV3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0c2449"/><stop offset="1" stopColor="#061129"/></linearGradient>
           <linearGradient id="routePathV3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#67e8f9"/><stop offset="0.55" stopColor="#22e4ff"/><stop offset="1" stopColor="#34d399"/></linearGradient>
           <radialGradient id="routeNodeGlow"><stop offset="0" stopColor="#22e4ff" stopOpacity=".7"/><stop offset="1" stopColor="#22e4ff" stopOpacity="0"/></radialGradient>
           <pattern id="routeGridV3" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0H0v25" fill="none" stroke="#7dd3fc" strokeOpacity=".055" strokeWidth=".7"/></pattern>
           <filter id="routeGlowV3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        <rect width="400" height="260" fill="url(#routeSeaV3)"/>
         <rect width="400" height="260" fill="url(#routeGridV3)"/>
-        <g className="route-bathymetry" fill="none">
-          <path d="M-15 30 C80 5 142 48 226 25 S350 4 430 37"/><path d="M-20 47 C67 25 150 65 225 43 S340 24 423 54"/><path d="M-10 224 C80 192 161 238 245 212 S342 196 420 223"/>
-        </g>
-        <g className="route-land-v3" strokeLinejoin="round">
-          <path d="M0 96 L64 92 L128 87 L174 72 L214 66 L250 70 L286 82 L295 112 L299 141 L303 164 L299 191 L294 224 L293 262 L0 262 Z"/>
-          <path d="M296 88 L400 96 L400 262 L340 262 L332 226 L324 194 L315 160 L307 126 Z"/>
-        </g>
         <path d="M286 82 L295 112 L299 141 L303 164" className="route-canal-v3"/>
         <g className="route-current-vectors" aria-hidden>
           {[52,104,156,208,260,312].map((x,i)=><path key={x} d={`M${x} ${42+(i%2)*10} l12 0 l-4 -3 m4 3 l-4 3`}/>) }
@@ -269,6 +262,7 @@ function RouteMap({ computing }: { computing: boolean }) {
         <g className="route-suez-readout"><rect x="315" y="113" width="68" height="35" rx="8"/><text x="349" y="127" textAnchor="middle">SUEZ</text><text x="349" y="139" textAnchor="middle">+0.8 KN</text></g>
         <text x="87" y="24" className="route-sea-label" textAnchor={lab.textAnchor} style={lab.style}>{L("MEDITERRANEAN", "البحر المتوسط", "地中海", "AKDENİZ", "MÉDITERRANÉE")}</text>
       </svg>
+      </div>
       <div className="route-intel-legend"><span><i className="opt" />{L("OPTIMISED", "المسار المحسّن", "优化路线", "OPTİMİZE", "OPTIMISÉ")}</span><span><i className="base" />{L("BASELINE", "المسار الأساسي", "基准路线", "BAZ", "RÉFÉRENCE")}</span><b>{L("AI re-route active", "إعادة توجيه ذكية مفعلة", "AI 改道已启用", "AI yeniden rota aktif", "Re-routage IA actif")}</b></div>
     </div>
   );
