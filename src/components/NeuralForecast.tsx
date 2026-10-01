@@ -113,10 +113,10 @@ export default function NeuralForecast() {
   const confidence = svgNumProps("left", 0);
 
   return (
-    <div>
+    <div className="forecast-engine">
       <div
         ref={hostRef}
-        className={cn("nf card-inset relative overflow-hidden rounded-xl", live && "nf-live")}
+        className={cn("nf forecast-core card-inset relative overflow-hidden rounded-xl", live && "nf-live")}
         role="img"
         aria-label={
           "Neural route forecast: four live signals feed a model layer that scores three candidate " +
@@ -132,7 +132,7 @@ export default function NeuralForecast() {
             localized end labels, whose length varies by language. Measured worst
             cases are "Committed" reaching 441.7 in English and the input labels
             reaching 1.6 in Arabic — both would clip against a flush viewBox. */}
-        <svg viewBox="-8 -22 460 218" className="w-full" shapeRendering="geometricPrecision" aria-hidden>
+        <svg viewBox="-24 -22 500 218" className="w-full" shapeRendering="geometricPrecision" aria-hidden>
           <defs>
             <linearGradient id="nfEdge" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#22e4ff" stopOpacity="0.05" />
@@ -154,7 +154,7 @@ export default function NeuralForecast() {
             { x: HID_X, label: n("layerHidden") },
             { x: OUT_X, label: n("layerOut") },
           ].map((c) => (
-            <text key={c.x} x={c.x} y={-10} fill="var(--well-muted)" fontSize="7.5" textAnchor={cap.textAnchor} style={cap.style}>
+            <text key={c.x} x={c.x} y={-10} fill="var(--well-muted)" fontSize="8.5" textAnchor={cap.textAnchor} style={cap.style}>
               {c.label}
             </text>
           ))}
@@ -216,7 +216,7 @@ export default function NeuralForecast() {
             <g key={p.key}>
               <circle cx={IN_X} cy={p.y} r="5" fill="#0b2c5e" stroke="#22e4ff" strokeOpacity="0.75" />
               <circle cx={IN_X} cy={p.y} r="2" fill="#22e4ff" />
-              <text x={IN_X - 12} y={p.y + 3.5} fill="var(--well-muted)" fontSize="8.5" textAnchor={inLabel.textAnchor} style={inLabel.style}>
+              <text x={IN_X - 12} y={p.y + 3.5} fill="var(--well-muted)" fontSize="9.2" textAnchor={inLabel.textAnchor} style={inLabel.style}>
                 {n(`in${i}`)}
               </text>
             </g>
@@ -261,7 +261,7 @@ export default function NeuralForecast() {
                     sized for Arabic, not Latin: Cairo's glyph box measures 16.04
                     units at 8.5px — nearly twice the Latin box — because of
                     diacritic ascenders, and a Latin-sized gap collides. */}
-                <text x={OUT_X + 15} y={win ? y - 5 : y + 3.5} fill={win ? "#34d399" : "var(--well-muted)"} fontSize="8.5" textAnchor={outLabel.textAnchor} style={outLabel.style}>
+                <text x={OUT_X + 15} y={win ? y - 5 : y + 3.5} fill={win ? "#34d399" : "var(--well-muted)"} fontSize="9.2" textAnchor={outLabel.textAnchor} style={outLabel.style}>
                   {n(`rt${i}`)}
                 </text>
                 {/* Confidence pinned to the node it belongs to. Same value as the

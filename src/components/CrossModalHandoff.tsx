@@ -62,7 +62,7 @@ export default function CrossModalHandoff() {
     >
       <div className="mx-auto max-w-7xl">
         <Reveal>
-          <div className="glass-strong gpu relative overflow-hidden rounded-[1.75rem] p-8 sm:p-10">
+          <div className="handoff-console glass-strong gpu relative overflow-hidden rounded-[1.75rem] p-8 sm:p-10">
             {/* Amber wash rather than the site's cyan: this block belongs to the
                 surface it hands off to, and the colour is the first thing that
                 says so. */}
@@ -70,6 +70,12 @@ export default function CrossModalHandoff() {
               className="glow-wash pointer-events-none absolute -top-24 end-0 h-64 w-[32rem] max-w-full rounded-full"
               style={{ "--wash": "rgba(232, 179, 23, 0.12)" } as React.CSSProperties}
             />
+
+            <div className="handoff-flow" aria-hidden>
+              <span className="handoff-node handoff-node-sea">SEA</span>
+              <span className="handoff-track"><i /></span>
+              <span className="handoff-node handoff-node-land">LAND</span>
+            </div>
 
             <div className="relative grid items-center gap-8 lg:grid-cols-[1.35fr_1fr]">
               <div>
@@ -87,7 +93,7 @@ export default function CrossModalHandoff() {
               <div className="flex flex-col gap-4">
                 {/* Status strip */}
                 <div
-                  className="rounded-xl border p-4"
+                  className="handoff-status rounded-xl border p-4"
                   style={{ borderColor: `${land.accent}40`, background: `${land.accent}0f` }}
                 >
                   <div className="flex items-start gap-2.5">
@@ -106,13 +112,13 @@ export default function CrossModalHandoff() {
                     </p>
                   </div>
                   <div className="mt-3">
-                    <ModelBadge short />
+                    <ModelBadge short className="handoff-model-badge" />
                   </div>
                 </div>
 
                 <a
                   href={land.href}
-                  className="group inline-flex items-center justify-center gap-2.5 rounded-2xl px-6 py-4 font-display text-sm font-bold tracking-wide transition-all duration-300"
+                  className="handoff-cta group inline-flex items-center justify-center gap-2.5 rounded-2xl px-6 py-4 font-display text-sm font-bold tracking-wide transition-all duration-300"
                   style={{ background: land.accent, color: "#10161C", boxShadow: `0 0 22px ${land.glow}` }}
                 >
                   {c.cta}

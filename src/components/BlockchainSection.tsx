@@ -32,7 +32,9 @@ function BlockIcon({ bright }: { bright?: boolean }) {
 
 function Panel({ title, status, children }: { title: string; status: string; children: React.ReactNode }) {
   return (
-    <GlassCard strong className="clip-angled card-pad relative overflow-hidden">
+    <GlassCard strong className="engine-panel engine-panel-ledger ledger-console clip-angled card-pad relative overflow-hidden">
+      <span className="engine-panel-orbit" aria-hidden />
+      <span className="engine-panel-scanline" aria-hidden />
       <div className="card-head">
         <div className="card-head-title">{title}</div>
         <div className="live-eyebrow live-eyebrow-ok">
@@ -41,8 +43,8 @@ function Panel({ title, status, children }: { title: string; status: string; chi
         </div>
       </div>
       {/* Ledger visuals settle no real transaction; say so on the panel. */}
-      <ModelBadge />
-      <div className="relative">{children}</div>
+      <ModelBadge className="engine-model-badge" />
+      <div className="engine-panel-body relative">{children}</div>
       <div className="pointer-events-none absolute right-4 top-4 h-6 w-6 border-r border-t border-neon/30" />
       <div className="pointer-events-none absolute bottom-4 left-4 h-6 w-6 border-b border-l border-neon/30" />
     </GlassCard>
@@ -77,6 +79,7 @@ export default function BlockchainSection() {
               <div className="group relative shrink-0">
                 <div
                   className={cn(
+                    "ledger-node",
                     /* Below `sm` the four nodes and their hashes are the row's
                        whole width budget: at 40px they total 184px against the
                        198px the panel leaves at a 360px viewport. At 56px they
@@ -86,7 +89,7 @@ export default function BlockchainSection() {
                     "grid h-10 w-10 place-items-center rounded-2xl border bg-cyan-950/30 backdrop-blur-sm transition-all duration-300 sm:h-16 sm:w-16",
                     "border-cyan-400/60 shadow-[0_0_18px_rgba(34,211,238,0.35)]",
                     "group-hover:-translate-y-1 group-hover:scale-[1.07] group-hover:border-cyan-300 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.65)]",
-                    isFinal && "border-cyan-300/80 bg-cyan-900/40 shadow-[0_0_26px_rgba(34,211,238,0.55)]"
+                    isFinal && "ledger-node-final border-cyan-300/80 bg-cyan-900/40 shadow-[0_0_26px_rgba(34,211,238,0.55)]"
                   )}
                 >
                   <BlockIcon bright={isFinal} />
@@ -108,7 +111,7 @@ export default function BlockchainSection() {
                 {/* Ledger hashes are hex identifiers — pinned LTR so they never
                     reorder when the document flips to RTL. */}
                 <div
-                  className="mt-2.5 text-center font-mono text-[6px] leading-relaxed tracking-[0.04em] text-ghost transition-colors group-hover:text-cyan-300 sm:text-[8px] sm:tracking-[0.1em]"
+                  className="mt-2.5 text-center font-mono text-[8px] leading-relaxed tracking-[0.03em] text-ghost transition-colors group-hover:text-cyan-300 sm:tracking-[0.1em]"
                   dir="ltr"
                   style={{ unicodeBidi: "isolate" }}
                 >
@@ -121,7 +124,7 @@ export default function BlockchainSection() {
       </div>
 
       {/* ── auto-settling smart-contract steps ── */}
-      <div className="mt-7 rounded-xl border border-cyan-400/20 bg-cyan-950/20 p-4 backdrop-blur-sm">
+      <div className="ledger-contract mt-7 rounded-xl border border-cyan-400/20 bg-cyan-950/20 p-4 backdrop-blur-sm">
         <div className="mb-4 font-mono text-[9px] uppercase leading-relaxed tracking-[0.25em] text-ghost">{n("contract")}</div>
         {/* Same 360px floor as the ledger row above: 149px needed against 124px
             at 320px, so the four steps wrap to 2 x 2 and lose their connectors. */}

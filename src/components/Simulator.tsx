@@ -283,8 +283,8 @@ function RouteMap({ computing }: { computing: boolean }) {
 
       {/* sea labels */}
       <text x="96" y="20" fill="var(--c-muted)" fontSize="8.5" opacity="0.75" textAnchor={lab.textAnchor} style={lab.style}>{L("Mediterranean Sea", "البحر المتوسط", "地中海", "Akdeniz", "Mer Méditerranée")}</text>
-      <text transform="translate(311 198) rotate(78)" fill="var(--c-muted)" fontSize="7.5" opacity="0.75" textAnchor="middle" style={lab.style}>{L("Gulf of Suez", "خليج السويس", "苏伊士湾", "Süveyş Körfezi", "Golfe de Suez")}</text>
-      <text x="330" y="108" fill="var(--c-neon)" fontSize="7.5" opacity="0.8" textAnchor={lab.textAnchor} style={lab.style}>{L("Suez Canal", "قناة السويس", "苏伊士运河", "Süveyş Kanalı", "Canal de Suez")}</text>
+      <text transform="translate(311 198) rotate(78)" fill="var(--c-muted)" fontSize="8.5" opacity="0.82" textAnchor="middle" style={lab.style}>{L("Gulf of Suez", "خليج السويس", "苏伊士湾", "Süveyş Körfezi", "Golfe de Suez")}</text>
+      <text x="330" y="108" fill="var(--c-neon)" fontSize="8.5" opacity="0.88" textAnchor={lab.textAnchor} style={lab.style}>{L("Suez Canal", "قناة السويس", "苏伊士运河", "Süveyş Kanalı", "Canal de Suez")}</text>
     </svg>
   );
 }
@@ -481,8 +481,8 @@ export default function Simulator() {
           {/* route visualization */}
           <div className="lg:col-span-5">
             <Reveal from="up" delay={150}>
-              <GlassCard strong className="card-pad relative flex h-full flex-col overflow-hidden">
-                <div className="mb-4 flex items-center justify-between gap-3">
+              <GlassCard strong className="eta-console card-pad relative flex h-full flex-col overflow-hidden">
+                <div className="eta-console-head mb-4 flex items-center justify-between gap-3">
                   <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-neon">{t("sim.eta")}</p>
                   <span className="live-eyebrow live-eyebrow-ok">
                     <span className="live-dot live-dot-ok" />
@@ -490,12 +490,12 @@ export default function Simulator() {
                   </span>
                 </div>
 
-                <RouteMap computing={computing} />
+                <div className="eta-map-shell"><RouteMap computing={computing} /></div>
 
                 {/* Fixed 3-row template per cell so row height is identical in every
                     language; numerals pinned dir="ltr" with tabular figures so digits
                     neither reorder nor re-measure when the document flips to RTL. */}
-                <div className="mt-4 grid grid-cols-3 gap-3 max-[360px]:grid-cols-1">
+                <div className="eta-metrics mt-4 grid grid-cols-3 gap-3 max-[360px]:grid-cols-1">
                   {[
                     { label: t("sim.nmLabel"), value: fmtInt(nm), unit: t("sim.nmUnit"), hero: false },
                     { label: t("sim.eta"), value: etaText, unit: t("sim.reroute"), hero: true },

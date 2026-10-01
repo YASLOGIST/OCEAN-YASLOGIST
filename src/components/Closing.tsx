@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { useLang } from "../lib/i18n";
+import { FounderAvatar } from "./Brand";
 import { Reveal } from "./ui";
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -32,7 +33,7 @@ export default function Closing() {
               free, and it drops this surface's blur radius from 20px to the
               system's 6px. Blur radius is the dominant backdrop-filter cost, so
               this reduces P5's weight without changing P5's surface count. */}
-          <div className="connect-card glass-strong gpu relative overflow-hidden rounded-[2rem] p-10 text-center sm:p-14">
+          <div className="founder-connect-console connect-card glass-strong gpu relative overflow-hidden rounded-[2rem] p-10 text-center sm:p-14">
             {/* One atmospheric glow, not three. R1: painted as a radial-gradient
                 rather than a blurred circle — a `filter` promotes its own
                 compositor surface, a gradient does not. */}
@@ -42,7 +43,17 @@ export default function Closing() {
             />
 
             <div className="relative">
-              <p className="micro font-mono text-neon">{t("closing.tag")}</p>
+              <div className="founder-connect-id">
+                <FounderAvatar initials="AY" className="founder-connect-avatar h-16 w-16" />
+                <div className="text-start">
+                  <p className="micro font-mono text-neon">{t("founder.lead")}</p>
+                  <p className="type-serif mt-1 text-lg font-bold text-ice">{t("founder.name")}</p>
+                  <p className="mt-1 text-[11px] text-ghost">{t("founder.title")}</p>
+                </div>
+                <span className="founder-connect-live"><i /> DIRECT</span>
+              </div>
+
+              <p className="micro mt-8 font-mono text-neon">{t("closing.tag")}</p>
 
               {/* Hairline rule under the eyebrow: a small piece of structure that
                   reads as letterhead rather than as a web form. */}
@@ -57,7 +68,7 @@ export default function Closing() {
 
               {/* One unambiguous primary action; the call is the secondary path.
                   Both carry visible focus rings for keyboard operation. */}
-              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <div className="founder-contact-actions mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <a
                   href={WA_LINK}
                   target="_blank"
@@ -78,7 +89,7 @@ export default function Closing() {
               </div>
 
               {/* phone — dir locked so RTL never reverses it */}
-              <div className="mt-8">
+              <div className="founder-contact-line mt-8">
                 <a
                   href="tel:+201041139910"
                   className="cta-phone tabular font-display text-2xl font-bold tracking-wide text-ice sm:text-3xl"

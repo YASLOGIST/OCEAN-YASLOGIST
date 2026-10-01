@@ -2451,3 +2451,831 @@ input[type="range"].oq-range::-moz-range-track {
 [data-theme="light"] .text-sky-400 {
   color: #0369a1 !important;
 }
+
+
+/* ═══════════════════════ OCEAN · PANEL EVOLUTION 2026 ═══════════════════════
+   Ten high-value surfaces share one material system, but each tells a different
+   operational story through geometry, colour temperature and motion. Motion is
+   transform/opacity only and always optional under reduced-motion. */
+
+/* ── Shared instrument frame ─────────────────────────────────────────── */
+.engine-panel {
+  --panel-accent: 34 228 255;
+  --panel-accent-2: 59 130 246;
+  --panel-alert: 251 191 36;
+  isolation: isolate;
+  border-color: rgb(var(--panel-accent) / .3) !important;
+  background:
+    linear-gradient(145deg, rgb(var(--panel-accent) / .055), transparent 28%),
+    linear-gradient(165deg, var(--glass-sa), var(--glass-sb));
+  box-shadow:
+    var(--glass-edges),
+    0 24px 80px -42px rgb(var(--panel-accent) / .62),
+    var(--glass-sshadow);
+}
+.engine-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, rgb(var(--panel-accent) / .08), transparent) 0 0 / 100% 1px no-repeat,
+    radial-gradient(70% 40% at 100% 0%, rgb(var(--panel-accent) / .11), transparent 72%);
+}
+.engine-panel-orbit {
+  position: absolute;
+  top: -5.5rem;
+  inset-inline-end: -5.5rem;
+  width: 12rem;
+  height: 12rem;
+  border: 1px solid rgb(var(--panel-accent) / .15);
+  border-radius: 9999px;
+  box-shadow: inset 0 0 0 1.5rem rgb(var(--panel-accent) / .018);
+  pointer-events: none;
+}
+.engine-panel-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 1.8rem;
+  border: 1px dashed rgb(var(--panel-accent) / .12);
+  border-radius: inherit;
+}
+.engine-panel-scanline {
+  position: absolute;
+  top: 0;
+  inset-inline: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(var(--panel-accent) / .65), transparent);
+  opacity: .55;
+  animation: panelSweep 6.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.engine-panel .card-head {
+  position: relative;
+  z-index: 2;
+  padding-bottom: .9rem;
+  border-bottom: 1px solid rgb(var(--panel-accent) / .12);
+}
+.engine-panel .card-head-title {
+  color: var(--c-text);
+  letter-spacing: .22em;
+}
+.engine-model-badge { position: relative; z-index: 2; }
+.engine-panel-body { margin-top: .95rem; z-index: 1; }
+
+.engine-panel-forecast { --panel-accent: 34 228 255; --panel-accent-2: 52 211 153; }
+.engine-panel-berth { --panel-accent: 56 189 248; --panel-accent-2: 245 158 11; }
+.engine-panel-cold { --panel-accent: 103 232 249; --panel-accent-2: 244 114 182; }
+.engine-panel-reference { --panel-accent: 14 165 233; --panel-accent-2: 251 113 133; }
+.engine-panel-ledger { --panel-accent: 45 212 191; --panel-accent-2: 52 211 153; }
+
+/* ── VESSEL · SAMPLE · command surface ─────────────────────────────── */
+.vessel-console {
+  isolation: isolate;
+  border-color: color-mix(in srgb, var(--c-neon) 34%, transparent) !important;
+  background:
+    radial-gradient(60% 45% at 8% 0%, color-mix(in srgb, var(--c-neon) 11%, transparent), transparent 70%),
+    linear-gradient(150deg, var(--glass-sa), var(--glass-sb));
+}
+.vessel-console::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--c-neon) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--c-neon) 7%, transparent) 1px, transparent 1px);
+  background-size: 42px 42px;
+  -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%);
+  mask-image: linear-gradient(180deg, #000, transparent 70%);
+  opacity: .46;
+}
+.vessel-console-head::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  width: 4rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-neon));
+}
+.vessel-speed-zone { position: relative; }
+.vessel-speed-zone::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -1rem;
+  top: 50%;
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--c-neon) 15%, transparent);
+  border-left-color: color-mix(in srgb, var(--c-neon) 75%, transparent);
+  transform: translateY(-48%) rotate(-18deg);
+  pointer-events: none;
+}
+.vessel-speed-value {
+  position: relative;
+  text-shadow: 0 0 28px color-mix(in srgb, var(--c-neon) 25%, transparent);
+}
+.vessel-readout {
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--dur-base) var(--ease-out-expo), border-color var(--dur-base) ease, background var(--dur-base) ease;
+}
+.vessel-readout::after {
+  content: "";
+  position: absolute;
+  inset-inline: .6rem;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c-neon) 36%, transparent), transparent);
+}
+.vessel-readout:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--c-neon) 30%, transparent); }
+.vessel-route-box { position: relative; overflow: hidden; }
+.vessel-route-box::before {
+  content: "ROUTE";
+  position: absolute;
+  inset-inline-end: .8rem;
+  bottom: .55rem;
+  font: 700 1.85rem/1 var(--font-display);
+  letter-spacing: -.05em;
+  color: color-mix(in srgb, var(--c-neon) 7%, transparent);
+}
+.vessel-route-line { position: relative; overflow: visible !important; }
+.vessel-route-pulse {
+  position: absolute;
+  top: 50%;
+  left: 64%;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: var(--c-neon);
+  box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--c-neon) 14%, transparent), 0 0 18px var(--glow);
+  transform: translate(-50%, -50%);
+  animation: routePulse 2.2s ease-in-out infinite;
+}
+.vessel-waypoints {
+  display: flex;
+  justify-content: space-between;
+  margin-top: .7rem;
+  font: 500 8px/1 var(--font-mono);
+  letter-spacing: .14em;
+  color: color-mix(in srgb, var(--c-muted) 72%, transparent);
+}
+.vessel-waypoints span { display: inline-flex; align-items: center; gap: .35rem; }
+.vessel-waypoints i { width: 4px; height: 4px; border-radius: 50%; background: color-mix(in srgb, var(--c-neon) 70%, transparent); }
+
+/* ── PLATFORM FOUNDER · signature authority ─────────────────────────── */
+.founder-signature-card {
+  position: relative;
+  overflow: hidden;
+  border-inline-start: 2px solid color-mix(in srgb, var(--c-neon) 65%, transparent) !important;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--c-neon) 6%, transparent), transparent 44%),
+    linear-gradient(155deg, var(--glass-a), var(--glass-b));
+}
+.founder-signature-card::after {
+  content: "FOUNDER";
+  position: absolute;
+  inset-inline-end: .5rem;
+  bottom: .35rem;
+  font: 700 2.8rem/.85 var(--font-display);
+  letter-spacing: -.04em;
+  color: color-mix(in srgb, var(--c-neon) 5%, transparent);
+  pointer-events: none;
+}
+.founder-signature-avatar {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-neon) 32%, transparent), 0 0 30px -12px var(--glow);
+}
+
+/* ── REPOSITIONING FORECAST · decision lattice ──────────────────────── */
+.forecast-engine { position: relative; }
+.forecast-core {
+  border-color: rgb(34 228 255 / .18) !important;
+  box-shadow: inset 0 0 50px rgb(34 228 255 / .035), inset 0 1px 0 rgb(255 255 255 / .04);
+}
+.forecast-core::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 48%, rgb(34 228 255 / .04) 50%, transparent 52%);
+  transform: translateX(-100%);
+  animation: inferenceSweep 5.2s ease-in-out infinite;
+}
+.forecast-engine .hero-metric-compact {
+  border-inline-start: 3px solid var(--stat-hero);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--stat-hero) 10%, transparent), var(--tile-bg));
+}
+.forecast-engine .stat-tile { border-top-color: rgb(34 228 255 / .2); }
+
+/* ── GATEWAY BERTH VIEW · harbour operations board ─────────────────── */
+.berth-column-head { opacity: .85; }
+.berth-row {
+  position: relative;
+  background: linear-gradient(90deg, rgb(56 189 248 / .045), var(--tile-bg));
+  border-color: rgb(56 189 248 / .09);
+  transition: transform var(--dur-base) var(--ease-out-expo), border-color var(--dur-base) ease, background var(--dur-base) ease;
+}
+.berth-row::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 2px;
+  border-radius: 2px;
+  background: rgb(56 189 248 / .5);
+}
+.berth-row:hover { transform: translateX(2px); border-color: rgb(56 189 248 / .32); }
+.berth-row-warn { background: linear-gradient(90deg, rgb(245 158 11 / .09), var(--tile-bg)); border-color: rgb(245 158 11 / .18); }
+.berth-row-warn::before { background: rgb(245 158 11 / .8); box-shadow: 0 0 12px rgb(245 158 11 / .35); }
+.berth-slots > span { position: relative; }
+.berth-slots > span::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 1px;
+  border-top: 1px solid rgb(255 255 255 / .25);
+}
+.berth-legend { opacity: .85; }
+
+/* ── COLD-CHAIN MONITOR · thermal recorder ─────────────────────────── */
+.cold-plot {
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgb(103 232 249 / .035), transparent 60%),
+    linear-gradient(160deg, rgb(6 18 44 / .62), rgb(3 8 24 / .82));
+}
+.cold-plot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: repeating-linear-gradient(90deg, transparent 0 31px, rgb(103 232 249 / .045) 32px);
+}
+.cold-plot::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 68%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgb(244 114 182 / .65), transparent);
+  box-shadow: 0 0 18px rgb(244 114 182 / .25);
+  opacity: .8;
+}
+.cold-kpi {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgb(103 232 249 / .04), var(--tile-bg));
+}
+.cold-kpi::before { content: ""; position: absolute; inset-inline: .5rem; top: 0; height: 1px; background: linear-gradient(90deg, transparent, rgb(103 232 249 / .45), transparent); }
+.cold-kpi:nth-child(3)::before { background: linear-gradient(90deg, transparent, rgb(244 114 182 / .55), transparent); }
+
+/* ── REFERENCE RECONCILIATION · stitched identity graph ────────────── */
+.reference-map { position: relative; overflow: hidden; }
+.reference-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 0 50%, rgb(14 165 233 / .08), transparent 52%);
+}
+.reference-spine { position: relative; z-index: 1; }
+.reference-row {
+  background: linear-gradient(90deg, rgb(14 165 233 / .04), var(--tile-bg));
+  border-color: rgb(14 165 233 / .10);
+  transition: transform var(--dur-base) var(--ease-out-expo), border-color var(--dur-base) ease;
+}
+.reference-row:hover { transform: translateX(2px); border-color: rgb(14 165 233 / .28); }
+.reference-row-bad {
+  background: linear-gradient(90deg, rgb(251 113 133 / .1), var(--tile-bg));
+  border-color: rgb(251 113 133 / .26);
+  box-shadow: inset 3px 0 0 rgb(251 113 133 / .55);
+}
+.reference-row-ok { box-shadow: inset 2px 0 0 rgb(52 211 153 / .32); }
+.reference-summary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgb(14 165 233 / .1), rgb(34 228 255 / .025));
+}
+.reference-summary::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -1.6rem;
+  bottom: -2.6rem;
+  width: 5.5rem;
+  height: 5.5rem;
+  border: 1px solid rgb(14 165 233 / .12);
+  border-radius: 9999px;
+  box-shadow: inset 0 0 0 1rem rgb(14 165 233 / .025);
+  pointer-events: none;
+}
+
+/* ── TAMPER-EVIDENT RECORD · immutable ledger ──────────────────────── */
+.ledger-console { overflow: hidden; }
+.ledger-node {
+  position: relative;
+  background:
+    linear-gradient(145deg, rgb(45 212 191 / .11), rgb(5 25 35 / .42));
+}
+.ledger-node::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  border: 1px solid rgb(45 212 191 / .08);
+}
+.ledger-node-final::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 1.15rem;
+  border: 1px dashed rgb(52 211 153 / .25);
+  animation: ledgerSeal 7s linear infinite;
+}
+.ledger-contract {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgb(45 212 191 / .055), transparent 30%),
+    rgb(6 34 44 / .26) !important;
+}
+.ledger-contract::before { content: ""; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, transparent, rgb(45 212 191 / .7), transparent); }
+
+/* ── OPTIMISED ARRIVAL · route command deck ───────────────────────── */
+.eta-console {
+  isolation: isolate;
+  border-color: color-mix(in srgb, var(--c-neon) 30%, transparent) !important;
+  background:
+    radial-gradient(80% 45% at 50% 0%, color-mix(in srgb, var(--c-neon) 10%, transparent), transparent 70%),
+    linear-gradient(155deg, var(--glass-sa), var(--glass-sb));
+}
+.eta-console::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, color-mix(in srgb, var(--c-neon) 3%, transparent), transparent 36%); }
+.eta-console-head { position: relative; z-index: 2; padding-bottom: .8rem; border-bottom: 1px solid color-mix(in srgb, var(--c-neon) 14%, transparent); }
+.eta-map-shell {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--c-neon) 14%, transparent);
+  border-radius: .95rem;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--c-neon) 5%, transparent), transparent);
+}
+.eta-map-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 35px color-mix(in srgb, var(--c-neon) 5%, transparent);
+}
+.eta-metrics .stat-tile { position: relative; overflow: hidden; }
+.eta-metrics .stat-tile:nth-child(2) { border-color: color-mix(in srgb, var(--stat-hero) 32%, transparent); background: linear-gradient(145deg, color-mix(in srgb, var(--stat-hero) 10%, transparent), var(--tile-bg)); }
+.eta-metrics .stat-tile:nth-child(2)::before { content: ""; position: absolute; inset-inline: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--stat-hero), transparent); }
+
+/* ── INTERMODAL HANDOFF · sea → road relay ─────────────────────────── */
+.handoff-console {
+  border-color: rgb(232 179 23 / .28) !important;
+  background:
+    linear-gradient(110deg, rgb(34 228 255 / .05), transparent 38%, rgb(232 179 23 / .08)),
+    linear-gradient(155deg, var(--glass-sa), var(--glass-sb));
+}
+.handoff-flow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1.4rem;
+  padding: .55rem .7rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: color-mix(in srgb, rgb(var(--c-chrome)) 3%, transparent);
+}
+.handoff-node { font: 600 8px/1 var(--font-mono); letter-spacing: .18em; }
+.handoff-node-sea { color: var(--c-neon); }
+.handoff-node-land { color: #e8b317; }
+.handoff-track { position: relative; height: 1px; background: linear-gradient(90deg, var(--c-neon), rgb(232 179 23 / .85)); }
+.handoff-track::before, .handoff-track::after { content: ""; position: absolute; top: 50%; width: 5px; height: 5px; border-radius: 50%; transform: translateY(-50%); }
+.handoff-track::before { left: 0; background: var(--c-neon); }
+.handoff-track::after { right: 0; background: #e8b317; }
+.handoff-track i { position: absolute; top: 50%; left: 0; width: .5rem; height: .5rem; border-radius: 50%; background: #fff; box-shadow: 0 0 12px rgb(232 179 23 / .7); transform: translate(-50%, -50%); animation: handoffPacket 3s var(--ease-in-out-soft) infinite; }
+.handoff-status { position: relative; overflow: hidden; }
+.handoff-status::after { content: ""; position: absolute; inset-inline-start: 0; bottom: 0; width: 42%; height: 1px; background: linear-gradient(90deg, #e8b317, transparent); }
+.handoff-cta { position: relative; overflow: hidden; }
+.handoff-cta::after { content: none; }
+.handoff-cta:hover { transform: translateY(-2px); filter: brightness(1.04); }
+
+/* ── CONNECT · PLATFORM FOUNDER · direct console ───────────────────── */
+.founder-connect-console {
+  border-color: color-mix(in srgb, var(--c-neon) 32%, transparent) !important;
+  background:
+    radial-gradient(80% 50% at 50% 0%, color-mix(in srgb, var(--c-neon) 9%, transparent), transparent 70%),
+    linear-gradient(155deg, var(--glass-sa), var(--glass-sb));
+}
+.founder-connect-id {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  max-width: 38rem;
+  margin: 0 auto;
+  padding: .8rem 1rem;
+  border: 1px solid var(--hairline);
+  border-radius: 1rem;
+  background: color-mix(in srgb, rgb(var(--c-chrome)) 3%, transparent);
+  text-align: start;
+}
+.founder-connect-avatar { box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-neon) 28%, transparent), 0 0 26px -10px var(--glow); }
+.founder-connect-live { display: inline-flex; align-items: center; gap: .45rem; font: 600 8px/1 var(--font-mono); letter-spacing: .14em; color: var(--status-ok); }
+.founder-connect-live i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; animation: directPulse 2.4s ease-in-out infinite; }
+.founder-contact-actions { position: relative; }
+.founder-contact-actions::before { content: ""; position: absolute; top: 50%; left: 50%; width: min(90%, 32rem); height: 1px; transform: translate(-50%,-50%); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c-neon) 18%, transparent), transparent); z-index: -1; }
+.founder-contact-line { position: relative; }
+.founder-contact-line::before { content: ""; position: absolute; left: 50%; top: -.7rem; width: 5px; height: 5px; border-radius: 50%; background: var(--c-neon); box-shadow: 0 0 10px var(--glow); transform: translateX(-50%); }
+
+/* Theme correction: preserve the richer geometry on white glass without making
+   it cloudy. Instrument wells deliberately remain dark in both themes. */
+[data-theme="light"] .engine-panel,
+[data-theme="light"] .vessel-console,
+[data-theme="light"] .eta-console,
+[data-theme="light"] .handoff-console,
+[data-theme="light"] .founder-connect-console {
+  box-shadow: var(--glass-edges), 0 22px 62px -34px rgb(15 70 115 / .32), var(--glass-sshadow);
+}
+[data-theme="light"] .berth-row,
+[data-theme="light"] .cold-kpi,
+[data-theme="light"] .reference-row { background-color: rgb(255 255 255 / .32); }
+[data-theme="light"] .engine-model-badge,
+[data-theme="light"] .vessel-model-badge,
+[data-theme="light"] .handoff-model-badge {
+  color: #7c4a00 !important;
+  border-color: rgb(180 120 0 / .34) !important;
+  background: rgb(255 244 196 / .55) !important;
+}
+[data-theme="light"] .ledger-contract {
+  background:
+    linear-gradient(90deg, rgb(13 148 136 / .07), transparent 36%),
+    rgb(240 253 250 / .82) !important;
+  border-color: rgb(13 148 136 / .2) !important;
+}
+[data-theme="light"] .ledger-contract .text-ghost { color: #31465a !important; }
+[data-theme="light"] .ledger-contract .text-cyan-100\/80,
+[data-theme="light"] .ledger-contract .text-cyan-200 { color: #0f5f66 !important; }
+[data-theme="light"] .cold-plot { background: linear-gradient(160deg, #0a1730, #071226); }
+[data-theme="light"] .founder-signature-card::after,
+[data-theme="light"] .vessel-route-box::before,
+[data-theme="light"] .reference-summary::after { opacity: .65; }
+
+@keyframes panelSweep { 0%,100% { transform: translateY(0); opacity: .2; } 50% { transform: translateY(22rem); opacity: .7; } }
+@keyframes routePulse { 0%,100% { transform: translate(-50%,-50%) scale(.82); opacity: .65; } 50% { transform: translate(-50%,-50%) scale(1.18); opacity: 1; } }
+@keyframes inferenceSweep { 0%,100% { transform: translateX(-120%); opacity: 0; } 40% { opacity: .65; } 60% { transform: translateX(120%); opacity: 0; } }
+@keyframes ledgerSeal { to { transform: rotate(360deg); } }
+@keyframes handoffPacket { 0% { left: 0; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+@keyframes directPulse { 0%,100% { opacity: .5; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
+
+@media (max-width: 639px) {
+  .engine-panel-orbit { width: 8rem; height: 8rem; top: -4rem; inset-inline-end: -4rem; }
+  .engine-panel-scanline { display: none; }
+  .vessel-speed-zone::before { width: 6.25rem; height: 6.25rem; inset-inline-start: -.6rem; }
+  .vessel-route-box::before, .founder-signature-card::after, .reference-summary::after { font-size: 1rem; }
+  .founder-connect-id { grid-template-columns: auto minmax(0,1fr); }
+  .founder-connect-live { grid-column: 2; }
+  .handoff-flow { margin-bottom: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .engine-panel-scanline,
+  .vessel-route-pulse,
+  .forecast-core::after,
+  .ledger-node-final::after,
+  .handoff-track i,
+  .founder-connect-live i { animation: none !important; }
+  .vessel-readout:hover,
+  .berth-row:hover,
+  .reference-row:hover { transform: none; }
+}
+
+
+/* Narrow operational cards: preserve words, not the desktop column geometry. */
+@media (max-width: 479px) {
+  .berth-column-head { display: none; }
+  .berth-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: .6rem .75rem;
+    padding-block: .7rem;
+  }
+  .berth-name {
+    grid-column: 1;
+    grid-row: 1;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  .berth-slots { grid-column: 1; grid-row: 2; }
+  .berth-queue { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+}
+
+/* At the 320px floor, long panel titles and statuses must stack instead of
+   fighting for the same row. This protects EN/AR/FR without reducing type. */
+@media (max-width: 359px) {
+  .engine-panel .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .45rem;
+  }
+  .engine-panel .live-eyebrow { align-self: flex-start; }
+}
+
+/* 320px final legibility pass: reflow dense data instead of shrinking it. */
+@media (max-width: 359px) {
+  .berth-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+  }
+  .berth-name {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    white-space: nowrap;
+  }
+  .berth-slots { grid-column: 1; grid-row: 2; }
+  .berth-queue { grid-column: 2; grid-row: 2; }
+
+  .cold-kpis {
+    grid-template-columns: 1fr !important;
+    gap: .45rem;
+  }
+  .cold-kpi {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .75rem;
+    text-align: start;
+    padding: .6rem .75rem;
+  }
+  .cold-kpi > :last-child {
+    margin-top: 0;
+    text-align: end;
+  }
+
+  .reference-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .4rem;
+  }
+  .reference-row > span:last-child {
+    width: 100%;
+    max-width: none !important;
+    justify-content: flex-start;
+    text-align: start;
+  }
+
+  .founder-contact-actions .cta-primary {
+    width: 100%;
+    justify-content: center;
+    font-size: .875rem;
+    line-height: 1.35;
+  }
+  .founder-contact-line .cta-phone {
+    display: inline-block;
+    font-size: 1.3rem;
+    letter-spacing: .015em;
+    white-space: nowrap;
+  }
+}
+
+/* Light-mode semantic statuses: keep operational state words above AA-like
+   visual contrast on pale glass instead of inheriting dark-theme pastels. */
+[data-theme="light"] .reference-row-ok > span:last-child { color: #047857 !important; }
+[data-theme="light"] .reference-row-bad > span:last-child { color: #be123c !important; }
+[data-theme="light"] .berth-row .text-emerald-300 { color: #047857 !important; }
+[data-theme="light"] .berth-row .text-amber-300 { color: #92400e !important; }
+
+@media (max-width: 359px) {
+  .founder-contact-actions .cta-primary {
+    gap: .5rem;
+    padding-inline: .9rem;
+    font-size: .78rem;
+    letter-spacing: 0;
+    line-height: 1.25;
+  }
+}
+
+
+/* ═══════════════════════ Showcase V2 · adaptive cinematic surfaces ═══════════════════════ */
+/* The design language below is deliberately shared: every showcase surface
+   gets the same physical material model, while each panel keeps its own data
+   metaphor. Pointer lighting is fed by App.tsx on fine pointers only. */
+:where(.vessel-console, .eta-console, .engine-panel, .handoff-console, .founder-connect-console, .founder-signature-card) {
+  --pointer-x: 50%;
+  --pointer-y: 24%;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition:
+    transform 420ms var(--ease-out-expo),
+    border-color 300ms ease,
+    box-shadow 420ms var(--ease-out-expo),
+    background-color 260ms ease,
+    color 220ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.vessel-console, .eta-console, .engine-panel, .handoff-console, .founder-connect-console, .founder-signature-card):hover {
+    transform: perspective(1500px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translate3d(0, -2px, 0);
+  }
+}
+
+/* Pointer-reactive illumination is merged into the existing material instead
+   of adding another DOM layer. Light theme uses a cooler, lower-alpha spot so
+   the white glass does not bloom. */
+.engine-panel::before {
+  background:
+    radial-gradient(38% 34% at var(--pointer-x) var(--pointer-y), rgb(var(--panel-accent) / .15), transparent 72%),
+    linear-gradient(90deg, transparent, rgb(var(--panel-accent) / .08), transparent) 0 0 / 100% 1px no-repeat,
+    radial-gradient(70% 40% at 100% 0%, rgb(var(--panel-accent) / .11), transparent 72%);
+  transition: opacity 280ms ease;
+}
+[data-theme="light"] .engine-panel::before {
+  background:
+    radial-gradient(34% 30% at var(--pointer-x) var(--pointer-y), rgb(var(--panel-accent) / .09), transparent 72%),
+    linear-gradient(90deg, transparent, rgb(var(--panel-accent) / .09), transparent) 0 0 / 100% 1px no-repeat,
+    radial-gradient(70% 40% at 100% 0%, rgb(var(--panel-accent) / .07), transparent 72%);
+}
+
+.vessel-console {
+  background:
+    radial-gradient(42% 34% at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--c-neon) 14%, transparent), transparent 72%),
+    radial-gradient(60% 45% at 8% 0%, color-mix(in srgb, var(--c-neon) 11%, transparent), transparent 70%),
+    linear-gradient(150deg, var(--glass-sa), var(--glass-sb));
+}
+.eta-console {
+  background:
+    radial-gradient(44% 34% at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--c-neon) 12%, transparent), transparent 74%),
+    radial-gradient(80% 45% at 50% 0%, color-mix(in srgb, var(--c-neon) 10%, transparent), transparent 70%),
+    linear-gradient(155deg, var(--glass-sa), var(--glass-sb));
+}
+.handoff-console {
+  background:
+    radial-gradient(44% 36% at var(--pointer-x) var(--pointer-y), rgb(232 179 23 / .10), transparent 72%),
+    linear-gradient(110deg, rgb(34 228 255 / .05), transparent 38%, rgb(232 179 23 / .08)),
+    linear-gradient(155deg, var(--glass-sa), var(--glass-sb));
+}
+.founder-connect-console {
+  background:
+    radial-gradient(44% 36% at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--c-neon) 11%, transparent), transparent 72%),
+    radial-gradient(80% 50% at 50% 0%, color-mix(in srgb, var(--c-neon) 9%, transparent), transparent 70%),
+    linear-gradient(155deg, var(--glass-sa), var(--glass-sb));
+}
+.founder-signature-card {
+  background:
+    radial-gradient(48% 70% at var(--pointer-x) var(--pointer-y), color-mix(in srgb, var(--c-neon) 12%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, var(--c-neon) 6%, transparent), transparent 44%),
+    linear-gradient(155deg, var(--glass-a), var(--glass-b));
+}
+
+/* A single travelling sensor on the panel orbit adds life without asking the
+   entire card to animate. Each engine uses a different cycle, avoiding the
+   synthetic "all dashboards pulse together" look. */
+.engine-panel-orbit::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgb(var(--panel-accent));
+  box-shadow: 0 0 12px rgb(var(--panel-accent) / .72);
+  transform-origin: 0 6rem;
+  animation: engineOrbit var(--orbit-speed, 13s) linear infinite;
+}
+.engine-panel-forecast { --orbit-speed: 11s; }
+.engine-panel-berth { --orbit-speed: 14s; }
+.engine-panel-cold { --orbit-speed: 12.5s; }
+.engine-panel-reference { --orbit-speed: 15s; }
+.engine-panel-ledger { --orbit-speed: 10.5s; }
+
+/* Panel-specific intelligence cues. They signal state; none covers readable
+   content or depends on hover to communicate meaning. */
+.berth-row-warn::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: 0;
+  width: 34%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(245 158 11 / .9), transparent);
+  animation: berthPressure 3.8s ease-in-out infinite;
+}
+.cold-plot::after { animation: coldExcursion 2.8s ease-in-out infinite; }
+.reference-row-bad { animation: rejectedSignal 3.4s ease-in-out infinite; }
+.ledger-node-final { animation: ledgerCommitGlow 3.2s ease-in-out infinite; }
+.founder-signature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 32%, color-mix(in srgb, var(--c-neon) 12%, transparent) 48%, transparent 64%);
+  transform: translateX(-115%);
+  animation: founderSheen 8s ease-in-out infinite;
+}
+.eta-map-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 42%, color-mix(in srgb, var(--c-neon) 12%, transparent) 50%, transparent 58%);
+  transform: translateX(-115%);
+  animation: etaScan 7s ease-in-out infinite;
+}
+
+/* The view-transition capture gives the whole cinematic stack one coherent
+   morph between themes. It is intentionally short: the UI feels instant, but
+   the eyes never see a white/dark flash between token sets. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 300ms;
+  animation-timing-function: var(--ease-in-out-soft);
+}
+::view-transition-old(root) { animation-name: themeFadeOut; }
+::view-transition-new(root) { animation-name: themeFadeIn; }
+.theme-transitioning * { transition-duration: 0s !important; }
+
+@keyframes engineOrbit { to { transform: rotate(360deg); } }
+@keyframes berthPressure {
+  0%,100% { transform: translateX(-30%); opacity: .18; }
+  50% { transform: translateX(200%); opacity: .95; }
+}
+@keyframes coldExcursion {
+  0%,100% { opacity: .42; box-shadow: 0 0 10px rgb(244 114 182 / .10); }
+  50% { opacity: .95; box-shadow: 0 0 24px rgb(244 114 182 / .34); }
+}
+@keyframes rejectedSignal {
+  0%,100% { box-shadow: inset 3px 0 0 rgb(251 113 133 / .55), 0 0 0 transparent; }
+  50% { box-shadow: inset 3px 0 0 rgb(251 113 133 / .9), 0 0 24px -16px rgb(251 113 133 / .65); }
+}
+@keyframes ledgerCommitGlow {
+  0%,100% { filter: brightness(1); }
+  50% { filter: brightness(1.12); }
+}
+@keyframes founderSheen {
+  0%,70%,100% { transform: translateX(-115%); opacity: 0; }
+  78% { opacity: .8; }
+  92% { transform: translateX(115%); opacity: 0; }
+}
+@keyframes etaScan {
+  0%,68%,100% { transform: translateX(-115%); opacity: 0; }
+  75% { opacity: .8; }
+  91% { transform: translateX(115%); opacity: 0; }
+}
+@keyframes themeFadeOut {
+  from { opacity: 1; filter: blur(0); }
+  to { opacity: 0; filter: blur(2px); }
+}
+@keyframes themeFadeIn {
+  from { opacity: 0; filter: blur(2px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+/* Mobile gets composed depth, never desktop tilt. Touch targets and data stay
+   stable while subtle panel state motion remains visible. */
+@media (max-width: 639px), (hover: none), (pointer: coarse) {
+  :where(.vessel-console, .eta-console, .engine-panel, .handoff-console, .founder-connect-console, .founder-signature-card) {
+    transform: none !important;
+  }
+  .engine-panel-orbit::before { width: 4px; height: 4px; transform-origin: 0 4rem; }
+}
+
+/* Off-screen motion governor. Existing and V2 instrumentation resumes the
+   moment the panel enters the expanded viewport, so there is no visible
+   start-up delay. */
+.engine-panel:not(.showcase-active) .engine-panel-orbit::before,
+.engine-panel:not(.showcase-active) .berth-row-warn::after,
+.engine-panel:not(.showcase-active) .cold-plot::after,
+.engine-panel:not(.showcase-active) .reference-row-bad,
+.engine-panel:not(.showcase-active) .ledger-node-final,
+.vessel-console:not(.showcase-active) .vessel-route-pulse,
+.eta-console:not(.showcase-active) .eta-map-shell::before,
+.founder-signature-card:not(.showcase-active)::before,
+.handoff-console:not(.showcase-active) .handoff-track i,
+.founder-connect-console:not(.showcase-active) .founder-connect-live i {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+  .engine-panel-orbit::before,
+  .berth-row-warn::after,
+  .cold-plot::after,
+  .reference-row-bad,
+  .ledger-node-final,
+  .founder-signature-card::before,
+  .eta-map-shell::before { animation: none !important; }
+}

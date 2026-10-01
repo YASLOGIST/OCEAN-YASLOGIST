@@ -36,13 +36,13 @@ export default function FulfillmentBay() {
   const exY = ty(TEMPS[exIdx]);
 
   return (
-    <div>
+    <div className="cold-engine">
       <div className="mb-3 flex items-center justify-between gap-3 font-mono text-[9px] uppercase tracking-[0.2em]">
         <span className="text-ice" dir="ltr" style={{ unicodeBidi: "isolate" }}>{n("head")}</span>
         <span className="text-ghost/80">{n("logged")}</span>
       </div>
 
-      <div className="card-inset relative overflow-hidden rounded-xl p-3">
+      <div className="cold-plot card-inset relative overflow-hidden rounded-xl p-3">
         <svg
           viewBox="0 0 320 120"
           className="w-full"
@@ -84,13 +84,13 @@ export default function FulfillmentBay() {
         </span>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2">
+      <div className="cold-kpis mt-4 grid grid-cols-3 gap-2">
         {[
           { k: n("rangeK"), v: n("rangeV") },
           { k: n("intervalK"), v: n("intervalV") },
           { k: n("statusK"), v: n("statusV") },
         ].map((r) => (
-          <div key={r.k} className="rounded-lg border border-chrome/5 bg-chrome/[0.03] px-2.5 py-2 text-center">
+          <div key={r.k} className="cold-kpi rounded-lg border border-chrome/5 bg-chrome/[0.03] px-2.5 py-2 text-center">
             <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-ghost/70">{r.k}</div>
             <div className="tabular mt-1 font-mono text-[11px] text-ice" dir="ltr" style={{ unicodeBidi: "isolate" }}>
               {r.v}

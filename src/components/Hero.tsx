@@ -11,8 +11,8 @@ import { GlassCard, ModelBadge, NeonButton, Parallax, Reveal, SectionTag, ArrowR
 function FounderBadge() {
   const { t } = useLang();
   return (
-    <div className="glass card-lift gpu flex max-w-md items-center gap-5 rounded-2xl p-5">
-      <FounderAvatar initials="AY" className="h-16 w-16 shrink-0" />
+    <div className="founder-signature-card glass card-lift gpu flex max-w-md items-center gap-5 rounded-2xl p-5">
+      <FounderAvatar initials="AY" className="founder-signature-avatar h-16 w-16 shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="micro font-mono text-neon">{t("founder.lead")}</p>
         <p className="type-serif mt-2 text-lg font-bold leading-tight text-ice">{t("founder.name")}</p>
@@ -39,9 +39,9 @@ function VesselCard() {
   ];
 
   return (
-    <GlassCard strong className="relative p-6 sm:p-8">
+    <GlassCard strong className="vessel-console relative p-6 sm:p-8">
       {/* tier 1 — identifier + live state */}
-      <header className="flex items-center justify-between gap-4 border-b border-chrome/10 pb-4">
+      <header className="vessel-console-head flex items-center justify-between gap-4 border-b border-chrome/10 pb-4">
         <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-neon">
           {t("hero.telemetry.vessel")}
         </span>
@@ -57,16 +57,16 @@ function VesselCard() {
       {/* The card carries a vessel identifier, a speed and an ETA, all of which
           read as a live AIS feed. It is a model; the badge says so beside them. */}
       <div className="mt-4 flex justify-start">
-        <ModelBadge />
+        <ModelBadge className="vessel-model-badge" />
       </div>
 
       {/* tier 2 — the primary metric, highest contrast on the card */}
-      <div className="mt-6 flex items-end justify-between gap-4 max-[360px]:flex-col max-[360px]:items-start max-[360px]:gap-3">
+      <div className="vessel-speed-zone mt-6 flex items-end justify-between gap-4 max-[360px]:flex-col max-[360px]:items-start max-[360px]:gap-3">
         <div className="min-w-0">
           <div className="font-mono text-[9px] uppercase tracking-[0.24em] text-ghost/80">
             {t("hero.telemetry.speed")}
           </div>
-          <div className="tabular mt-2 font-display text-[3.25rem] font-bold leading-none tracking-tight text-ice">
+          <div className="vessel-speed-value tabular mt-2 font-display text-[3.25rem] font-bold leading-none tracking-tight text-ice">
             18.6
             <span className="ms-2 align-baseline text-lg font-semibold text-neon">KN</span>
           </div>
@@ -82,22 +82,28 @@ function VesselCard() {
       </div>
 
       {/* tier 3 — secondary readouts, quieter. 2-up on narrow so nothing truncates. */}
-      <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="vessel-readout-grid mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {readouts.map((r) => (
-          <div key={r.k} className="rounded-lg border border-chrome/5 bg-chrome/[0.03] px-2 py-2.5 text-center">
+          <div key={r.k} className="vessel-readout rounded-lg border border-chrome/5 bg-chrome/[0.03] px-2 py-2.5 text-center">
             <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-ghost/70">{r.k}</div>
             <div className="tabular mt-1 font-mono text-[12px] text-ice">{r.v}</div>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 rounded-xl border border-neon/20 bg-neon/[0.05] p-4">
+      <div className="vessel-route-box mt-6 rounded-xl border border-neon/20 bg-neon/[0.05] p-4">
         <div className="flex items-center justify-between gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-ghost/80">
           <span>{t("hero.telemetry.route")}</span>
           <span className="shrink-0 text-neon">SHA → SUZ → PSD</span>
         </div>
-        <div className="mt-3 h-1 rounded-full bg-chrome/10">
+        <div className="vessel-route-line mt-3 h-1 rounded-full bg-chrome/10">
           <div className="grad-bar h-full w-[64%] rounded-full" />
+          <span className="vessel-route-pulse" aria-hidden />
+        </div>
+        <div className="vessel-waypoints" aria-hidden>
+          <span><i />SHA</span>
+          <span><i />SUZ</span>
+          <span><i />PSD</span>
         </div>
         <p className="mt-2.5 font-mono text-[9px] uppercase leading-relaxed tracking-[0.18em] text-ice/45">
           {t("hero.telemetry.etaNote")}

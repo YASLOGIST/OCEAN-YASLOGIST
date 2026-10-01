@@ -10,9 +10,11 @@ import { CheckIcon, CountUp, GlassCard, ModelBadge, Parallax, Reveal, SectionTag
 
 /* ═══════════════════════════ shared panel ═══════════════════════════ */
 
-function Panel({ title, status, children }: { title: string; status: string; children: ReactNode }) {
+function Panel({ title, status, children, variant }: { title: string; status: string; children: ReactNode; variant: "forecast" | "berth" | "cold" | "reference" }) {
   return (
-    <GlassCard strong className="clip-angled card-pad relative overflow-hidden">
+    <GlassCard strong className={cn("engine-panel clip-angled card-pad relative overflow-hidden", `engine-panel-${variant}`)}>
+      <span className="engine-panel-orbit" aria-hidden />
+      <span className="engine-panel-scanline" aria-hidden />
       <div className="card-head">
         <div className="card-head-title">{title}</div>
         <div className="live-eyebrow live-eyebrow-ok">
@@ -22,8 +24,8 @@ function Panel({ title, status, children }: { title: string; status: string; chi
       </div>
       {/* Every engine panel is a model, not a feed. Stated on the panel rather
           than only in the Terms modal, which a visitor has to open to reach. */}
-      <ModelBadge />
-      <div className="relative">{children}</div>
+      <ModelBadge className="engine-model-badge" />
+      <div className="engine-panel-body relative">{children}</div>
       <div className="pointer-events-none absolute right-4 top-4 h-6 w-6 border-r border-t border-neon/30" />
       <div className="pointer-events-none absolute bottom-4 left-4 h-6 w-6 border-b border-l border-neon/30" />
     </GlassCard>
@@ -35,7 +37,7 @@ function Panel({ title, status, children }: { title: string; status: string; chi
 function VisualAnalytics() {
   const { t } = useLang();
   return (
-    <Panel title={t("pillars.0.panel.title")} status={t("pillars.0.panel.status")}>
+    <Panel title={t("pillars.0.panel.title")} status={t("pillars.0.panel.status")} variant="forecast">
       <NeuralForecast />
     </Panel>
   );
@@ -46,7 +48,7 @@ function VisualAnalytics() {
 function VisualFleet() {
   const { t } = useLang();
   return (
-    <Panel title={t("pillars.1.panel.title")} status={t("pillars.1.panel.status")}>
+    <Panel title={t("pillars.1.panel.title")} status={t("pillars.1.panel.status")} variant="berth">
       <FleetRadar />
     </Panel>
   );
@@ -57,7 +59,7 @@ function VisualFleet() {
 function VisualWarehouse() {
   const { t } = useLang();
   return (
-    <Panel title={t("pillars.2.panel.title")} status={t("pillars.2.panel.status")}>
+    <Panel title={t("pillars.2.panel.title")} status={t("pillars.2.panel.status")} variant="cold">
       <FulfillmentBay />
     </Panel>
   );
@@ -68,7 +70,7 @@ function VisualWarehouse() {
 function VisualGreen() {
   const { t } = useLang();
   return (
-    <Panel title={t("pillars.3.panel.title")} status={t("pillars.3.panel.status")}>
+    <Panel title={t("pillars.3.panel.title")} status={t("pillars.3.panel.status")} variant="reference">
       <VoyageProfile />
     </Panel>
   );

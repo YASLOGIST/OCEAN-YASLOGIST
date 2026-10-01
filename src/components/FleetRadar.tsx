@@ -35,9 +35,9 @@ export default function FleetRadar() {
   };
 
   return (
-    <div>
+    <div className="berth-engine">
       {/* column header */}
-      <div className="mb-2 grid grid-cols-[1.35fr_1fr_auto] items-center gap-3 px-3 font-mono text-[8px] uppercase tracking-[0.18em] text-ghost/70">
+      <div className="berth-column-head mb-2 grid grid-cols-[1.35fr_1fr_auto] items-center gap-3 px-3 font-mono text-[8px] uppercase tracking-[0.18em] text-ghost/70">
         <span>{L("Gateway", "المنفذ", "核心口岸", "Liman Kapısı", "Portail")}</span>
         <span>{L("Berths", "الأرصفة", "泊位占用", "Rıhtımlar", "Postes")}</span>
         <span className="text-end">{L("Queue · Demurrage", "الطابور · الأرضيات", "排队 · 滞期预警", "Kuyruk · Demoraj", "File · Surestaries")}</span>
@@ -47,15 +47,15 @@ export default function FleetRadar() {
         {GATES.map((g) => (
           <div
             key={g.en}
-            className="grid grid-cols-[1.35fr_1fr_auto] items-center gap-3 rounded-lg border border-chrome/5 bg-chrome/[0.03] px-3 py-2.5"
+            className={"berth-row grid grid-cols-[1.35fr_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2.5 " + (g.warn ? "berth-row-warn" : "")}
           >
             {/* gateway */}
-            <span className="truncate font-mono text-[11px] text-ice">
+            <span className="berth-name min-w-0 font-mono text-[11px] leading-snug text-ice">
               {L(g.en, g.ar, g.zh, g.tr, g.fr)}
             </span>
 
             {/* berth occupancy */}
-            <span className="flex items-center gap-1.5" aria-hidden>
+            <span className="berth-slots flex items-center gap-1.5" aria-hidden>
               {Array.from({ length: g.berths }).map((_, i) => (
                 <span
                   key={i}
@@ -70,7 +70,7 @@ export default function FleetRadar() {
             </span>
 
             {/* queue + demurrage status */}
-            <span className="flex items-center justify-end gap-2.5">
+            <span className="berth-queue flex items-center justify-end gap-2.5">
               <span className="tabular font-mono text-[11px] text-ice/80" dir="ltr" style={{ unicodeBidi: "isolate" }}>
                 {g.queue > 0 ? `+${g.queue}` : "—"}
               </span>
@@ -93,7 +93,7 @@ export default function FleetRadar() {
       </div>
 
       {/* legend + honest note */}
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-chrome/10 pt-3 font-mono text-[8px] uppercase tracking-[0.14em] text-ghost/70">
+      <div className="berth-legend mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-chrome/10 pt-3 font-mono text-[8px] uppercase tracking-[0.14em] text-ghost/70">
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-[3px] border border-neon/50 bg-neon/80" />
           {L("Occupied", "مشغول", "占用中", "Dolu", "Occupé")}

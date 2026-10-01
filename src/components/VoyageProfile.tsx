@@ -25,15 +25,15 @@ export default function VoyageProfile() {
   ];
 
   return (
-    <div>
+    <div className="reference-engine">
       <div className="mb-3 font-mono text-[9px] uppercase tracking-[0.22em] text-ice">{n("head")}</div>
 
-      <div className="card-inset rounded-xl p-4">
-        <ol className="relative space-y-2.5 border-s border-dashed border-neon/25 ps-4">
+      <div className="reference-map card-inset rounded-xl p-4">
+        <ol className="reference-spine relative space-y-2.5 border-s border-dashed border-neon/25 ps-4">
           {refs.map((r) => (
             <li
               key={r.label}
-              className="relative flex items-center justify-between gap-3 rounded-lg border border-chrome/5 bg-chrome/[0.03] px-3 py-2"
+              className={"reference-row relative flex items-center justify-between gap-3 rounded-lg border px-3 py-2 " + (r.bad ? "reference-row-bad" : "reference-row-ok")}
             >
               <span
                 className={
@@ -64,7 +64,7 @@ export default function VoyageProfile() {
         </ol>
       </div>
 
-      <div className="mt-4 flex items-center gap-4 rounded-xl border border-neon/20 bg-neon/[0.05] px-4 py-3">
+      <div className="reference-summary mt-4 flex items-center gap-4 rounded-xl border border-neon/20 bg-neon/[0.05] px-4 py-3">
         <span className="tabular font-display text-3xl font-bold leading-none text-neon">{n("countV")}</span>
         <span className="font-mono text-[9px] uppercase leading-snug tracking-[0.2em] text-ghost">{n("countK")}</span>
       </div>

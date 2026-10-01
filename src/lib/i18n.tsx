@@ -375,7 +375,7 @@ const en: Dict = {
         ref4: "Gate Pass",
         foot: "Filed by the customer or their broker. YASLOGIST watches the references line up; it does not file the declaration.",
         countV: "7",
-        countK: "Reference types",
+        countK: "Reference types · 5 shown",
       },
     },
     {
@@ -709,7 +709,7 @@ const ar: Dict = {
         ref4: "تصريح البوابة",
         foot: "يقدّمها العميل أو وسيطه المرخّص. YASLOGIST تراقب تطابق المراجع — لا تقدّم الإقرار.",
         countV: "7",
-        countK: "أنواع المراجع",
+        countK: "أنواع المراجع · 5 معروضة",
       },
     },
     {
@@ -1043,7 +1043,7 @@ const zh: Dict = {
         ref4: "出入闸通行单",
         foot: "由货主或合规报关行申报。YASLOGIST 负责数据交叉验证与一致性监控，不代行申报权责。",
         countV: "7类",
-        countK: "单证类型",
+        countK: "单证类型 · 展示5项",
       },
     },
     {
@@ -1378,7 +1378,7 @@ const tr: Dict = {
         ref4: "Kapı Giriş İzni",
         foot: "Müşteri veya gümrük müşaviri tarafından beyan edilir. YASLOGIST referans tutarlılığını denetler, doğrudan beyanda bulunmaz.",
         countV: "7",
-        countK: "Referans türü",
+        countK: "Referans türü · 5 gösteriliyor",
       },
     },
     {
@@ -1713,7 +1713,7 @@ const fr: Dict = {
         ref4: "Bon d'Accès Porte",
         foot: "Déclaré par le client ou son transitaire agréé. YASLOGIST contrôle la concordance des références, sans déposer la déclaration en douane.",
         countV: "7",
-        countK: "Types de références",
+        countK: "Types de références · 5 affichés",
       },
     },
     {
