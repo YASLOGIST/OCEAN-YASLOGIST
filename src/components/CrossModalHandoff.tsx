@@ -17,27 +17,53 @@ export default function CrossModalHandoff() {
   const c = COPY[lang];
   const land = SURFACES.find((s) => s.id === "land")!;
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const handoffProgressRef = useRef(0);
 
   useEffect(() => subscribeScroll((f) => {
     const el = sectionRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
     if (r.bottom < -f.vh * 0.2 || r.top > f.vh * 1.2) return;
+    const video = videoRef.current;
     if (f.reduced) {
       el.style.setProperty("--handoff-p", "0.5000");
       el.style.setProperty("--handoff-x", "50.00%");
+      handoffProgressRef.current = 0.5;
+      if (video && Number.isFinite(video.duration) && video.duration > 0) video.currentTime = video.duration * 0.5;
       return;
     }
     const travel = Math.max(f.vh * 0.65, r.height - f.vh * 0.72);
     const p = Math.max(0, Math.min(1, (-r.top + f.vh * 0.18) / travel));
+    handoffProgressRef.current = p;
     el.style.setProperty("--handoff-p", p.toFixed(4));
     el.style.setProperty("--handoff-x", `${(8 + p * 84).toFixed(2)}%`);
+    if (video && Number.isFinite(video.duration) && video.duration > 0) {
+      const target = Math.min(video.duration - 0.035, Math.max(0, p * video.duration));
+      if (Math.abs(video.currentTime - target) > 0.04) video.currentTime = target;
+    }
   }), []);
 
   return (
     <section ref={sectionRef} aria-label={c.tag} className="handoff-chapter section-iso relative">
       <div className="handoff-sticky">
         <div className="handoff-world" aria-hidden>
+          <video
+            ref={videoRef}
+            className="handoff-bg-video"
+            src="/media/intermodal-handoff-scrub.mp4"
+            poster="/media/intermodal-handoff-poster.jpg"
+            muted
+            playsInline
+            preload="metadata"
+            onLoadedMetadata={(event) => {
+              const video = event.currentTarget;
+              const target = Math.min(video.duration - 0.035, Math.max(0, handoffProgressRef.current * video.duration));
+              if (Number.isFinite(target)) video.currentTime = target;
+            }}
+            tabIndex={-1}
+          />
+          <div className="handoff-video-veil" />
           <div className="handoff-sea-field"><i /><i /><i /><i /></div>
           <div className="handoff-port-silhouette"><span /><span /><span /></div>
           <div className="handoff-land-field"><i /><i /><i /></div>
