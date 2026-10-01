@@ -1,102 +1,103 @@
 import { useLang } from "../lib/i18n";
 
-/* ═══════════════════ Engine 03 · Pharma Cold-Chain Monitor ═══════════════════
-   A temperature trace across the voyage read against the 2–8°C pharma band.
-   Most of the run sits inside the band; one reading breaks above it and is
-   flagged the moment it starts — the point this card exists to make. The panel
-   observes a reading that travels with the shipment reference; it does not
-   operate a cold store. Points are deterministic and the motion budget is a
-   single pulsing dot, so nothing here depends on a live feed (the panel's
-   ModelBadge says as much).
-
-   NOTE: the file keeps its original name/export (FulfillmentBay) so the
-   Pillars import is untouched; the warehouse floor-plan it used to render was
-   removed — YASLOGIST observes cold-chain data, it does not run a fulfilment bay.
-──────────────────────────────────────────────────────────────────────────── */
-
 const TEMPS = [5, 5.5, 4.8, 6, 5.2, 6.6, 5.8, 7, 10.8, 9.3, 6.2, 5, 5.4, 5.7];
-const X0 = 12;
-const X1 = 308;
-const Y0 = 14;
-const Y1 = 106;
+const X0 = 18;
+const X1 = 302;
+const Y0 = 16;
+const Y1 = 116;
 const TMAX = 12;
-
 const ty = (t: number) => Y1 - (t / TMAX) * (Y1 - Y0);
 const tx = (i: number) => X0 + (i / (TEMPS.length - 1)) * (X1 - X0);
-
 const yHi = ty(8);
 const yLo = ty(2);
 const points = TEMPS.map((t, i) => `${tx(i).toFixed(1)},${ty(t).toFixed(1)}`).join(" ");
+const area = `M ${X0} ${Y1} L ${TEMPS.map((t, i) => `${tx(i).toFixed(1)} ${ty(t).toFixed(1)}`).join(" L ")} L ${X1} ${Y1} Z`;
 const exIdx = TEMPS.indexOf(Math.max(...TEMPS));
 
 export default function FulfillmentBay() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const n = (k: string) => t(`pillars.2.notes.${k}`);
+  const L = (en: string, ar: string, zh?: string, tr?: string, fr?: string) => {
+    if (lang === "ar") return ar;
+    if (lang === "zh" && zh) return zh;
+    if (lang === "tr" && tr) return tr;
+    if (lang === "fr" && fr) return fr;
+    return en;
+  };
   const exX = tx(exIdx);
   const exY = ty(TEMPS[exIdx]);
 
   return (
-    <div className="cold-engine">
-      <div className="mb-3 flex items-center justify-between gap-3 font-mono text-[9px] uppercase tracking-[0.2em]">
-        <span className="text-ice" dir="ltr" style={{ unicodeBidi: "isolate" }}>{n("head")}</span>
-        <span className="text-ghost/80">{n("logged")}</span>
-      </div>
-
-      <div className="cold-plot card-inset relative overflow-hidden rounded-xl p-3">
-        <svg
-          viewBox="0 0 320 120"
-          className="w-full"
-          role="img"
-          aria-label="Container temperature across the voyage against the 2 to 8 degree pharma band, with one excursion flagged"
-        >
-          {/* safe band 2–8°C */}
-          <rect
-            x={X0}
-            y={yHi}
-            width={X1 - X0}
-            height={yLo - yHi}
-            fill="rgba(52,211,153,0.10)"
-            stroke="rgba(52,211,153,0.35)"
-            strokeDasharray="3 3"
-          />
-          <text x={X1} y={yHi - 3} textAnchor="end" fontSize="8" fontFamily="monospace" fill="rgba(148,163,184,0.9)">
-            {n("hi")}
-          </text>
-          <text x={X1} y={yLo + 10} textAnchor="end" fontSize="8" fontFamily="monospace" fill="rgba(148,163,184,0.9)">
-            {n("lo")}
-          </text>
-
-          {/* excursion guide + reading */}
-          <line x1={exX} y1={Y0} x2={exX} y2={Y1} stroke="rgba(251,113,133,0.35)" strokeWidth="1" strokeDasharray="2 2" />
-          <polyline points={points} fill="none" stroke="var(--c-neon)" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" />
-          <circle cx={exX} cy={exY} r="3.4" fill="#fb7185" />
-        </svg>
-
-        <span className="absolute right-3 top-2 inline-flex items-center gap-1.5 rounded-full border border-rose-400/40 bg-rose-400/10 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.14em] text-rose-300">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-70" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-rose-400" />
-          </span>
-          {n("excursion")}
-        </span>
-        <span className="absolute bottom-2 left-3 font-mono text-[8px] uppercase tracking-[0.16em] text-emerald-300/80">
-          {n("band")}
-        </span>
-      </div>
-
-      <div className="cold-kpis mt-4 grid grid-cols-3 gap-2">
-        {[
-          { k: n("rangeK"), v: n("rangeV") },
-          { k: n("intervalK"), v: n("intervalV") },
-          { k: n("statusK"), v: n("statusV") },
-        ].map((r) => (
-          <div key={r.k} className="cold-kpi rounded-lg border border-chrome/5 bg-chrome/[0.03] px-2.5 py-2 text-center">
-            <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-ghost/70">{r.k}</div>
-            <div className="tabular mt-1 font-mono text-[11px] text-ice" dir="ltr" style={{ unicodeBidi: "isolate" }}>
-              {r.v}
-            </div>
+    <div className="cold-command">
+      <div className="cold-command-grid">
+        <div className="cold-dial-wrap">
+          <div className="cold-dial" aria-label={L("Current temperature 5.7 degrees Celsius", "درجة الحرارة الحالية 5.7 مئوية")}>
+            <div className="cold-dial-rings" aria-hidden><i /><i /><i /></div>
+            <div className="cold-dial-value"><strong>5.7</strong><span>°C</span></div>
+            <div className="cold-dial-state"><i />{L("IN BAND", "داخل النطاق", "范围内", "ARALIKTA", "DANS LA PLAGE")}</div>
           </div>
-        ))}
+          <div className="cold-sensor-meta">
+            <span><b>CT-118</b>{L("container", "حاوية", "集装箱", "konteyner", "conteneur")}</span>
+            <span><b>2s</b>{L("sample", "عينة", "采样", "örnek", "échantillon")}</span>
+            <span><b>14</b>{L("points", "نقطة", "点", "nokta", "points")}</span>
+          </div>
+        </div>
+
+        <div className="cold-thermal-screen">
+          <div className="cold-screen-head">
+            <span>{n("head")}</span>
+            <span className="cold-screen-live"><i /> {n("logged")}</span>
+          </div>
+          <svg viewBox="0 0 320 132" role="img" aria-label="Cold chain trace with one excursion above the safe band">
+            <defs>
+              <linearGradient id="coldArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#22e4ff" stopOpacity="0.26" />
+                <stop offset="1" stopColor="#22e4ff" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="coldLine" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="#38bdf8" />
+                <stop offset="0.62" stopColor="#22e4ff" />
+                <stop offset="1" stopColor="#5eead4" />
+              </linearGradient>
+              <filter id="coldGlow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+            </defs>
+            <g className="cold-grid-lines" aria-hidden>
+              {[28, 52, 76, 100].map((y) => <line key={y} x1="12" y1={y} x2="308" y2={y} />)}
+              {[42, 84, 126, 168, 210, 252, 294].map((x) => <line key={x} x1={x} y1="12" x2={x} y2="120" />)}
+            </g>
+            <rect x={X0} y={yHi} width={X1 - X0} height={yLo - yHi} className="cold-safe-zone" />
+            <path d={area} fill="url(#coldArea)" />
+            <polyline points={points} fill="none" stroke="url(#coldLine)" strokeWidth="2.3" strokeLinejoin="round" strokeLinecap="round" />
+            <line x1={exX} y1={Y0} x2={exX} y2={Y1} className="cold-ex-guide" />
+            <circle cx={exX} cy={exY} r="4.5" className="cold-ex-dot" filter="url(#coldGlow)" />
+            <circle cx={tx(TEMPS.length - 1)} cy={ty(TEMPS.at(-1)!)} r="3" className="cold-current-dot" />
+            <text x={X1 - 2} y={yHi - 5} textAnchor="end" className="cold-axis-label">8°C</text>
+            <text x={X1 - 2} y={yLo + 12} textAnchor="end" className="cold-axis-label">2°C</text>
+          </svg>
+          <span className="cold-event-chip"><i />{n("excursion")}</span>
+          <span className="cold-band-chip">{n("band")}</span>
+          <span className="cold-scan" aria-hidden />
+        </div>
+      </div>
+
+      <div className="cold-event-rail" aria-label={L("Temperature event timeline", "الخط الزمني لحرارة الشحنة")}>
+        <div className="cold-event-rail-line" aria-hidden><i /><i /><i /><i /><i /></div>
+        <div className="cold-event-stages">
+          <span><b>00:00</b>{L("Loaded", "تحميل", "装载", "Yüklendi", "Chargé")}</span>
+          <span><b>06:40</b>{L("Stable", "مستقر", "稳定", "Stabil", "Stable")}</span>
+          <span className="is-alert"><b>11:18</b>{L("Excursion", "تجاوز", "偏离", "Sapma", "Écart")}</span>
+          <span><b>11:42</b>{L("Recovered", "استعادة", "恢复", "Düzeldi", "Rétabli")}</span>
+          <span><b>14:00</b>{L("In band", "داخل النطاق", "范围内", "Aralıkta", "Conforme")}</span>
+        </div>
+      </div>
+
+      <div className="cold-command-kpis">
+        <span><small>{n("rangeK")}</small><b>{n("rangeV")}</b></span>
+        <span><small>{n("intervalK")}</small><b>{n("intervalV")}</b></span>
+        <span className="is-alert"><small>{n("statusK")}</small><b>{n("statusV")}</b></span>
       </div>
     </div>
   );

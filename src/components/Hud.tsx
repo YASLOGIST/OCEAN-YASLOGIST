@@ -112,7 +112,7 @@ export default function Hud() {
       </div>
 
       {/* right dot navigation */}
-      <nav className="fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-end gap-4 lg:flex">
+      <nav className="hud-dot-rail fixed right-3 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-end gap-4 lg:flex 2xl:right-5">
         {DOT_IDS.map((id, i) => (
           <button
             key={id}
@@ -122,7 +122,7 @@ export default function Hud() {
           >
             <span
               className={cn(
-                "font-mono text-[9px] uppercase tracking-[0.25em] text-ghost/70 transition-all duration-300 group-hover:text-neon",
+                "hud-dot-label hidden font-mono text-[9px] uppercase tracking-[0.25em] text-ghost/70 transition-all duration-300 group-hover:text-neon 2xl:block",
                 active === id ? "translate-x-0 text-neon opacity-100" : "translate-x-2 opacity-0"
               )}
             >

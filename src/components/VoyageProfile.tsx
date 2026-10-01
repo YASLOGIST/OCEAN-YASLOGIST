@@ -1,75 +1,69 @@
 import { useLang } from "../lib/i18n";
 
-/* ═══════════════ Engine 04 · ACID & B/L Reference Reconciliation ═══════════════
-   The references a shipment carries — booking, B/L, container, ACID, gate pass —
-   stitched onto one record and cross-checked before the vessel sails. Four line
-   up; the ACID filing is rejected, and it surfaces here at booking rather than
-   at the gate. The customer or their licensed broker files the declaration; this
-   panel only watches the references line up (its ModelBadge says so).
-
-   NOTE: the file keeps its original name/export (VoyageProfile) so the Pillars
-   import is untouched; the low-carbon voyage chart it used to render was removed
-   — YASLOGIST is not a carrier and makes no emissions claim.
-──────────────────────────────────────────────────────────────────────────── */
-
 export default function VoyageProfile() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const n = (k: string) => t(`pillars.3.notes.${k}`);
-
+  const L = (en: string, ar: string, zh?: string, tr?: string, fr?: string) => {
+    if (lang === "ar") return ar;
+    if (lang === "zh" && zh) return zh;
+    if (lang === "tr" && tr) return tr;
+    if (lang === "fr" && fr) return fr;
+    return en;
+  };
   const refs = [
-    { label: n("ref0"), bad: false },
-    { label: n("ref1"), bad: false },
-    { label: n("ref2"), bad: false },
-    { label: n("ref3"), bad: true },
-    { label: n("ref4"), bad: false },
+    { label: n("ref0"), bad: false, x: 18, y: 28, code: "BK" },
+    { label: n("ref1"), bad: false, x: 82, y: 22, code: "BL" },
+    { label: n("ref2"), bad: false, x: 86, y: 75, code: "CT" },
+    { label: n("ref3"), bad: true, x: 18, y: 78, code: "AC" },
+    { label: n("ref4"), bad: false, x: 50, y: 92, code: "GP" },
   ];
 
   return (
-    <div className="reference-engine">
-      <div className="mb-3 font-mono text-[9px] uppercase tracking-[0.22em] text-ice">{n("head")}</div>
+    <div className="reference-command">
+      <div className="reference-command-head">
+        <div>
+          <p className="reference-overline">{n("head")}</p>
+          <p className="reference-subline">{L("One shipment identity · five linked references", "هوية شحنة واحدة · خمسة مراجع مترابطة", "一个货运身份 · 五个关联参考", "Tek sevkiyat kimliği · beş bağlı referans", "Une identité d'expédition · cinq références liées")}</p>
+        </div>
+        <div className="reference-score"><strong>4/5</strong><span>{L("aligned", "متطابق", "已对齐", "eşleşti", "alignés")}</span></div>
+      </div>
 
-      <div className="reference-map card-inset rounded-xl p-4">
-        <ol className="reference-spine relative space-y-2.5 border-s border-dashed border-neon/25 ps-4">
+      <div className="reference-graph" role="img" aria-label={L("Shipment reference reconciliation graph", "مخطط مطابقة مراجع الشحنة")}>
+        <div className="reference-grid" aria-hidden />
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
           {refs.map((r) => (
-            <li
-              key={r.label}
-              className={"reference-row relative flex items-center justify-between gap-3 rounded-lg border px-3 py-2 " + (r.bad ? "reference-row-bad" : "reference-row-ok")}
-            >
-              <span
-                className={
-                  "absolute -start-[9px] top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full border-2 border-abyss " +
-                  (r.bad ? "bg-rose-400" : "bg-emerald-400")
-                }
-              />
-              <span className="min-w-0 font-mono text-[11px] text-ice/90">{r.label}</span>
-              {r.bad ? (
-                <span className="inline-flex max-w-[52%] items-center justify-end gap-1.5 text-end font-mono text-[8px] uppercase leading-snug tracking-[0.12em] text-rose-300">
-                  <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
-                    <path d="M12 9v4" />
-                    <path d="M12 17h.01" />
-                  </svg>
-                  {n("flag")}
-                </span>
-              ) : (
-                <span className="inline-flex shrink-0 items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-emerald-300/90">
-                  <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                  {n("ok")}
-                </span>
-              )}
-            </li>
+            <line key={r.code} x1="50" y1="52" x2={r.x} y2={r.y} className={r.bad ? "reference-link bad" : "reference-link ok"} />
           ))}
-        </ol>
+        </svg>
+        <div className="reference-core-node">
+          <span className="reference-core-orbit" aria-hidden />
+          <b>SHIPMENT</b>
+          <strong>YL-SEA-118</strong>
+          <small>{L("identity core", "هوية مركزية", "身份核心", "kimlik çekirdeği", "noyau d'identité")}</small>
+        </div>
+        {refs.map((r) => (
+          <div
+            key={r.code}
+            className={`reference-satellite reference-satellite-${r.code.toLowerCase()} ${r.bad ? "is-bad" : "is-ok"}`}
+            style={{ left: `${r.x}%`, top: `${r.y}%` }}
+          >
+            <i>{r.code}</i>
+            <div><strong>{r.label}</strong><small>{r.bad ? n("flag") : n("ok")}</small></div>
+          </div>
+        ))}
+        <span className="reference-scan" aria-hidden />
       </div>
 
-      <div className="reference-summary mt-4 flex items-center gap-4 rounded-xl border border-neon/20 bg-neon/[0.05] px-4 py-3">
-        <span className="tabular font-display text-3xl font-bold leading-none text-neon">{n("countV")}</span>
-        <span className="font-mono text-[9px] uppercase leading-snug tracking-[0.2em] text-ghost">{n("countK")}</span>
+      <div className="reference-event-strip">
+        <span className="reference-event-icon">!</span>
+        <div><small>{L("Mismatch isolated", "تم عزل عدم التطابق", "已隔离不匹配", "Uyumsuzluk ayrıştırıldı", "Écart isolé")}</small><strong>{n("ref3")}</strong></div>
+        <p>{n("flag")}</p>
       </div>
 
-      <p className="mt-3 border-t border-chrome/10 pt-3 text-[11px] leading-relaxed text-ghost">{n("foot")}</p>
+      <div className="reference-command-footer">
+        <span><b>{n("countV")}</b>{n("countK")}</span>
+        <p>{n("foot")}</p>
+      </div>
     </div>
   );
 }

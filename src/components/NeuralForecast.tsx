@@ -277,8 +277,26 @@ export default function NeuralForecast() {
         </svg>
       </div>
 
+      <div className="forecast-signal-deck" aria-label="Model signal contribution">
+        {[82, 74, 91, 68].map((v, i) => (
+          <div key={INPUTS[i].key} className="forecast-signal-row">
+            <span>{n(`in${i}`)}</span>
+            <div><i style={{ width: `${v}%` }} /></div>
+            <b className="tabular">{v}</b>
+          </div>
+        ))}
+      </div>
+
+      <div className="forecast-decision-timeline" aria-hidden>
+        <span className="is-done"><i />01</span>
+        <b />
+        <span className="is-live"><i />02</span>
+        <b />
+        <span><i />03</span>
+      </div>
+
       {/* Metric band — one dominant figure, two supporting. */}
-      <div className="mt-4 space-y-3">
+      <div className="forecast-metric-deck mt-4 space-y-3">
         <div className="hero-metric hero-metric-compact">
           <div className="stat-key">{n("accuracy")}</div>
           <div className="hero-metric-val tabular" dir="ltr" style={{ unicodeBidi: "isolate" }}>

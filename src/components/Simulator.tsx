@@ -99,8 +99,8 @@ function SliderRow({
 }) {
   const pct = ((value - min) / (max - min)) * 100;
   return (
-    <div>
-      <div className="flex items-end justify-between gap-4">
+    <div className="scenario-axis">
+      <div className="scenario-axis-head">
         <label className="stat-key">{label}</label>
         <div className="text-end">
           <span className="tabular font-display text-2xl font-bold tracking-tight text-ice" dir="ltr" style={{ unicodeBidi: "isolate" }}>
@@ -109,6 +109,7 @@ function SliderRow({
           <span className="ms-1.5 font-mono text-[10px] text-neon">{unit}</span>
         </div>
       </div>
+      <div className="scenario-axis-rail" aria-hidden><span style={{ width: `${pct}%` }} /><i style={{ left: `${pct}%` }} /></div>
       <input
         type="range"
         dir="ltr"
@@ -145,9 +146,9 @@ function PresetRow({
   onPick: (v: number) => void;
 }) {
   return (
-    <div>
+    <div className="scenario-preset-bank">
       <p className="stat-key mb-2">{heading}</p>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="scenario-preset-grid">
         {values.map((v, i) => (
           <button
             key={v}
@@ -155,7 +156,9 @@ function PresetRow({
             aria-pressed={active === v}
             className={cn("preset-chip", active === v && "preset-chip-on")}
           >
-            {labels[i] ?? String(v)}
+            <span className="preset-index">0{i + 1}</span>
+            <span className="preset-label">{labels[i] ?? String(v)}</span>
+            <i className="preset-state" aria-hidden />
           </button>
         ))}
       </div>
@@ -218,74 +221,56 @@ function RouteMap({ computing }: { computing: boolean }) {
     if (lang === "fr" && fr) return fr;
     return en;
   };
-
+  const gates = [
+    { x: 132, y: 85, en: "Alexandria", ar: "الإسكندرية", zh: "亚历山大港", tr: "İskenderiye", fr: "Alexandrie", ly: 72 },
+    { x: 118, y: 96, en: "El Dekheila", ar: "الدخيلة", zh: "德海拉港", tr: "El Dekheila", fr: "El Dekheila", ly: 111 },
+    { x: 250, y: 73, en: "Damietta", ar: "دمياط", zh: "杜姆亚特港", tr: "Dimyat", fr: "Damiette", ly: 60 },
+    { x: 286, y: 82, en: "E. Port Said", ar: "شرق بورسعيد", zh: "塞得东港", tr: "Doğu Port Said", fr: "Port-Saïd Est", ly: 103 },
+    { x: 302, y: 181, en: "Sokhna", ar: "السخنة", zh: "苏赫奈港", tr: "Ayn Suhna", fr: "Sokhna", ly: 197 },
+  ];
   return (
-    <svg viewBox="0 0 400 230" className={cn("route-map w-full", computing && "is-computing")} role="img" aria-label="Egyptian sea gateways: Alexandria, El Dekheila, Damietta, East Port Said and Ain Sokhna, with the Suez Canal and an approach lane from the Mediterranean.">
-      <defs>
-        <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="var(--c-neon)" stopOpacity="0.25" />
-          <stop offset="1" stopColor="var(--c-neon)" stopOpacity="1" />
-        </linearGradient>
-        <pattern id="routeGrid" width="30" height="30" patternUnits="userSpaceOnUse">
-          <path d="M30 0H0v30" fill="none" stroke="var(--grid-line)" strokeWidth="1" />
-        </pattern>
-      </defs>
-
-      {/* sea: a faint accent wash under the grid, so water reads as water */}
-      <rect width="400" height="230" fill="color-mix(in srgb, var(--c-neon) 5%, transparent)" />
-      <rect width="400" height="230" fill="url(#routeGrid)" />
-
-      {/* land: mainland Egypt with the Nile-delta bulge + Sinai, the Gulf of
-          Suez as the water channel between them, Ain Sokhna on its west shore */}
-      <g stroke="color-mix(in srgb, var(--c-neon) 60%, transparent)" strokeWidth="1.2" strokeLinejoin="round">
-        <path d="M0 80 L70 76 L136 72 L175 60 L207 55 L240 57 L258 60 L278 65 L292 69 L299 96 L303 124 L305 148 L300 168 L296 196 L295 232 L0 232 Z"
-              fill="color-mix(in srgb, var(--c-muted) 22%, transparent)" />
-        <path d="M306 74 L392 80 L392 232 L338 232 L330 196 L322 168 L316 144 L311 120 L308 96 Z"
-              fill="color-mix(in srgb, var(--c-muted) 22%, transparent)" />
-      </g>
-
-      {/* Suez Canal — the waterway the record follows from Med to Red Sea */}
-      <path d="M292 69 L299 96 L303 124 L305 148" fill="none" stroke="var(--c-neon)" strokeWidth="1.6" strokeOpacity="0.85" strokeDasharray="2 2.5" strokeLinecap="round" />
-
-      {/* approach lane: open Mediterranean → delta berth */}
-      <path d="M26 26 Q 150 34 292 69" fill="none" stroke="var(--c-neon)" strokeWidth="7" strokeLinecap="round" opacity="0.07" />
-      <path d="M26 26 Q 150 34 292 69" fill="none" stroke="url(#routeGrad)" strokeWidth="2.2" strokeLinecap="round" strokeDasharray="430" className="animate-dash" />
-
-      {/* vessel under way — accent fill, reads in light and dark */}
-      <g className="animate-floaty" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
-        <path d="M182 45 l-6 -5 v-3.5 h12 v3.5 z" fill="var(--c-neon)" />
-        <rect x="175" y="34" width="14" height="3.4" rx="1" fill="var(--c-neon)" opacity="0.55" />
-      </g>
-
-      {/* Cairo — inland reference */}
-      <circle cx="222" cy="150" r="2.6" fill="none" stroke="var(--c-muted)" strokeWidth="1.4" />
-      <text x="222" y="164" fill="var(--c-muted)" fontSize="8" textAnchor={lab.textAnchor} style={lab.style}>{L("Cairo", "القاهرة", "开罗", "Kahire", "Le Caire")}</text>
-
-      {/* gateways */}
-      {([
-        { x: 136, y: 72, en: "Alexandria", ar: "الإسكندرية", zh: "亚历山大港", tr: "İskenderiye", fr: "Alexandrie", ly: 64, arrive: false },
-        { x: 122, y: 82, en: "El Dekheila", ar: "الدخيلة", zh: "德海拉港", tr: "El Dekheila", fr: "El Dekheila", ly: 96, arrive: false },
-        { x: 258, y: 60, en: "Damietta", ar: "دمياط", zh: "杜姆亚特港", tr: "Dimyat", fr: "Damiette", ly: 50, arrive: false },
-        { x: 292, y: 69, en: "E. Port Said", ar: "شرق بورسعيد", zh: "塞得东港", tr: "Doğu Port Said", fr: "Port-Saïd Est", ly: 88, arrive: true },
-        { x: 298, y: 161, en: "Sokhna", ar: "السخنة", zh: "苏赫奈港", tr: "Ayn Suhna", fr: "Sokhna", ly: 176, arrive: false },
-      ] as const).map((g) => (
-        <g key={g.en}>
-          {g.arrive && (
-            <circle cx={g.x} cy={g.y} r="11" fill="none" stroke="var(--c-neon)" strokeOpacity="0.5" className="animate-ping" style={{ transformBox: "fill-box", transformOrigin: "center" }} />
-          )}
-          <circle cx={g.x} cy={g.y} r={g.arrive ? 5.5 : 4} fill="var(--c-neon)" className={g.arrive ? "glow-dot" : undefined} />
-          <circle cx={g.x} cy={g.y} r={g.arrive ? 5.5 : 4} fill="none" stroke="var(--c-bg)" strokeWidth="1" />
-          <text x={g.x} y={g.ly} fill={g.arrive ? "var(--c-neon)" : "var(--c-muted)"} fontSize="8.5" textAnchor={lab.textAnchor} style={lab.style}>
-            {L(g.en, g.ar, g.zh, g.tr, g.fr)}
-          </text>
+    <div className={cn("route-intelligence", computing && "is-computing")}>
+      <div className="route-intel-topline">
+        <span><i /> AIS + PORT SYNC</span>
+        <span className="tabular">31.2°N · 32.3°E</span>
+      </div>
+      <svg viewBox="0 0 400 260" className="route-map-v3" role="img" aria-label="Optimised Egyptian maritime route intelligence view">
+        <defs>
+          <linearGradient id="routeSeaV3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0c2449"/><stop offset="1" stopColor="#061129"/></linearGradient>
+          <linearGradient id="routePathV3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#67e8f9"/><stop offset="0.55" stopColor="#22e4ff"/><stop offset="1" stopColor="#34d399"/></linearGradient>
+          <radialGradient id="routeNodeGlow"><stop offset="0" stopColor="#22e4ff" stopOpacity=".7"/><stop offset="1" stopColor="#22e4ff" stopOpacity="0"/></radialGradient>
+          <pattern id="routeGridV3" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0H0v25" fill="none" stroke="#7dd3fc" strokeOpacity=".055" strokeWidth=".7"/></pattern>
+          <filter id="routeGlowV3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="400" height="260" fill="url(#routeSeaV3)"/>
+        <rect width="400" height="260" fill="url(#routeGridV3)"/>
+        <g className="route-bathymetry" fill="none">
+          <path d="M-15 30 C80 5 142 48 226 25 S350 4 430 37"/><path d="M-20 47 C67 25 150 65 225 43 S340 24 423 54"/><path d="M-10 224 C80 192 161 238 245 212 S342 196 420 223"/>
         </g>
-      ))}
-
-      {/* sea labels */}
-      <text x="96" y="20" fill="var(--c-muted)" fontSize="8.5" opacity="0.75" textAnchor={lab.textAnchor} style={lab.style}>{L("Mediterranean Sea", "البحر المتوسط", "地中海", "Akdeniz", "Mer Méditerranée")}</text>
-      <text transform="translate(311 198) rotate(78)" fill="var(--c-muted)" fontSize="8.5" opacity="0.82" textAnchor="middle" style={lab.style}>{L("Gulf of Suez", "خليج السويس", "苏伊士湾", "Süveyş Körfezi", "Golfe de Suez")}</text>
-      <text x="330" y="108" fill="var(--c-neon)" fontSize="8.5" opacity="0.88" textAnchor={lab.textAnchor} style={lab.style}>{L("Suez Canal", "قناة السويس", "苏伊士运河", "Süveyş Kanalı", "Canal de Suez")}</text>
-    </svg>
+        <g className="route-land-v3" strokeLinejoin="round">
+          <path d="M0 96 L64 92 L128 87 L174 72 L214 66 L250 70 L286 82 L295 112 L299 141 L303 164 L299 191 L294 224 L293 262 L0 262 Z"/>
+          <path d="M296 88 L400 96 L400 262 L340 262 L332 226 L324 194 L315 160 L307 126 Z"/>
+        </g>
+        <path d="M286 82 L295 112 L299 141 L303 164" className="route-canal-v3"/>
+        <g className="route-current-vectors" aria-hidden>
+          {[52,104,156,208,260,312].map((x,i)=><path key={x} d={`M${x} ${42+(i%2)*10} l12 0 l-4 -3 m4 3 l-4 3`}/>) }
+        </g>
+        <path d="M18 40 C92 44 160 45 214 62 S270 66 286 82 C296 107 300 135 303 164" className="route-baseline-v3"/>
+        <path id="route-opt-path" d="M18 40 C92 30 154 50 214 62 S266 64 286 82 C294 104 298 134 303 164" className="route-optimised-v3"/>
+        <g className="route-packets-v3" filter="url(#routeGlowV3)">
+          {[0,1,2].map(i=><circle key={i} r="2.2" fill="#a5f3fc"><animateMotion dur={`${3.4+i*.55}s`} begin={`${i*.7}s`} repeatCount="indefinite"><mpath href="#route-opt-path"/></animateMotion></circle>)}
+        </g>
+        <g className="route-vessel-v3" transform="translate(196 58)" filter="url(#routeGlowV3)"><path d="M0 0h18l-3 7H4z"/><path d="M5-4h8v4H5z"/></g>
+        {gates.map((g,i)=><g key={g.en} className={i===3?"route-gate-v3 is-target":"route-gate-v3"}>
+          <circle cx={g.x} cy={g.y} r="12" fill="url(#routeNodeGlow)"/>
+          <circle cx={g.x} cy={g.y} r={i===3?5.5:4.4}/>
+          <text x={g.x} y={g.ly} textAnchor={lab.textAnchor} style={lab.style}>{L(g.en,g.ar,g.zh,g.tr,g.fr)}</text>
+        </g>)}
+        <g className="route-suez-readout"><rect x="315" y="113" width="68" height="35" rx="8"/><text x="349" y="127" textAnchor="middle">SUEZ</text><text x="349" y="139" textAnchor="middle">+0.8 KN</text></g>
+        <text x="87" y="24" className="route-sea-label" textAnchor={lab.textAnchor} style={lab.style}>{L("MEDITERRANEAN", "البحر المتوسط", "地中海", "AKDENİZ", "MÉDITERRANÉE")}</text>
+      </svg>
+      <div className="route-intel-legend"><span><i className="opt" />{L("OPTIMISED", "المسار المحسّن", "优化路线", "OPTİMİZE", "OPTIMISÉ")}</span><span><i className="base" />{L("BASELINE", "المسار الأساسي", "基准路线", "BAZ", "RÉFÉRENCE")}</span><b>{L("AI re-route active", "إعادة توجيه ذكية مفعلة", "AI 改道已启用", "AI yeniden rota aktif", "Re-routage IA actif")}</b></div>
+    </div>
   );
 }
 
@@ -364,8 +349,8 @@ export default function Simulator() {
           {/* controls + results */}
           <div className="lg:col-span-7">
             <Reveal from="up">
-              <GlassCard strong className="card-pad relative overflow-hidden">
-                <div className="relative space-y-8">
+              <GlassCard strong className="sim-command-deck card-pad relative overflow-hidden">
+                <div className="sim-command-inner relative space-y-8"><span className="sim-command-orbit" aria-hidden /><span className="sim-command-scan" aria-hidden />
                   <SliderRow label={t("sim.teuLabel")} unit={t("sim.teuUnit")} min={1000} max={500000} step={1000} value={teu} onChange={setTeu} />
                   <SliderRow label={t("sim.nmLabel")} unit={t("sim.nmUnit")} min={1000} max={12000} step={50} value={nm} onChange={setNm} />
 

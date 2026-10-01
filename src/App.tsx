@@ -32,7 +32,9 @@ export default function App() {
       ".vessel-console",
       ".founder-signature-card",
       ".eta-console",
+      ".sim-command-deck",
       ".engine-panel",
+      ".handoff-chapter",
       ".handoff-console",
       ".founder-connect-console",
     ].join(",");
@@ -42,7 +44,14 @@ export default function App() {
       return;
     }
     const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => entry.target.classList.toggle("showcase-active", entry.isIntersecting)),
+      (entries) => entries.forEach((entry) => {
+        entry.target.classList.toggle("showcase-active", entry.isIntersecting);
+        entry.target.querySelectorAll<SVGSVGElement>("svg").forEach((svg) => {
+          if (typeof svg.pauseAnimations !== "function") return;
+          if (entry.isIntersecting) svg.unpauseAnimations();
+          else svg.pauseAnimations();
+        });
+      }),
       { rootMargin: "22% 0px", threshold: 0.01 },
     );
     panels.forEach((panel) => observer.observe(panel));
@@ -56,6 +65,7 @@ export default function App() {
       ".vessel-console",
       ".founder-signature-card",
       ".eta-console",
+      ".sim-command-deck",
       ".engine-panel",
       ".handoff-console",
       ".founder-connect-console",

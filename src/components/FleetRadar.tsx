@@ -1,19 +1,8 @@
 import { useLang } from "../lib/i18n";
 
-/* ═══════════════════════ Engine 02 · Gateway Berth View ═══════════════════════
-   The five Egyptian sea gateways as a live berth board, not a radar. Each row
-   reads left→right: gateway → berth occupancy (filled = vessel alongside, hollow
-   = free) → vessels waiting → demurrage status. Two gateways show a queue
-   building, which is exactly the moment this engine exists to catch: a queue at
-   the quay flagged before it turns into a demurrage invoice.
-
-   Everything is read from vessel AIS and terminal berth status — the panel
-   observes; it does not run the terminal. The ModelBadge on the panel says the
-   figures are an illustrative model, not a live operational feed. Bilingual by a
-   small inline map so no radar-era i18n keys are needed; RTL falls out of the
-   logical-property layout.
-──────────────────────────────────────────────────────────────────────────── */
-
+/* Gateway command view: the five Egyptian sea gateways read as a harbour
+   pressure surface rather than a conventional table. The geometry is still
+   deterministic illustrative data; motion only visualises queue pressure. */
 type Gate = { en: string; ar: string; zh: string; tr: string; fr: string; berths: number; used: number; queue: number; warn: boolean };
 
 const GATES: Gate[] = [
@@ -33,89 +22,69 @@ export default function FleetRadar() {
     if (lang === "fr" && fr) return fr;
     return en;
   };
+  const totalBerths = GATES.reduce((n, g) => n + g.berths, 0);
+  const used = GATES.reduce((n, g) => n + g.used, 0);
+  const queued = GATES.reduce((n, g) => n + g.queue, 0);
+  const pressure = Math.round((queued / Math.max(1, totalBerths)) * 100);
 
   return (
-    <div className="berth-engine">
-      {/* column header */}
-      <div className="berth-column-head mb-2 grid grid-cols-[1.35fr_1fr_auto] items-center gap-3 px-3 font-mono text-[8px] uppercase tracking-[0.18em] text-ghost/70">
-        <span>{L("Gateway", "المنفذ", "核心口岸", "Liman Kapısı", "Portail")}</span>
-        <span>{L("Berths", "الأرصفة", "泊位占用", "Rıhtımlar", "Postes")}</span>
-        <span className="text-end">{L("Queue · Demurrage", "الطابور · الأرضيات", "排队 · 滞期预警", "Kuyruk · Demoraj", "File · Surestaries")}</span>
+    <div className="berth-command">
+      <div className="berth-overview">
+        <div className="berth-pressure" style={{ "--pressure": `${pressure}%` } as React.CSSProperties}>
+          <div className="berth-pressure-ring">
+            <span className="tabular">{pressure}</span><small>%</small>
+          </div>
+          <div>
+            <p className="berth-overline">{L("Network pressure", "ضغط الشبكة", "网络压力", "Ağ basıncı", "Pression réseau")}</p>
+            <p className="berth-overview-copy">{L("Five gateways resolved as one quay-pressure picture.", "خمسة منافذ في صورة موحدة لضغط الأرصفة.", "五大港口统一呈现泊位压力。", "Beş liman tek rıhtım baskısı görünümünde.", "Cinq ports dans une vue unique de pression à quai.")}</p>
+          </div>
+        </div>
+        <div className="berth-network-kpis" aria-label="Gateway network summary">
+          <span><b>{GATES.length}</b>{L("gateways", "منافذ", "港口", "liman", "ports")}</span>
+          <span><b>{used}/{totalBerths}</b>{L("occupied", "مشغول", "占用", "dolu", "occupés")}</span>
+          <span><b>{queued}</b>{L("waiting", "منتظر", "候泊", "bekleyen", "en attente")}</span>
+        </div>
       </div>
 
-      <div className="space-y-2">
-        {GATES.map((g) => (
-          <div
-            key={g.en}
-            className={"berth-row grid grid-cols-[1.35fr_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2.5 " + (g.warn ? "berth-row-warn" : "")}
-          >
-            {/* gateway */}
-            <span className="berth-name min-w-0 font-mono text-[11px] leading-snug text-ice">
-              {L(g.en, g.ar, g.zh, g.tr, g.fr)}
-            </span>
+      <div className="berth-harbour" role="list" aria-label={L("Gateway berth pressure", "ضغط أرصفة المنافذ")}>
+        <div className="berth-water-grid" aria-hidden />
+        <div className="berth-quay-spine" aria-hidden><span /></div>
+        {GATES.map((g, index) => (
+          <article key={g.en} className={`berth-lane ${g.warn ? "is-warning" : "is-clear"}`} role="listitem">
+            <div className="berth-lane-id">
+              <span className="berth-lane-index">0{index + 1}</span>
+              <strong>{L(g.en, g.ar, g.zh, g.tr, g.fr)}</strong>
+              <small>{g.warn ? L("QUEUE BUILDING", "طابور يتراكم", "队列增长", "KUYRUK ARTIYOR", "FILE EN HAUSSE") : L("FLOW NOMINAL", "تدفق منتظم", "流量正常", "AKIŞ NORMAL", "FLUX NOMINAL")}</small>
+            </div>
 
-            {/* berth occupancy */}
-            <span className="berth-slots flex items-center gap-1.5" aria-hidden>
-              {Array.from({ length: g.berths }).map((_, i) => (
-                <span
-                  key={i}
-                  className={
-                    "h-2.5 w-2.5 rounded-[3px] border " +
-                    (i < g.used
-                      ? "border-neon/50 bg-neon/80 shadow-[0_0_6px_rgba(34,228,255,0.4)]"
-                      : "border-chrome/20 bg-transparent")
-                  }
-                />
+            <div className="berth-lane-water" aria-hidden>
+              <span className="berth-lane-route" />
+              <span className="berth-vessel berth-vessel-main"><i /></span>
+              {Array.from({ length: g.queue }).map((_, i) => (
+                <span key={i} className="berth-vessel berth-vessel-wait" style={{ "--q": i } as React.CSSProperties}><i /></span>
               ))}
-            </span>
+            </div>
 
-            {/* queue + demurrage status */}
-            <span className="berth-queue flex items-center justify-end gap-2.5">
-              <span className="tabular font-mono text-[11px] text-ice/80" dir="ltr" style={{ unicodeBidi: "isolate" }}>
-                {g.queue > 0 ? `+${g.queue}` : "—"}
-              </span>
-              <span
-                className={
-                  "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.12em] " +
-                  (g.warn
-                    ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
-                    : "border-emerald-400/30 bg-emerald-400/10 text-emerald-300")
-                }
-              >
-                <span className={"h-1.5 w-1.5 rounded-full " + (g.warn ? "bg-amber-400" : "bg-emerald-400")} />
-                {g.warn
-                  ? L("Building", "يتراكم", "拥堵预警", "Yığılma", "Engorgement")
-                  : L("Clear", "منتظم", "通畅正常", "Açık", "Dégagé")}
-              </span>
-            </span>
-          </div>
+            <div className="berth-lane-quay">
+              <div className="berth-slot-bank" aria-label={`${g.used} of ${g.berths} berths occupied`}>
+                {Array.from({ length: g.berths }).map((_, i) => (
+                  <span key={i} className={i < g.used ? "is-used" : "is-free"}><i /></span>
+                ))}
+              </div>
+              <div className="berth-queue-readout">
+                <span className="tabular">{g.queue ? `+${g.queue}` : "—"}</span>
+                <em>{g.warn ? L("pressure", "ضغط", "压力", "baskı", "pression") : L("clear", "منتظم", "通畅", "açık", "dégagé")}</em>
+              </div>
+            </div>
+          </article>
         ))}
       </div>
 
-      {/* legend + honest note */}
-      <div className="berth-legend mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-chrome/10 pt-3 font-mono text-[8px] uppercase tracking-[0.14em] text-ghost/70">
-        <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-[3px] border border-neon/50 bg-neon/80" />
-          {L("Occupied", "مشغول", "占用中", "Dolu", "Occupé")}
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-[3px] border border-chrome/20" />
-          {L("Free", "فارغ", "空闲", "Boş", "Libre")}
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-          {L("Queue building", "طابور يتراكم", "排队积压", "Kuyruk artıyor", "File croissante")}
-        </span>
+      <div className="berth-footer-line">
+        <span><i className="is-live" /> AIS</span>
+        <span><i className="is-terminal" /> {L("terminal status", "حالة المحطة", "码头状态", "terminal durumu", "statut terminal")}</span>
+        <p>{L("Queue pressure is surfaced before the demurrage clock starts.", "يظهر ضغط الانتظار قبل بدء عداد الأرضيات.", "在滞期计时开始前显示排队压力。", "Kuyruk baskısı demoraj saati başlamadan görünür.", "La pression d'attente apparaît avant le début des surestaries.")}</p>
       </div>
-      <p className="mt-2 text-[11px] leading-relaxed text-ghost">
-        {L(
-          "Berth occupancy and vessels waiting, read from AIS and terminal status. A queue building at the quay is flagged before the demurrage clock starts.",
-          "إشغال الأرصفة والسفن المنتظرة، مقروءة من AIS وحالة المحطة. تكدّس الطابور عند الرصيف يُرصد قبل أن يبدأ عدّاد الأرضيات.",
-          "整合船舶 AIS 与码头作业状态实时追踪泊位占用与候泊船只。在码头排队演变为滞期费账单前提前预警。",
-          "AIS ve terminal durumundan okunan rıhtım doluluğu ve bekleyen gemiler. Rıhtımdaki yığılma, demoraj saati başlamadan tespit edilir.",
-          "Occupation des postes à quai et navires en attente d'après l'AIS et le terminal. L'attente au quai est alertée avant les surestaries."
-        )}
-      </p>
     </div>
   );
 }
