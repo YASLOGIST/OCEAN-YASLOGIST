@@ -12,13 +12,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const transitionTimer = useRef<number | null>(null);
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") return "dark";
-    const saved = localStorage.getItem("oq-theme");
-    return saved === "light" || saved === "dark" ? saved : "dark";
+    try {
+      const saved = localStorage.getItem("oq-theme");
+      return saved === "light" || saved === "dark" ? saved : "dark";
+    } catch {
+      return "dark";
+    }
   });
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("oq-theme", theme);
+    try {
+      localStorage.setItem("oq-theme", theme);
+    } catch {
+      /* A blocked storage API must not make theme switching fail. */
+    }
   }, [theme]);
 
   useEffect(() => () => {

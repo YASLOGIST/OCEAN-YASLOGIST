@@ -208,7 +208,7 @@ const en: Dict = {
       },
       {
         title: "ACID & B/L Rejections",
-        desc: "ACID and bill-of-lading references are filed and cross-checked before the vessel sails, so a rejected filing surfaces at booking, not at the gate.",
+        desc: "Shows how customer- or broker-filed ACID and bill-of-lading references could be cross-checked before sailing, so an inconsistency can surface at booking rather than at the gate.",
         metric: "7",
         metricLabel: "Reference types modelled",
       },
@@ -355,7 +355,7 @@ const en: Dict = {
       pre: "ACID & B/L ",
       accent: "Reference Stitching",
       post: "",
-      desc: "Uses Egypt’s ACID workflow as one localized compliance example, cross-checking it with bill-of-lading references before sailing while keeping the record model extensible to other national requirements.",
+      desc: "Demonstrates Egypt’s ACID workflow as one localized compliance example, showing how customer- or broker-filed references could be cross-checked against the bill of lading before sailing.",
       bullets: [
         "Booking, B/L, container and ACID reconciled onto one record",
         "A mismatch or rejection is flagged at booking, not at the gate",
@@ -383,11 +383,11 @@ const en: Dict = {
       pre: "Tamper-Evident ",
       accent: "Shared Record",
       post: "",
-      desc: "Every document and handover written to a shared, tamper-evident record, so a forged release or a duplicated B/L is caught before it clears the gate.",
+      desc: "Demonstrates how documents and handovers could move through a shared, tamper-evident record, surfacing an altered release or duplicated B/L before gate handoff.",
       bullets: [
-        "Every document and handover written to a tamper-evident record",
-        "A forged release or duplicated B/L is caught before the gate",
-        "One shared record the customer, their broker and the port can read",
+        "Demo documents and handovers move through a tamper-evident record",
+        "Shows how an altered release or duplicated B/L could be flagged",
+        "Illustrates one shared view for customer, broker and port references",
       ],
       chips: ["Tamper-Evident", "Digital B/L", "Audit Trail"],
       statLabel: "Demo record stages",
@@ -542,7 +542,7 @@ const ar: Dict = {
       },
       {
         title: "رفض ملفات ACID والبوالص",
-        desc: "تُستخرج مراجع ACID وبوليصة الشحن ويُتحقّق منها قبل الإبحار، فيظهر أي رفض عند الحجز لا عند البوابة.",
+        desc: "يوضح كيف يمكن مطابقة مراجع ACID وبوليصة الشحن التي يقدمها العميل أو المخلص قبل الإبحار، ليظهر أي تعارض عند الحجز بدلًا من البوابة.",
         metric: "7",
         metricLabel: "أنواع مراجع بالنموذج",
       },
@@ -689,7 +689,7 @@ const ar: Dict = {
       pre: "ترابط مراجع ",
       accent: "ACID والبوالص",
       post: "",
-      desc: "يستخدم مسار ACID المصري كمثال محلي للامتثال، مع مطابقته ببوليصة الشحن قبل الإبحار، مع إبقاء نموذج السجل قابلًا للتوسع إلى متطلبات الدول الأخرى.",
+      desc: "يعرض مسار ACID المصري كمثال امتثال محلي، ويوضح كيف يمكن مطابقة المراجع التي يقدمها العميل أو وسيطه مع بوليصة الشحن قبل الإبحار.",
       bullets: [
         "الحجز والبوليصة والحاوية وACID على سجل واحد",
         "أي تعارض أو رفض يُرصد عند الحجز لا عند البوابة",
@@ -717,11 +717,11 @@ const ar: Dict = {
       pre: "",
       accent: "سجل مشترك يكشف التلاعب",
       post: "",
-      desc: "كل مستند وتسليم يُكتب على سجل مشترك يكشف أي تلاعب، فلا يمر إفراج مزوَّر أو بوليصة مكرَّرة قبل البوابة.",
+      desc: "يوضح كيف يمكن تمرير المستندات والتسليمات عبر سجل مشترك يكشف التلاعب، لإظهار إفراج معدّل أو بوليصة مكررة قبل التسليم عند البوابة.",
       bullets: [
-        "كل مستند وتسليم مكتوب على سجل يكشف أي تلاعب",
-        "أي إفراج مزوَّر أو بوليصة مكرَّرة يُرصد قبل البوابة",
-        "سجل واحد مشترك يقرأه العميل ووسيطه والميناء",
+        "مستندات وتسليمات النموذج تمر عبر سجل يكشف التلاعب",
+        "يوضح كيف يمكن رصد إفراج معدّل أو بوليصة مكررة",
+        "يعرض رؤية مشتركة لمراجع العميل ووسيطه والميناء",
       ],
       chips: ["يكشف التلاعب", "بوليصة رقمية (B/L)", "أثر تدقيق"],
       statLabel: "مراحل السجل التجريبي",
@@ -848,7 +848,7 @@ const zh: Dict = {
     tag: "五大核心引擎",
     title1: "单一数字底座。",
     title2: "五项颠覆性突破。",
-    sub: "将货运全程所有单证要素——订舱、提单、箱号、ACID、车牌——汇聚于单一防篡改记录。五大引擎协同运转，预见隐性成本并自主拦截。",
+    sub: "将货运全程的订舱、提单、箱号、ACID 与车牌等参考信息汇聚到同一记录。五个演示引擎分别呈现记录可提前识别的成本与交接风险。",
   },
   solutions: {
     tag: "直面五大行业沉疴",
@@ -876,7 +876,7 @@ const zh: Dict = {
       },
       {
         title: "ACID 与提单核验驳回",
-        desc: "在船舶离港前全面校核埃及 ACID 与海运提单 (B/L) 数据一致性，将退单风险拦截在订舱端而非码头闸口。",
+        desc: "演示如何在开航前核对由客户或持牌报关代理提交的 ACID 与海运提单参考信息，使不一致项能在订舱阶段而非闸口被发现。",
         metric: "7",
         metricLabel: "建模单证类型",
       },
@@ -972,7 +972,7 @@ const zh: Dict = {
         "展示泊位队列增长如何被突出呈现",
         "展示船舶与订舱、提单及集装箱之间的关联",
       ],
-      chips: ["AIS 实时数据源", "泊位作业状态", "滞期费主动预警"],
+      chips: ["AIS 风格样本", "模拟泊位状态", "滞期风险场景"],
       statLabel: "建模口岸场景",
       panel: { title: "核心口岸泊位全景图", status: "AIS · 模拟" },
       notes: {
@@ -1023,11 +1023,11 @@ const zh: Dict = {
       pre: "ACID 与提单 ",
       accent: "多维单证智能校验",
       post: "",
-      desc: "在船舶开航前自动核验埃及 ACID 预申报编号与海运提单要素，确保异常在订舱阶段即获纠正，免遭到港退运。",
+      desc: "以埃及 ACID 流程为本地合规示例，演示如何在开航前核对由客户或持牌报关代理提交的 ACID 与海运提单参考信息。",
       bullets: [
-        "订舱单、海运提单、集装箱号与 ACID 统一核对归档",
-        "单证要素矛盾或预审驳回在订舱阶段即行预警排除",
-        "贯通七大类单证；客户合规申报，YASLOGIST 实时监控核验",
+        "演示订舱、提单、箱号与 ACID 如何汇入同一记录",
+        "展示单证不一致项如何在订舱阶段被标记",
+        "模拟七类参考信息的关联；客户或持牌代理负责申报",
       ],
       chips: ["ACID 智能复核", "提单一致性校验", "开航前风险拦截"],
       statLabel: "开航前协同交叉核验单证类型",
@@ -1051,11 +1051,11 @@ const zh: Dict = {
       pre: "防篡改 ",
       accent: "供应链分布式共享账本",
       post: "",
-      desc: "每一项单据放行、款项支付与交接签收均登记在防篡改共享记录中，伪造电子放货单或重复提货在闸口前被即刻拦截。",
+      desc: "演示单证与交接如何经过共享的防篡改记录，并说明被修改的放行参考或重复提单可如何在闸口交接前被标记。",
       bullets: [
-        "所有放行单证与货物交接全过程留痕于防篡改账本",
-        "伪造放行指令或重复提单在抵岸进闸前自动识别阻断",
-        "客户、货代、港口及监管方共享同一不可篡改的数据视界",
+        "演示单证与货物交接经过防篡改记录的过程",
+        "展示修改后的放行参考或重复提单如何被标记",
+        "呈现客户、代理与港口参考信息的统一共享视图",
       ],
       chips: ["防篡改机制", "数字电子提单", "不可逆审计追踪"],
       statLabel: "演示记录阶段",
@@ -1211,7 +1211,7 @@ const tr: Dict = {
       },
       {
         title: "ACID ve B/L Reddi",
-        desc: "ACID ve konşimento referansları gemi kalkmadan önce eşleştirilip doğrulanır; böylece ret durumları gümrük kapısında değil rezervasyonda çözülür.",
+        desc: "Müşteri veya yetkili gümrük müşavirinin sunduğu ACID ve konşimento referanslarının sefer öncesinde nasıl karşılaştırılabileceğini ve tutarsızlıkların kapı yerine rezervasyonda nasıl görülebileceğini gösterir.",
         metric: "7",
         metricLabel: "Modellenen referans türü",
       },
@@ -1358,7 +1358,7 @@ const tr: Dict = {
       pre: "ACID ve Konşimento ",
       accent: "Referans Eşleme",
       post: "",
-      desc: "ACID ve konşimento referansları gemi seyre çıkmadan önce çapraz kontrol edilir; böylece reddedilen başvurular kapıda değil rezervasyonda düzeltilir.",
+      desc: "Müşteri veya yetkili gümrük müşavirinin sunduğu ACID ve konşimento referanslarının sefer öncesinde nasıl karşılaştırılabileceğini gösteren yerelleştirilmiş bir uyum senaryosudur.",
       bullets: [
         "Rezervasyon, konşimento, konteyner ve ACID tek kayıtta uzlaştırılır",
         "Uyuşmazlık veya ret kapıda değil rezervasyonda uyarılır",
@@ -1386,11 +1386,11 @@ const tr: Dict = {
       pre: "Değiştirilemez ",
       accent: "Paylaşımlı Kayıt Defteri",
       post: "",
-      desc: "Her belge ve teslimat kurcalamaya karşı korumalı paylaşımlı kayda yazılır; böylece sahte teslimat veya mükerrer B/L kapıdan geçmeden yakalanır.",
+      desc: "Belgelerin ve devirlerin paylaşılan, kurcalamaya dayanıklı bir kayıttan nasıl geçebileceğini; değiştirilmiş teslim referanslarının veya yinelenmiş B/L'lerin nasıl işaretlenebileceğini gösterir.",
       bullets: [
-        "Her belge ve devir işlemi değiştirilemez kayda işlenir",
-        "Sahte teslimat veya mükerrer konşimento kapı öncesinde engellenir",
-        "Müşteri, müşavir ve limanın birlikte okuyabildiği tek ortak kayıt",
+        "Demo belgeleri ve devirleri kurcalamaya dayanıklı kayıttan geçer",
+        "Değiştirilmiş teslim referanslarının nasıl işaretlenebileceğini gösterir",
+        "Müşteri, müşavir ve liman referansları için ortak bir görünüm sunar",
       ],
       chips: ["Değiştirilemez", "Dijital B/L", "Denetim İzi"],
       statLabel: "Demo kayıt aşamaları",
@@ -1546,7 +1546,7 @@ const fr: Dict = {
       },
       {
         title: "Rejets ACID et Connaissement B/L",
-        desc: "Les références ACID et connaissement sont rapprochées avant l'appareillage ; toute non-conformité est signalée dès le booking.",
+        desc: "Montre comment rapprocher avant l’appareillage les références ACID et connaissement déposées par le client ou son transitaire agréé, afin de repérer une incohérence dès la réservation plutôt qu’à la porte.",
         metric: "7",
         metricLabel: "Types de références modélisées",
       },
@@ -1693,7 +1693,7 @@ const fr: Dict = {
       pre: "Rapprochement des Références ",
       accent: "ACID & Connaissement",
       post: "",
-      desc: "Contrôle croisé des références ACID et du connaissement avant l'appareillage pour corriger les rejets dès la réservation.",
+      desc: "Scénario localisé montrant comment rapprocher avant l’appareillage les références ACID et connaissement déposées par le client ou son transitaire agréé.",
       bullets: [
         "Booking, connaissement, conteneur et ACID réconciliés sur un seul dossier",
         "Toute incohérence est signalée dès la réservation, pas à la porte",
@@ -1721,11 +1721,11 @@ const fr: Dict = {
       pre: "Registre Partagé ",
       accent: "Inaltérable et Vérifiable",
       post: "",
-      desc: "Chaque document et transfert consigné sur un registre partagé inaltérable pour empêcher la contrefaçon de bons de sortie.",
+      desc: "Montre comment documents et transferts pourraient passer par un registre partagé inaltérable afin de signaler une référence de mainlevée modifiée ou un B/L dupliqué avant la porte.",
       bullets: [
-        "Chaque document et transfert inscrit sur un registre inaltérable",
-        "Tout faux bon de sortie ou B/L dupliqué est bloqué avant la porte",
-        "Un registre unique accessible au client, au transitaire et au port",
+        "Les documents et transferts de démonstration suivent un registre inaltérable",
+        "Montre comment signaler une référence modifiée ou un B/L dupliqué",
+        "Illustre une vue commune des références client, transitaire et port",
       ],
       chips: ["Inaltérable", "B/L Numérique", "Piste d'Audit"],
       statLabel: "Étapes du registre démo",
@@ -1834,9 +1834,14 @@ function resolve(obj: unknown, path: string): unknown {
 
 export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem("oq-lang") : null;
-    if (saved === "ar" || saved === "zh" || saved === "tr" || saved === "fr") {
-      return saved as Lang;
+    try {
+      const saved = typeof window !== "undefined" ? localStorage.getItem("oq-lang") : null;
+      if (saved === "ar" || saved === "zh" || saved === "tr" || saved === "fr") {
+        return saved as Lang;
+      }
+    } catch {
+      /* Storage can be unavailable in hardened/private contexts. Language
+         selection must still work for the current session. */
     }
     return "en";
   });
@@ -1846,7 +1851,11 @@ export function LangProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = dir;
-    localStorage.setItem("oq-lang", lang);
+    try {
+      localStorage.setItem("oq-lang", lang);
+    } catch {
+      /* Keep the in-memory preference when persistence is blocked. */
+    }
   }, [lang, dir]);
 
   const t = useCallback((key: string): string => {

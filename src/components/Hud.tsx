@@ -12,7 +12,14 @@ const SECTION_IDS = ["hero", "stats", "solutions", "simulator", "p1", "p2", "p3"
 const DOT_IDS = ["hero", "solutions", "simulator", "p1", "p2", "p3", "p4", "p5", "connect"];
 
 export default function Hud() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const sectionNavLabel = {
+    en: "Page sections",
+    ar: "أقسام الصفحة",
+    zh: "页面章节",
+    tr: "Sayfa bölümleri",
+    fr: "Sections de la page",
+  }[lang];
   const [active, setActive] = useState("hero");
   const flowRef = useRef<HTMLDivElement>(null);
   const flowLabelRef = useRef<HTMLSpanElement>(null);
@@ -112,7 +119,7 @@ export default function Hud() {
       </div>
 
       {/* right dot navigation */}
-      <nav className="hud-dot-rail fixed right-3 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-end gap-4 lg:flex 2xl:right-5">
+      <nav aria-label={sectionNavLabel} className="hud-dot-rail fixed right-3 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-end gap-4 lg:flex 2xl:right-5">
         {DOT_IDS.map((id, i) => (
           <button
             key={id}

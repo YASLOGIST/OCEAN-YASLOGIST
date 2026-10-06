@@ -4,10 +4,88 @@ import { fileURLToPath } from "url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
-import { viteSingleFile } from "vite-plugin-singlefile";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+/**
+ * Inline the app's generated JS and CSS into index.html while leaving public/
+ * media external. The previous third-party plugin pulled a glob matcher into
+ * the build solely for an optional include pattern this project never used;
+ * that matcher has no patched release for its stack-exhaustion advisory. This
+ * bounded plugin implements only the invariant this repository needs: one JS
+ * chunk, one CSS asset, one HTML artifact.
+ */
+function singleFileBundle(): Plugin {
+  const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return {
+    name: "yaslogist-single-file",
+    enforce: "post",
+    config(config) {
+      config.base = "./";
+      config.build ??= {};
+      config.build.assetsInlineLimit = () => true;
+      config.build.chunkSizeWarningLimit = 100_000_000;
+      config.build.cssCodeSplit = false;
+      config.build.assetsDir = "";
+      config.build.rollupOptions ??= {};
+      config.build.rollupOptions.output ??= {};
+      const outputs = Array.isArray(config.build.rollupOptions.output)
+        ? config.build.rollupOptions.output
+        : [config.build.rollupOptions.output];
+      outputs.forEach((output) => { output.inlineDynamicImports = true; });
+    },
+    generateBundle(_options, bundle) {
+      const htmlNames = Object.keys(bundle).filter((name) => /\.html?$/.test(name));
+      const jsNames = Object.keys(bundle).filter((name) => /\.[mc]?js$/.test(name));
+      const cssNames = Object.keys(bundle).filter((name) => /\.css$/.test(name));
+      const inlined = new Set<string>();
+
+      for (const htmlName of htmlNames) {
+        const htmlAsset = bundle[htmlName];
+        if (htmlAsset.type !== "asset") continue;
+        let html = typeof htmlAsset.source === "string"
+          ? htmlAsset.source
+          : new TextDecoder().decode(htmlAsset.source);
+
+        for (const jsName of jsNames) {
+          const chunk = bundle[jsName];
+          if (chunk.type !== "chunk") continue;
+          const filename = escapeRegex(chunk.fileName);
+          const tag = new RegExp(`<script([^>]*?) src="(?:[^"]*?/)?${filename}"([^>]*)></script>`);
+          const code = chunk.code
+            .replace(/"?__VITE_PRELOAD__"?/g, "void 0")
+            .replace(/<(\/script>|!--)/g, "\\x3C$1")
+            .trim();
+          html = html.replace(tag, (_match, beforeSrc: string, afterSrc: string) =>
+            `<script${beforeSrc}${afterSrc}>${code}</script>`);
+          inlined.add(jsName);
+          this.info(`Inlining: ${jsName}`);
+        }
+
+        for (const cssName of cssNames) {
+          const asset = bundle[cssName];
+          if (asset.type !== "asset") continue;
+          const filename = escapeRegex(asset.fileName);
+          const tag = new RegExp(`<link([^>]*?) href="(?:[^"]*?/)?${filename}"([^>]*)>`);
+          const css = (typeof asset.source === "string"
+            ? asset.source
+            : new TextDecoder().decode(asset.source))
+            .replace('@charset "UTF-8";', "")
+            .trim();
+          html = html.replace(tag, (_match, beforeHref: string, afterHref: string) =>
+            `<style${beforeHref}${afterHref}>${css}</style>`);
+          inlined.add(cssName);
+          this.info(`Inlining: ${cssName}`);
+        }
+
+        htmlAsset.source = html;
+      }
+
+      inlined.forEach((name) => { delete bundle[name]; });
+    },
+  };
+}
 
 /**
  * macOS recreates .DS_Store inside public/ whenever the folder is opened in
@@ -47,7 +125,14 @@ export default defineConfig({
   // sub-path, or file://. The inlined JS/CSS/images carry no URL, so they are
   // unaffected.
   base: "./",
-  plugins: [react(), tailwindcss(), viteSingleFile(), stripJunkFiles()],
+  /* Agent/CI previews are reverse-proxied through an ephemeral hostname. The
+     development server binds beyond localhost and accepts that proxy host;
+     production remains governed by Vercel's host and security headers. */
+  server: {
+    host: true,
+    allowedHosts: true,
+  },
+  plugins: [react(), tailwindcss(), singleFileBundle(), stripJunkFiles()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),

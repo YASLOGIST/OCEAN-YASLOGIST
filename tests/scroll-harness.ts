@@ -4,7 +4,7 @@ import {
   wakeScrollLoop,
   subscribeScroll,
   type ScrollFrame,
-} from "../src/lib/scroll";
+} from "../src/lib/scroll.ts";
 
 /* ══════════════════════════════════════════════════════════════════════════
    Headless harness for src/lib/scroll.ts

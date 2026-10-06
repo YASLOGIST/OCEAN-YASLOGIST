@@ -10,8 +10,15 @@ function PhoneIcon() {
 }
 
 export default function Closing() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const WA_LINK = "https://wa.me/201041139910";
+  const enquiryStatus = {
+    en: "FOUNDER-LED ENQUIRIES",
+    ar: "استفسارات يتابعها المؤسس",
+    zh: "创始人直接跟进咨询",
+    tr: "KURUCU TAKİPLİ TALEPLER",
+    fr: "DEMANDES SUIVIES PAR LE FONDATEUR",
+  }[lang];
 
   return (
     <section id="connect" className="founder-channel section-iso cv-auto relative scroll-mt-24 px-6 pb-14 pt-10 lg:px-10">
@@ -25,7 +32,7 @@ export default function Closing() {
             <div className="founder-portrait-aura" aria-hidden />
             <div className="founder-portrait-beam" aria-hidden />
             <FounderAvatar initials="AY" className="founder-channel-avatar" />
-            <div className="founder-channel-status"><i /> FOUNDER-LED ENQUIRIES</div>
+            <div className="founder-channel-status"><i /> {enquiryStatus}</div>
             <div className="founder-channel-identity">
               <small>{t("founder.lead")}</small>
               <strong>{t("founder.name")}</strong>

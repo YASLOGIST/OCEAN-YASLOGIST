@@ -1,7 +1,7 @@
-DROP THE TWO BRAND FILES IN THIS FOLDER
-=======================================
+DROP THE FOUNDER IMAGE IN THIS FOLDER
+=====================================
 
-Save each attachment here using EXACTLY these basenames. The extension can
+Save the attachment here using EXACTLY this basename. The extension can
 be .png, .jpg, .jpeg, .webp or .svg — the resolver matches on basename only,
 so no code needs to change.
 
@@ -19,7 +19,7 @@ Adding a third slot means adding its basename to that glob as well.
 
 SIZE MATTERS HERE
 -----------------
-`vite-plugin-singlefile` inlines these as base64 into the one output
-index.html, which inflates them by about 33%. Keep each file under ~300 KB.
+The repository-local single-file build plugin inlines this as base64 into
+index.html, which inflates it by about 33%. Keep the file under ~300 KB.
 The founder portrait renders at 56px, so anything past 512x512 is wasted
 bytes — resize before saving.
