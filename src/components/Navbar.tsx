@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { subscribeScroll } from "../lib/scroll";
 import { SUPPORTED_LANGUAGES, useLang, type Lang } from "../lib/i18n";
 import { useTheme } from "../lib/theme";
@@ -6,10 +6,28 @@ import { cn } from "../utils/cn";
 import { BrandMark } from "./Brand";
 import SuiteSwitcher from "./SuiteSwitcher";
 
+const NAV_UI: Record<Lang, {
+  home: string;
+  themeLight: string;
+  themeDark: string;
+  language: string;
+  currentLanguage: string;
+  nextLanguage: string;
+  menuOpen: string;
+  menuClose: string;
+  mobileSections: string;
+}> = {
+  en: { home: "YASLOGIST Ocean home", themeLight: "Switch to light theme", themeDark: "Switch to dark theme", language: "Language selection", currentLanguage: "Current language", nextLanguage: "Activate to switch to the next language", menuOpen: "Open navigation menu", menuClose: "Close navigation menu", mobileSections: "Section navigation" },
+  ar: { home: "الصفحة الرئيسية لـ YASLOGIST البحري", themeLight: "التبديل إلى المظهر الفاتح", themeDark: "التبديل إلى المظهر الداكن", language: "اختيار اللغة", currentLanguage: "اللغة الحالية", nextLanguage: "اضغط للانتقال إلى اللغة التالية", menuOpen: "فتح قائمة التنقل", menuClose: "إغلاق قائمة التنقل", mobileSections: "التنقل بين الأقسام" },
+  zh: { home: "YASLOGIST 海运首页", themeLight: "切换至浅色主题", themeDark: "切换至深色主题", language: "语言选择", currentLanguage: "当前语言", nextLanguage: "启用后切换到下一种语言", menuOpen: "打开导航菜单", menuClose: "关闭导航菜单", mobileSections: "章节导航" },
+  tr: { home: "YASLOGIST Ocean ana sayfası", themeLight: "Açık temaya geç", themeDark: "Koyu temaya geç", language: "Dil seçimi", currentLanguage: "Geçerli dil", nextLanguage: "Sonraki dile geçmek için etkinleştirin", menuOpen: "Gezinme menüsünü aç", menuClose: "Gezinme menüsünü kapat", mobileSections: "Bölüm gezintisi" },
+  fr: { home: "Accueil YASLOGIST Maritime", themeLight: "Passer au thème clair", themeDark: "Passer au thème sombre", language: "Choix de la langue", currentLanguage: "Langue actuelle", nextLanguage: "Activer pour passer à la langue suivante", menuOpen: "Ouvrir le menu de navigation", menuClose: "Fermer le menu de navigation", mobileSections: "Navigation des sections" },
+};
+
 function Logo() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   return (
-    <a href="#hero" aria-label="YASLOGIST Ocean home" className="group flex min-h-11 min-w-11 shrink-0 items-center gap-2 sm:gap-3 select-none">
+    <a href="#hero" aria-label={NAV_UI[lang].home} className="group flex min-h-11 min-w-11 shrink-0 items-center gap-2 sm:gap-3 select-none">
       <BrandMark className="h-9 w-9 sm:h-10 sm:w-10 xl:h-11 xl:w-11 shrink-0" />
       <span className="leading-none max-[360px]:hidden">
         <span className="flex items-center gap-1.5 font-display text-[13px] font-bold tracking-[0.1em] text-ice sm:text-base xl:text-lg whitespace-nowrap">
@@ -28,20 +46,22 @@ function Logo() {
 
 function ThemeToggle() {
   const { theme, toggle } = useTheme();
+  const { lang } = useLang();
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label="Toggle theme"
+      aria-label={theme === "dark" ? NAV_UI[lang].themeLight : NAV_UI[lang].themeDark}
+      aria-pressed={theme === "light"}
       className="glass gpu grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-xl text-neon transition-all duration-300 hover:border-neon/40"
     >
       {theme === "dark" ? (
-        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
           <circle cx="12" cy="12" r="4" />
           <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
         </svg>
       ) : (
-        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
           <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
         </svg>
       )}
@@ -56,7 +76,7 @@ function LangToggle() {
     <div
       dir="ltr"
       role="radiogroup"
-      aria-label="Language selection"
+      aria-label={NAV_UI[lang].language}
       className="hidden sm:inline-flex items-center rounded-full border border-chrome/15 bg-abyss/85 p-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)] backdrop-blur-xl shrink-0"
     >
       {SUPPORTED_LANGUAGES.map((item) => {
@@ -76,7 +96,7 @@ function LangToggle() {
             )}
             style={item.code === "ar" ? { fontFamily: "var(--font-ruqaa)", fontSize: "12px", lineHeight: "1" } : undefined}
             title={item.nativeName}
-            aria-label={`Switch language to ${item.nativeName}`}
+            aria-label={`${NAV_UI[lang].language}: ${item.nativeName}`}
           >
             {item.label}
           </button>
@@ -101,7 +121,7 @@ function MobileLangButton() {
     <button
       type="button"
       onClick={() => setLang(nextLang[lang])}
-      aria-label={`Current language: ${current.nativeName}. Tap to cycle.`}
+      aria-label={`${NAV_UI[lang].currentLanguage}: ${current.nativeName}. ${NAV_UI[lang].nextLanguage}.`}
       className="sm:hidden glass gpu flex h-11 min-w-11 px-2.5 cursor-pointer items-center justify-center rounded-xl border border-neon/30 text-neon font-display text-[11px] font-bold transition-all active:scale-95 shrink-0"
       style={lang === "ar" ? { fontFamily: "var(--font-ruqaa)", fontSize: "13px" } : undefined}
     >
@@ -114,8 +134,81 @@ export default function Navbar() {
   const { t, ta, lang, setLang } = useLang();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const scrolledRef = useRef(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => subscribeScroll((f) => setScrolled(f.y > 48)), []);
+  /* Crossing the header threshold is the only event React needs. The scroll
+     engine can publish dozens of frames while settling; scheduling the same
+     boolean on every one adds work without changing the rendered header. */
+  useEffect(() => subscribeScroll((f) => {
+    const next = f.y > 48;
+    if (next === scrolledRef.current) return;
+    scrolledRef.current = next;
+    setScrolled(next);
+  }), []);
+
+  /* The drawer is a modal navigation surface on tablet and phone: hidden links
+     are removed from the tab order, Escape closes it, focus cannot leak into
+     the page behind it, and page scrolling is restored without a layout jump. */
+  useEffect(() => {
+    if (!open) return;
+    const menu = menuRef.current;
+    if (!menu) return;
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+    const previousPadding = body.style.paddingInlineEnd;
+    const scrollbarGap = window.innerWidth - document.documentElement.clientWidth;
+    const background = Array.from(document.querySelectorAll<HTMLElement>("main, footer"));
+    const previousInert = background.map((el) => el.inert);
+    background.forEach((el) => { el.inert = true; });
+    body.style.overflow = "hidden";
+    if (scrollbarGap > 0) body.style.paddingInlineEnd = `${scrollbarGap}px`;
+
+    const focusables = () => Array.from(menu.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    )).filter((el) => !el.hasAttribute("inert"));
+    const focusRaf = requestAnimationFrame(() => focusables()[0]?.focus());
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      cancelAnimationFrame(focusRaf);
+      document.removeEventListener("keydown", onKeyDown);
+      background.forEach((el, index) => { el.inert = previousInert[index]; });
+      body.style.overflow = previousOverflow;
+      body.style.paddingInlineEnd = previousPadding;
+      if (menuButtonRef.current?.offsetParent !== null) menuButtonRef.current?.focus();
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeAtDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setOpen(false);
+    };
+    desktop.addEventListener("change", closeAtDesktop);
+    return () => desktop.removeEventListener("change", closeAtDesktop);
+  }, []);
 
   const links = ta("nav.links");
   const menuIds = ["hero", "solutions", "simulator", "p1", "p2", "p3", "p4", "p5", "connect"];
@@ -179,12 +272,15 @@ export default function Navbar() {
               <ThemeToggle />
 
               <button
+                ref={menuButtonRef}
                 type="button"
-                onClick={() => setOpen(!open)}
+                onClick={() => setOpen((value) => !value)}
                 className="glass gpu grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-xl text-neon lg:hidden"
-                aria-label="Toggle menu"
+                aria-label={open ? NAV_UI[lang].menuClose : NAV_UI[lang].menuOpen}
+                aria-expanded={open}
+                aria-controls="mobile-navigation"
               >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden focusable="false">
                   {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h10" />}
                 </svg>
               </button>
@@ -203,11 +299,17 @@ export default function Navbar() {
           02 was the first thing the eye found, 16.5px of it clipped. The row
           padding and type step below `sm` are what bring all nine back inside
           a phone viewport; `.nav-menu` guarantees the rest. */}
-      <nav
-        aria-label="Mobile section navigation"
+      <div
+        ref={menuRef}
+        id="mobile-navigation"
+        role="dialog"
+        aria-modal="true"
+        aria-label={NAV_UI[lang].mobileSections}
+        aria-hidden={!open}
+        inert={!open}
         className={cn(
           "nav-menu fixed inset-0 z-[9998] flex flex-col gap-2 px-8 transition-all duration-500 lg:hidden",
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+          open ? "pointer-events-auto opacity-100" : "pointer-events-none invisible opacity-0"
         )}
         style={{
           background: "color-mix(in srgb, var(--c-bg) 72%, transparent)",
@@ -251,6 +353,8 @@ export default function Navbar() {
                     setLang(item.code);
                     setOpen(false);
                   }}
+                  aria-pressed={isSelected}
+                  aria-label={`${NAV_UI[lang].language}: ${item.nativeName}`}
                   className={cn(
                     "flex min-h-11 flex-col items-center justify-center py-2 px-1 rounded-lg text-center transition-all",
                     isSelected
@@ -267,21 +371,23 @@ export default function Navbar() {
           </div>
         </div>
 
-        {menuIds.map((id, i) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            onClick={() => setOpen(false)}
-            className="group flex items-baseline gap-4 border-b border-chrome/10 py-2 sm:py-4"
-            style={{ transitionDelay: `${i * 40}ms` }}
-          >
-            <span className="font-mono text-[10px] text-neon/60">0{i + 1}</span>
-            <span className="font-display text-2xl font-semibold text-ice transition-colors group-hover:text-neon sm:text-3xl">
-              {menuLabels[id]}
-            </span>
-          </a>
-        ))}
-      </nav>
+        <nav aria-label={NAV_UI[lang].mobileSections} className="flex flex-col gap-2">
+          {menuIds.map((id, i) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              onClick={() => setOpen(false)}
+              className="group flex items-baseline gap-4 border-b border-chrome/10 py-2 sm:py-4"
+              style={{ transitionDelay: `${i * 40}ms` }}
+            >
+              <span className="font-mono text-[10px] text-neon/60">0{i + 1}</span>
+              <span className="font-display text-2xl font-semibold text-ice transition-colors group-hover:text-neon sm:text-3xl">
+                {menuLabels[id]}
+              </span>
+            </a>
+          ))}
+        </nav>
+      </div>
     </>
   );
 }

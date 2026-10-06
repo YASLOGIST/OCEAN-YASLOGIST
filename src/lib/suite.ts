@@ -10,9 +10,17 @@
 
 export type SurfaceId = "hub" | "land" | "ocean" | "air";
 
-/* Vite serves each surface from its own dev port, so a switcher hard-coded to
-   the production hosts would bounce a developer out of localhost mid-session. */
-const DEV = import.meta.env.DEV;
+/* Browser-facing navigation always defaults to a real, reachable origin. A
+   localhost URL here works only for the developer who started that server; in
+   a remote preview it sends the visitor to their own machine. Integrators can
+   still point a checkout at a local multi-app proxy with explicit VITE_*_URL
+   values, without shipping localhost as product behaviour. */
+const URLS = {
+  hub: import.meta.env.VITE_HUB_URL || "https://yaslogist.me",
+  land: import.meta.env.VITE_LAND_URL || "https://land.yaslogist.me",
+  ocean: import.meta.env.VITE_OCEAN_URL || "https://ocean.yaslogist.me",
+  air: import.meta.env.VITE_AIR_URL || "https://air.yaslogist.me",
+} as const;
 
 export type Surface = {
   id: SurfaceId;
@@ -32,7 +40,7 @@ export type Surface = {
 export const SURFACES: Surface[] = [
   {
     id: "hub",
-    href: "https://yaslogist.me",
+    href: URLS.hub,
     live: true,
     accent: "#C3CBD1",
     glow: "rgba(195, 203, 209, 0.35)",
@@ -44,7 +52,7 @@ export const SURFACES: Surface[] = [
   },
   {
     id: "land",
-    href: DEV ? "http://localhost:3000" : "https://land.yaslogist.me",
+    href: URLS.land,
     live: true,
     accent: "#E8B317",
     glow: "rgba(232, 179, 23, 0.4)",
@@ -56,7 +64,7 @@ export const SURFACES: Surface[] = [
   },
   {
     id: "ocean",
-    href: DEV ? "http://localhost:3100" : "https://ocean.yaslogist.me",
+    href: URLS.ocean,
     live: true,
     accent: "#22E4FF",
     glow: "rgba(34, 228, 255, 0.45)",
@@ -68,7 +76,7 @@ export const SURFACES: Surface[] = [
   },
   {
     id: "air",
-    href: DEV ? "http://localhost:3200" : "https://air.yaslogist.me",
+    href: URLS.air,
     live: true,
     accent: "#9BB0BC",
     glow: "rgba(155, 176, 188, 0.3)",

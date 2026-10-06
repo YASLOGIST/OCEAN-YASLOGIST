@@ -232,7 +232,7 @@ function RouteMap({ computing }: { computing: boolean }) {
       </div>
       <div className="route-map-stage">
         <div className="route-real-map" aria-hidden />
-      <svg viewBox="0 0 400 260" className="route-map-v3" role="img" aria-label="Optimised Egyptian maritime route intelligence view">
+      <svg viewBox="0 0 400 260" className="route-map-v3" role="img" aria-label={L("Optimised Egyptian maritime route scenario", "سيناريو مسار بحري مصري محسّن", "埃及海运优化路线场景", "Optimize edilmiş Mısır deniz rotası senaryosu", "Scénario de route maritime égyptienne optimisée")}>
         <defs>
           <linearGradient id="routePathV3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#67e8f9"/><stop offset="0.55" stopColor="#22e4ff"/><stop offset="1" stopColor="#34d399"/></linearGradient>
           <radialGradient id="routeNodeGlow"><stop offset="0" stopColor="#22e4ff" stopOpacity=".7"/><stop offset="1" stopColor="#22e4ff" stopOpacity="0"/></radialGradient>

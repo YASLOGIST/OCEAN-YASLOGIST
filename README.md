@@ -37,7 +37,7 @@ Every figure shown on these engines is an **illustrative model output**, marked 
 ## Tech stack
 
 - **React 19** + **TypeScript**
-- **Vite** with `vite-plugin-singlefile` (the production build inlines to a single HTML file)
+- **Vite** with a repository-local single-file build plugin (production JS/CSS inline into one HTML app shell; public frame sequences remain external)
 - **Tailwind CSS v4** (`@tailwindcss/vite`)
 - `clsx` + `tailwind-merge` for class composition
 - `@vercel/analytics` + `@vercel/speed-insights`
@@ -62,10 +62,10 @@ npm run dev        # Vite dev server, http://localhost:5173
 | Script | What it does |
 |--------|--------------|
 | `npm run dev` | Start the Vite dev server |
-| `npm run build` | Production build (single-file output in `dist/`) |
+| `npm run build` | Production build (single HTML app shell plus external public media in `dist/`) |
 | `npm run preview` | Serve the production build locally |
 | `npm run typecheck` | `tsc --noEmit` — types, JSX and imports |
-| `npm run test` | Scroll-harness checks (requires `bun`) |
+| `npm run test` | Deterministic scroll-engine harness (runner pinned in dev dependencies) |
 | `npm run check:bundle` | Bundle-size gate |
 | `npm run gate` | Full gate: typecheck → test → build → bundle check |
 
@@ -73,7 +73,7 @@ Run `npm run gate` before every push. Ship only when it is clean.
 
 ## Building & deploying
 
-`npm run build` emits a single-file production build to `dist/`. The site is deployed on Vercel and is Git-connected on `main`, so a push to `main` triggers a production build and deploy. Verify locally with `npm run preview` first.
+`npm run build` emits one self-contained HTML app shell plus the external frame sequences and maps from `public/` to `dist/`. The site is deployed on Vercel and is Git-connected on `main`, so a push to `main` triggers a production build and deploy. Verify locally with `npm run preview` first.
 
 ## Verification
 

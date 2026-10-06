@@ -1,5 +1,6 @@
 /* ── Bundle guard ─────────────────────────────────────────────────────
-   Fails the gate if an academic reference reaches the built artifact.
+   Fails the gate if an academic reference reaches the built artifact or if
+   generated application JS/CSS escapes the single-file HTML contract.
 
    The platform is presented as a commercial product; the repositioning
    removed every academic component from source. It did not remove the
@@ -9,7 +10,7 @@
    the artifact drifted silently. This asserts it instead.
 ────────────────────────────────────────────────────────────────────── */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 
 const BUNDLE = "dist/index.html";
 const BANNED = ["AASTMT", "Arab Academy", "CITL", "211010469"];
@@ -39,3 +40,20 @@ if (hits.length > 0) {
 }
 
 console.log(`✓ ${BUNDLE}: 0 academic references (${BANNED.length} tokens checked)`);
+
+const externalAppAssets = [
+  ...html.matchAll(/<script\b[^>]*\bsrc=["'][^"']+\.[mc]?js(?:[?#][^"']*)?["']/gi),
+  ...html.matchAll(/<link\b[^>]*\bhref=["'][^"']+\.css(?:[?#][^"']*)?["']/gi),
+].map((match) => match[0]);
+const emittedAppAssets = readdirSync("dist", { withFileTypes: true })
+  .filter((entry) => entry.isFile() && /\.(?:[mc]?js|css)$/.test(entry.name))
+  .map((entry) => entry.name);
+
+if (externalAppAssets.length || emittedAppAssets.length) {
+  console.error(`✗ ${BUNDLE}: generated JS/CSS must be inlined`);
+  externalAppAssets.forEach((tag) => console.error(`    external tag: ${tag}`));
+  emittedAppAssets.forEach((file) => console.error(`    emitted file: ${file}`));
+  process.exit(1);
+}
+
+console.log(`✓ ${BUNDLE}: single-file app shell (0 external generated JS/CSS assets)`);

@@ -48,7 +48,7 @@ export default function FulfillmentBay() {
             <span>{n("head")}</span>
             <span className="cold-screen-live"><i /> {n("logged")}</span>
           </div>
-          <svg viewBox="0 0 320 132" role="img" aria-label="Cold chain trace with one excursion above the safe band">
+          <svg viewBox="0 0 320 132" role="img" aria-label={L("Cold-chain trace with one excursion above the safe band", "مسار سلسلة تبريد يتضمن تجاوزًا واحدًا فوق النطاق الآمن", "冷链轨迹，其中一次超出安全温区", "Güvenli bandın üzerinde bir sapma içeren soğuk zincir izi", "Courbe de chaîne du froid avec un dépassement de la plage sûre")}>
             <defs>
               <linearGradient id="coldArea" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stopColor="#22e4ff" stopOpacity="0.26" />

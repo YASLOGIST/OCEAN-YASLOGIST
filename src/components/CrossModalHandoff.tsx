@@ -4,13 +4,34 @@ import { useLang } from "../lib/i18n";
 import { SURFACES } from "../lib/suite";
 import { ModelBadge } from "./ui";
 
-const COPY: Record<string, { tag: string; head: string; sub: string; status: string; cta: string; sea: string; port: string; land: string }> = {
-  en: { tag: "Intermodal handoff", head: "Cargo discharged at port? Seamless inland handshake.", sub: "The voyage record does not end at the quay. Container, booking and clearance references carry straight across to the road leg, so the truck that collects already knows what it is collecting.", status: "Port terminal berth clear · Instant transfer to FTL/LTL reefer fleet", cta: "Dispatch via YASLOGIST Land", sea: "SEA LEG", port: "PORT HANDOFF", land: "LAND LEG" },
-  ar: { tag: "تسليم متعدد الوسائط", head: "وصول الشحنة للميناء؟ تسليم فوري لشبكة النقل البري.", sub: "سجل الرحلة لا ينتهي عند الرصيف. أرقام الحاوية والحجز والتخليص تنتقل مباشرة إلى المرحلة البرية، لتعرف الشاحنة التي تستلم ما الذي تستلمه بالضبط.", status: "الرصيف جاهز · تحويل فوري إلى أسطول الحمولات الكاملة والمجزأة والمبرّدة", cta: "أرسل عبر YASLOGIST البري", sea: "المرحلة البحرية", port: "تسليم الميناء", land: "المرحلة البرية" },
-  zh: { tag: "多式联运无缝交接", head: "货物抵港卸船？即刻触发陆运干线接载。", sub: "货运航程并不终结于海港码头。集装箱号、订舱单及通关凭证直通公路干线，接载集卡在到场前已精准获知货况与装卸要求。", status: "码头泊位卸载完毕 · 即时转运至 FTL/LTL 重载及冷链车队", cta: "通过 YASLOGIST 陆运系统调度", sea: "海运段", port: "港口交接", land: "陆运段" },
-  tr: { tag: "Çok modlu aktarma", head: "Yük limana indi mi? Karayolu ile kesintisiz el sıkışma.", sub: "Sefer kaydı rıhtımda bitmez. Konteyner, rezervasyon ve gümrükleme referansları doğrudan karayolu bacağına aktarılır; böylece teslim alan araç ne aldığını önceden bilir.", status: "Liman terminal rıhtımı boş · FTL/LTL frigofirik filoya anında transfer", cta: "YASLOGIST Kara Üzerinden Sevk Et", sea: "DENİZ AYAĞI", port: "LİMAN AKTARIMI", land: "KARA AYAĞI" },
-  fr: { tag: "Relais intermodal", head: "Cargaison déchargée au port ? Relais routier immédiat.", sub: "Le registre de voyage ne s'arrête pas au quai. Conteneur, réservation et références douanières sont transmis directement au tronçon routier : le camion de collecte sait exactement ce qu'il prend en charge.", status: "Poste à quai dégagé · Transfert instantané vers la flotte FTL/LTL réfrigérée", cta: "Expédier via YASLOGIST Terrestre", sea: "SEGMENT MER", port: "RELAIS PORT", land: "SEGMENT ROUTE" },
+type HandoffCopy = {
+  tag: string;
+  head: string;
+  sub: string;
+  statusLabel: string;
+  status: string;
+  cta: string;
+  sea: string;
+  port: string;
+  land: string;
 };
+
+/* This is a capability narrative, not terminal telemetry. Keep the state
+   explicitly hypothetical in every locale: the component must not imply a
+   berth, fleet or shipment exists merely because its visual timeline moves. */
+const COPY: Record<string, HandoffCopy> = {
+  en: { tag: "Intermodal handoff", head: "Cargo discharged at port? Carry one record into the road leg.", sub: "The voyage record does not end at the quay. This scenario shows container, booking and clearance references prepared for the road leg, so collection can begin from the same shipment context.", statusLabel: "SIMULATED HANDOFF STATE", status: "Quay event modelled · references ready for road dispatch", cta: "Explore YASLOGIST Land", sea: "SEA LEG", port: "PORT HANDOFF", land: "LAND LEG" },
+  ar: { tag: "تسليم متعدد الوسائط", head: "وصول الشحنة للميناء؟ سجل واحد يواصل المرحلة البرية.", sub: "سجل الرحلة لا ينتهي عند الرصيف. يوضح هذا السيناريو تجهيز مراجع الحاوية والحجز والتخليص للمرحلة البرية، لتبدأ عملية الاستلام من سياق الشحنة نفسه.", statusLabel: "حالة تسليم ضمن المحاكاة", status: "تمت نمذجة حدث الرصيف · المراجع جاهزة لسيناريو الإرسال البري", cta: "استكشف YASLOGIST البري", sea: "المرحلة البحرية", port: "تسليم الميناء", land: "المرحلة البرية" },
+  zh: { tag: "多式联运交接", head: "货物抵港卸船？同一记录延续至陆运段。", sub: "货运记录并不终结于码头。本场景演示如何为陆运段准备集装箱号、订舱及通关参考信息，让提货流程沿用同一票货运上下文。", statusLabel: "模拟交接状态", status: "码头事件已建模 · 参考信息已准备进入陆运调度场景", cta: "探索 YASLOGIST 陆运", sea: "海运段", port: "港口交接", land: "陆运段" },
+  tr: { tag: "Çok modlu aktarma", head: "Yük limana indi mi? Aynı kayıt karayolu ayağına devam eder.", sub: "Sefer kaydı rıhtımda bitmez. Bu senaryo konteyner, rezervasyon ve gümrük referanslarının karayolu ayağı için nasıl hazırlandığını gösterir; teslim alma aynı gönderi bağlamından başlayabilir.", statusLabel: "SİMÜLE AKTARMA DURUMU", status: "Rıhtım olayı modellendi · referanslar karayolu sevk senaryosuna hazır", cta: "YASLOGIST Karayolu'nu Keşfet", sea: "DENİZ AYAĞI", port: "LİMAN AKTARIMI", land: "KARA AYAĞI" },
+  fr: { tag: "Relais intermodal", head: "Cargaison déchargée au port ? Un même registre poursuit le trajet routier.", sub: "Le registre de voyage ne s'arrête pas au quai. Ce scénario montre comment préparer les références du conteneur, de la réservation et du dédouanement pour le segment routier, dans le même contexte d'expédition.", statusLabel: "ÉTAT DE RELAIS SIMULÉ", status: "Événement à quai modélisé · références prêtes pour le scénario routier", cta: "Explorer YASLOGIST Terrestre", sea: "SEGMENT MER", port: "RELAIS PORT", land: "SEGMENT ROUTE" },
+};
+
+function prefersStaticMedia() {
+  if (typeof window === "undefined") return false;
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches || connection?.saveData === true;
+}
 
 export default function CrossModalHandoff() {
   const { lang } = useLang();
@@ -23,10 +44,16 @@ export default function CrossModalHandoff() {
   const geometryRef = useRef({ top: 0, height: 0, ready: false });
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const mobilePlayback = useRef(typeof window !== "undefined" && window.matchMedia("(max-width: 767px), (pointer: coarse)").matches).current;
+  /* A motion-reduced or Save-Data session keeps the supplied poster and skips
+     the 48-frame sequence entirely. Loading every frame for a static composed
+     state wastes both transfer and decoded-image memory without changing what
+     that user sees. */
+  const staticPlayback = useRef(prefersStaticMedia()).current;
   const frameCount = 48;
   const frameWidth = mobilePlayback ? 960 : 1440;
   const frameHeight = mobilePlayback ? 540 : 810;
-  const frameBase = mobilePlayback ? "/media/handoff-frames-mobile/" : "/media/handoff-frames/";
+  const assetBase = import.meta.env.BASE_URL;
+  const frameBase = `${assetBase}media/${mobilePlayback ? "handoff-frames-mobile" : "handoff-frames"}/`;
   const frameStateRef = useRef({
     started: false,
     imgs: [] as HTMLImageElement[],
@@ -132,7 +159,7 @@ export default function CrossModalHandoff() {
               height: entry.boundingClientRect.height,
               ready: true,
             };
-            startFrames();
+            if (!staticPlayback) startFrames();
             wakeScrollLoop();
           }
         }, { rootMargin: "125% 0px" })
@@ -142,7 +169,11 @@ export default function CrossModalHandoff() {
       geometryRef.current = { top: rect.top + window.scrollY, height: rect.height, ready: true };
     };
     if (nearby) nearby.observe(section);
-    else { nearbyRef.current = true; refreshGeometry(); startFrames(); }
+    else {
+      nearbyRef.current = true;
+      refreshGeometry();
+      if (!staticPlayback) startFrames();
+    }
 
     const sectionResize = typeof ResizeObserver === "function"
       ? new ResizeObserver(refreshGeometry)
@@ -159,7 +190,7 @@ export default function CrossModalHandoff() {
       document.removeEventListener("visibilitychange", resume);
       nearbyRef.current = false;
     };
-  }, [frameBase, frameCount]);
+  }, [frameBase, frameCount, staticPlayback]);
 
   useEffect(() => subscribeScroll((f) => {
     const el = sectionRef.current;
@@ -190,7 +221,7 @@ export default function CrossModalHandoff() {
         <div className="handoff-world" aria-hidden>
           <img
             className="handoff-bg-video handoff-bg-poster"
-            src="/media/intermodal-handoff-poster.jpg"
+            src={`${assetBase}media/intermodal-handoff-poster.jpg`}
             alt=""
             draggable={false}
           />
@@ -198,7 +229,8 @@ export default function CrossModalHandoff() {
             ref={canvasRef}
             width={frameWidth}
             height={frameHeight}
-            className="handoff-bg-video handoff-bg-canvas"
+            className={`handoff-bg-video handoff-bg-canvas${staticPlayback ? " hidden" : ""}`}
+            aria-hidden
           />
           <div className="handoff-video-veil" />
           <div className="handoff-sea-field"><i /><i /><i /><i /></div>
@@ -227,7 +259,7 @@ export default function CrossModalHandoff() {
             <div className="handoff-action-v3">
               <div className="handoff-transfer-state">
                 <div className="handoff-transfer-icon" aria-hidden><span /><i /></div>
-                <div><small>LIVE HANDOFF STATE</small><p>{c.status}</p></div>
+                <div><small>{c.statusLabel}</small><p>{c.status}</p></div>
                 <ModelBadge short className="handoff-model-badge" />
               </div>
               <a href={land.href} className="handoff-cta-v3 group" style={{ "--land-accent": land.accent, "--land-glow": land.glow } as React.CSSProperties}>
