@@ -1,0 +1,771 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 720" width="100%" height="auto" role="img" aria-label="YASLOGIST Ocean — Cinematic maritime logistics intelligence visualization">
+<defs>
+  <!-- ── ATMOSPHERIC BACKGROUND GRADIENTS ─────────────────────────────── -->
+  <radialGradient id="bg-core" cx="50%" cy="48%" r="52%">
+    <stop offset="0%"   stop-color="#0b1a3a"/>
+    <stop offset="38%"  stop-color="#06102a"/>
+    <stop offset="72%"  stop-color="#03081a"/>
+    <stop offset="100%" stop-color="#01040c"/>
+  </radialGradient>
+
+  <radialGradient id="glow-a" cx="38%" cy="58%" r="38%">
+    <stop offset="0%"   stop-color="#1a5c8a" stop-opacity="0.32"/>
+    <stop offset="60%"  stop-color="#0d2a52" stop-opacity="0.10"/>
+    <stop offset="100%" stop-color="#03081a" stop-opacity="0"/>
+  </radialGradient>
+
+  <radialGradient id="glow-b" cx="74%" cy="28%" r="42%">
+    <stop offset="0%"   stop-color="#0a3a6a" stop-opacity="0.22"/>
+    <stop offset="100%" stop-color="#03081a" stop-opacity="0"/>
+  </radialGradient>
+
+  <linearGradient id="sea-grad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#0a1a35" stop-opacity="0.55"/>
+    <stop offset="40%"  stop-color="#061528" stop-opacity="0.40"/>
+    <stop offset="100%" stop-color="#020a18" stop-opacity="0.18"/>
+  </linearGradient>
+
+  <linearGradient id="accent-grad" x1="0" y1="0" x2="1" y2="0.3">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0.90"/>
+    <stop offset="50%"  stop-color="#22d3ee" stop-opacity="0.60"/>
+    <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.20"/>
+  </linearGradient>
+
+  <linearGradient id="accent-grad-v" x1="0" y1="1" x2="0" y2="0">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0.90"/>
+    <stop offset="55%"  stop-color="#22d3ee" stop-opacity="0.45"/>
+    <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.05"/>
+  </linearGradient>
+
+  <linearGradient id="neon-edge" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0.60"/>
+    <stop offset="50%"  stop-color="#22d3ee" stop-opacity="0.10"/>
+    <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.50"/>
+  </linearGradient>
+
+  <linearGradient id="text-grad" x1="0" y1="0" x2="1" y2="0.2">
+    <stop offset="0%"   stop-color="#e0f5ff"/>
+    <stop offset="50%"  stop-color="#c8f0ff"/>
+    <stop offset="100%" stop-color="#8ad4ff"/>
+  </linearGradient>
+
+  <linearGradient id="yas-grad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#22e4ff"/>
+    <stop offset="60%"  stop-color="#22d3ee"/>
+    <stop offset="100%" stop-color="#0ea5e9"/>
+  </linearGradient>
+
+  <radialGradient id="node-glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0.70"/>
+    <stop offset="40%"  stop-color="#22d3ee" stop-opacity="0.30"/>
+    <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+  </radialGradient>
+
+  <radialGradient id="node-pulse" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0.65"/>
+    <stop offset="100%" stop-color="#22e4ff" stop-opacity="0"/>
+  </radialGradient>
+
+  <radialGradient id="vessel-glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="#e0f5ff" stop-opacity="0.85"/>
+    <stop offset="45%"  stop-color="#22d3ee" stop-opacity="0.30"/>
+    <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+  </radialGradient>
+
+  <linearGradient id="route-main" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0.18"/>
+    <stop offset="50%"  stop-color="#22e4ff" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.10"/>
+  </linearGradient>
+
+  <linearGradient id="route-gulf" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#0ea5e9" stop-opacity="0.08"/>
+    <stop offset="40%"  stop-color="#0ea5e9" stop-opacity="0.35"/>
+    <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.15"/>
+  </linearGradient>
+
+  <linearGradient id="border-top" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0"/>
+    <stop offset="20%"  stop-color="#22e4ff" stop-opacity="0.30"/>
+    <stop offset="80%"  stop-color="#22e4ff" stop-opacity="0.30"/>
+    <stop offset="100%" stop-color="#22e4ff" stop-opacity="0"/>
+  </linearGradient>
+
+  <linearGradient id="border-bot" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0"/>
+    <stop offset="20%"  stop-color="#22e4ff" stop-opacity="0.18"/>
+    <stop offset="80%"  stop-color="#22e4ff" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#22e4ff" stop-opacity="0"/>
+  </linearGradient>
+
+  <linearGradient id="corner-neon" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#22e4ff" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="#22e4ff" stop-opacity="0"/>
+  </linearGradient>
+
+  <!-- ── HERO MARK: YL ligature inside circle (exact brand geometry) ──── -->
+  <symbol id="yas-mark" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-linecap="butt" stroke-linejoin="miter">
+    <circle cx="32" cy="32" r="29" stroke-width="2.2"/>
+    <g stroke-width="5" stroke-linecap="square">
+      <path d="M16 16 L27.5 31.5 L27.5 49"/>
+      <path d="M39 16 L30 28"/>
+      <path d="M40.5 20 L40.5 48 L53 48"/>
+    </g>
+  </symbol>
+
+  <!-- ── Animated vessel route paths (invisible, referenced by SMIL mpath) ── -->
+  <path id="vessel-gulf-path"
+        d="M388 528 C 402 523, 410 512, 420 498 C 448 468, 470 460, 490 456 C 510 452, 524 444, 538 440"
+        fill="none" stroke="none"/>
+  <path id="vessel-main-path"
+        d="M538 440 C 568 430, 590 418, 604 412 C 610 408, 620 398, 628 370 C 680 348, 740 310, 782 272 S 870 232, 950 218 C 1050 206, 1080 203, 1100 200"
+        fill="none" stroke="none"/>
+  <path id="vessel-suez-path"
+        d="M628 370 C 680 348, 740 310, 782 272 S 870 232, 950 218 C 1050 206, 1080 203, 1100 200"
+        fill="none" stroke="none"/>
+</defs>
+
+<style>
+  /* ── SHAKE-PROOF LOOP — all timing anchored to a single 11s cycle ── */
+  :root { --duration: 11s; }
+
+  .bg-fade {
+    animation: bgFade   var(--duration) ease-in-out infinite;
+  }
+  .bg-haze {
+    animation: bgHaze   var(--duration) ease-in-out infinite;
+  }
+  .scan-a {
+    animation: scanTop  var(--duration) ease-in-out infinite;
+  }
+  .scan-b {
+    animation: scanBot  var(--duration) ease-in-out infinite;
+  }
+  .grid-pulse {
+    animation: gridPulse var(--duration) ease-in-out infinite;
+  }
+
+  .route-main-dash {
+    stroke-dasharray: 14 18;
+    animation: routeFlowA var(--duration) linear infinite;
+  }
+  .route-gulf-dash  {
+    stroke-dasharray: 10 20;
+    animation: routeFlowB var(--duration) linear infinite;
+  }
+  .route-suez-dash  {
+    stroke-dasharray: 6 14;
+    animation: routeFlowC var(--duration) linear infinite;
+  }
+
+  .node-a-pulse { animation: nodeAPulse var(--duration) ease-in-out infinite; }
+  .node-b-pulse { animation: nodeBPulse var(--duration) ease-in-out infinite; }
+  .node-c-pulse { animation: nodeCPulse var(--duration) ease-in-out infinite; }
+  .node-d-pulse { animation: nodeDPulse var(--duration) ease-in-out infinite; }
+  .node-e-pulse { animation: nodeEPulse var(--duration) ease-in-out infinite; }
+  .node-g-pulse { animation: nodeGPulse var(--duration) ease-in-out infinite; }
+
+  .ring-a { animation: ringPulseA var(--duration) ease-out infinite; }
+  .ring-b { animation: ringPulseB var(--duration) ease-out infinite; }
+  .ring-c { animation: ringPulseC var(--duration) ease-out infinite; }
+  .ring-d { animation: ringPulseD var(--duration) ease-out infinite; }
+  .ring-e { animation: ringPulseE var(--duration) ease-out infinite; }
+  .ring-g { animation: ringPulseG var(--duration) ease-out infinite; }
+
+  .mark-float {
+    animation: markFloat var(--duration) ease-in-out infinite;
+  }
+  .mark-glow {
+    animation: markGlow var(--duration) ease-in-out infinite;
+  }
+  .title-fade {
+    animation: titleFade var(--duration) ease-in-out infinite;
+  }
+
+  @keyframes bgFade {
+    0%   { opacity: 0.82; }
+    25%  { opacity: 1.00; }
+    50%  { opacity: 0.88; }
+    75%  { opacity: 1.00; }
+    100% { opacity: 0.82; }
+  }
+  @keyframes bgHaze {
+    0%   { opacity: 0.22; transform: scale(1.00); }
+    50%  { opacity: 0.40; transform: scale(1.08); }
+    100% { opacity: 0.22; transform: scale(1.00); }
+  }
+  @keyframes scanTop {
+    0%   { transform: translateY(0px);   opacity: 0; }
+    10%  { opacity: 0.55; }
+    50%  { opacity: 0.55; }
+    90%  { opacity: 0.55; }
+    100% { transform: translateY(720px); opacity: 0; }
+  }
+  @keyframes scanBot {
+    0%   { transform: translateY(720px); opacity: 0; }
+    10%  { opacity: 0.30; }
+    50%  { opacity: 0.30; }
+    90%  { opacity: 0.30; }
+    100% { transform: translateY(0px);   opacity: 0; }
+  }
+  @keyframes gridPulse {
+    0%, 100% { opacity: 0.055; }
+    50%      { opacity: 0.095; }
+  }
+  @keyframes routeFlowA {
+    0%   { stroke-dashoffset:   0; }
+    100% { stroke-dashoffset: -3200; }
+  }
+  @keyframes routeFlowB {
+    0%   { stroke-dashoffset:   0; }
+    100% { stroke-dashoffset: -2800; }
+  }
+  @keyframes routeFlowC {
+    0%   { stroke-dashoffset:   0; }
+    100% { stroke-dashoffset: -2200; }
+  }
+  @keyframes nodeAPulse {
+    0%, 100% { opacity: 0.18; r: 7; }
+    50%      { opacity: 1.00; r: 12; }
+  }
+  @keyframes nodeBPulse {
+    0%, 100% { opacity: 0.18; r: 7; }
+    50%      { opacity: 1.00; r: 12; }
+  }
+  @keyframes nodeCPulse {
+    0%, 100% { opacity: 0.18; r: 7; }
+    50%      { opacity: 1.00; r: 12; }
+  }
+  @keyframes nodeDPulse {
+    0%, 100% { opacity: 0.18; r: 7; }
+    50%      { opacity: 1.00; r: 12; }
+  }
+  @keyframes nodeEPulse {
+    0%, 100% { opacity: 0.18; r: 7; }
+    50%      { opacity: 1.00; r: 12; }
+  }
+  @keyframes nodeGPulse {
+    0%, 100% { opacity: 0.12; r: 6; }
+    50%      { opacity: 0.85; r: 10; }
+  }
+  @keyframes ringPulseA {
+    0%   { opacity: 0; transform: scale(0.65); }
+    50%  { opacity: 0.55; }
+    100% { opacity: 0; transform: scale(2.6); }
+  }
+  @keyframes ringPulseB {
+    0%   { opacity: 0; transform: scale(0.65); }
+    50%  { opacity: 0.50; }
+    100% { opacity: 0; transform: scale(2.6); }
+  }
+  @keyframes ringPulseC {
+    0%   { opacity: 0; transform: scale(0.65); }
+    50%  { opacity: 0.50; }
+    100% { opacity: 0; transform: scale(2.6); }
+  }
+  @keyframes ringPulseD {
+    0%   { opacity: 0; transform: scale(0.65); }
+    50%  { opacity: 0.50; }
+    100% { opacity: 0; transform: scale(2.6); }
+  }
+  @keyframes ringPulseE {
+    0%   { opacity: 0; transform: scale(0.65); }
+    50%  { opacity: 0.50; }
+    100% { opacity: 0; transform: scale(2.6); }
+  }
+  @keyframes ringPulseG {
+    0%   { opacity: 0; transform: scale(0.65); }
+    50%  { opacity: 0.40; }
+    100% { opacity: 0; transform: scale(2.3); }
+  }
+  @keyframes markFloat {
+    0%, 100% { transform: translateY(0px)    translateX(0px);   }
+    25%      { transform: translateY(-3px)   translateX(2px);   }
+    50%      { transform: translateY(0px)    translateX(0px);   }
+    75%      { transform: translateY(2px)    translateX(-1px);  }
+  }
+  @keyframes markGlow {
+    0%, 100% { opacity: 0.55; filter: drop-shadow(0 0 22px rgba(34,228,255,0.50)); }
+    50%      { opacity: 1.00; filter: drop-shadow(0 0 40px rgba(34,228,255,0.85)); }
+  }
+  @keyframes titleFade {
+    0%, 100% { opacity: 0.92; }
+    50%      { opacity: 1.00; }
+  }
+</style>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 00 — CANVAS BASE                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<rect width="1920" height="720" fill="url(#bg-core)"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 01 — ATMOSPHERIC BACKGROUND                                     -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<rect class="bg-fade" width="1920" height="720" fill="url(#bg-core)"/>
+<rect class="bg-haze" width="1920" height="720" fill="url(#glow-a)"/>
+<rect width="1920" height="720" fill="url(#glow-b)"/>
+
+<!-- Volumetric haze band across the Red Sea corridor -->
+<ellipse cx="960" cy="380" rx="860" ry="170" fill="#0d2a52" opacity="0.14" class="bg-haze"/>
+
+<!-- Depth haze near horizon -->
+<rect y="520" width="1920" height="200" fill="url(#sea-grad)" opacity="0.60" class="bg-fade"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 02 — OCEAN GRID / DEPTH FIELD                                   -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- Latitude lines (horizontal) -->
+<g stroke="#1a4a7a" stroke-width="0.5" fill="none" opacity="0.30" class="grid-pulse">
+  <line x1="160"  y1="80"  x2="1760" y2="80"/>
+  <line x1="160"  y1="180" x2="1760" y2="180"/>
+  <line x1="160"  y1="290" x2="1760" y2="290"/>
+  <line x1="160"  y1="410" x2="1760" y2="410"/>
+  <line x1="160"  y1="540" x2="1760" y2="540"/>
+  <line x1="160"  y1="660" x2="1760" y2="660"/>
+</g>
+<!-- Longitude lines (vertical) -->
+<g stroke="#1a4a7a" stroke-width="0.4" fill="none" opacity="0.22" class="grid-pulse">
+  <line x1="300"  y1="60"  x2="300"  y2="680"/>
+  <line x1="500"  y1="60"  x2="500"  y2="680"/>
+  <line x1="700"  y1="60"  x2="700"  y2="680"/>
+  <line x1="900"  y1="60"  x2="900"  y2="680"/>
+  <line x1="1100" y1="60"  x2="1100" y2="680"/>
+  <line x1="1300" y1="60"  x2="1300" y2="680"/>
+  <line x1="1500" y1="60"  x2="1500" y2="680"/>
+  <line x1="1680" y1="60"  x2="1680" y2="680"/>
+</g>
+
+<!-- Grid coordinate ticks — subtle depth cues -->
+<g fill="#1a4a7a" font-family="IBM Plex Mono, monospace" font-size="9" opacity="0.35" class="grid-pulse">
+  <text x="292"  y="690" text-anchor="end">32°E</text>
+  <text x="492"  y="690" text-anchor="end">34°E</text>
+  <text x="692"  y="690" text-anchor="end">36°E</text>
+  <text x="892"  y="690" text-anchor="end">38°E</text>
+  <text x="1092" y="690" text-anchor="end">40°E</text>
+  <text x="1292" y="690" text-anchor="end">42°E</text>
+  <text x="1492" y="690" text-anchor="end">44°E</text>
+  <text x="1672" y="690" text-anchor="end">46°E</text>
+  <text x="142"  y="78"  text-anchor="end">32°N</text>
+  <text x="142"  y="188" text-anchor="end">31°N</text>
+  <text x="142"  y="298" text-anchor="end">30°N</text>
+  <text x="142"  y="418" text-anchor="end">29°N</text>
+  <text x="142"  y="548" text-anchor="end">28°N</text>
+  <text x="142"  y="668" text-anchor="end">27°N</text>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 03 — SUEZ CANAL (geometric corridor, centre of composition)    -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- Suez Canal as a distinct geometric corridor — the heart of this project -->
+<!-- Approximate SVG path from Suez (x=628,y=370) to Port Said (x=1100,y=200) -->
+<path d="M628 370 C 680 348, 740 310, 782 272 S 870 232, 1100 200"
+      fill="none" stroke="#22d3ee" stroke-width="2.2" stroke-opacity="0.14" stroke-linecap="round"/>
+<path d="M628 370 C 680 348, 740 310, 782 272 S 870 232, 1100 200"
+      fill="none" stroke="#22d3ee" stroke-width="1.0" stroke-opacity="0.22" class="route-suez-dash" stroke-linecap="round"/>
+
+<!-- Suez Canal label -->
+<g class="title-fade">
+  <text x="890" y="257" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="9.5"
+        fill="#22d3ee" fill-opacity="0.55" letter-spacing="0.3em">SUEZ CANAL</text>
+</g>
+
+<!-- Suez Canal entrance marker (Lake Timsah area) -->
+<g transform="translate(782 272)">
+  <circle class="ring-c" r="18" fill="none" stroke="#22e4ff" stroke-width="0.8" cx="0" cy="0"/>
+  <circle class="node-c-pulse" r="7" fill="url(#node-glow)"/>
+  <circle r="2.2" fill="#e0f5ff"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 04 — RED SEA SHIPPING CORRIDOR (primary route)                 -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- Jeddah → Suez corridor: shared route for Gulf and Red Sea traffic     -->
+<!-- Jeddah (538,440) → Mecca area (600,420) → Yanbu (568,396) → Suez (628,370) -->
+<!-- Extended: Suez → Port Said → Mediterranean → Alexandria → EU routes  -->
+
+<!-- Gulf → Red Sea → Mediterranean full corridor (thick base line) -->
+<path d="M340 555 C 420 510, 490 458, 538 440
+         C 568 430, 590 418, 604 412
+         C 610 408, 620 398, 628 370
+         C 680 348, 740 310, 782 272
+         S 870 232, 950 218
+         C 1050 206, 1080 203, 1100 200
+         C 1160 194, 1200 190, 1220 188
+         C 1260 184, 1290 183, 1300 168
+         C 1320 150, 1328 138, 1340 128"
+      fill="none" stroke="url(#route-main)" stroke-width="2.5" stroke-linecap="round"/>
+
+<!-- Animated dash layer along the corridor -->
+<path d="M340 555 C 420 510, 490 458, 538 440
+         C 568 430, 590 418, 604 412
+         C 610 408, 620 398, 628 370
+         C 680 348, 740 310, 782 272
+         S 870 232, 950 218
+         C 1050 206, 1080 203, 1100 200
+         C 1160 194, 1200 190, 1220 188
+         C 1260 184, 1290 183, 1300 168
+         C 1320 150, 1328 138, 1340 128"
+      fill="none" stroke="#22e4ff" stroke-width="1.0" stroke-opacity="0.60" class="route-main-dash" stroke-linecap="round"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 05 — GULF-ORIGIN ROUTE (separate visual strand)                -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- Persian Gulf → Strait of Hormuz → Gulf of Aden → Red Sea -->
+<!-- Manama (340,555) → Dammam (388,528) → Strait of Hormuz (420,498)  -->
+<!-- → Jeddah (538,440) — joins the main corridor at Jeddah               -->
+<path d="M340 555 C 362 540, 374 533, 388 528
+         C 402 523, 410 512, 420 498
+         C 448 468, 470 460, 490 456
+         C 510 452, 524 444, 538 440"
+      fill="none" stroke="url(#route-gulf)" stroke-width="2.0" stroke-linecap="round"/>
+<path d="M340 555 C 362 540, 374 533, 388 528
+         C 402 523, 410 512, 420 498
+         C 448 468, 470 460, 490 456
+         C 510 452, 524 444, 538 440"
+      fill="none" stroke="#0ea5e9" stroke-width="0.9" stroke-opacity="0.40" class="route-gulf-dash" stroke-linecap="round"/>
+
+<!-- Gulf label -->
+<g opacity="0.40" class="title-fade">
+  <text x="390" y="505" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="8.5"
+        fill="#0ea5e9" letter-spacing="0.28em">PERSIAN GULF</text>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 06 — DATA NODES at major ports / waypoints                     -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- NODE A — Manama, Bahrain (Persian Gulf entry) -->
+<g transform="translate(340 555)">
+  <circle class="ring-a" r="20" fill="none" stroke="#22e4ff" stroke-width="0.7" cx="0" cy="0"/>
+  <circle class="node-a-pulse" r="7" fill="url(#node-glow)"/>
+  <circle r="2.4" fill="#e0f5ff"/>
+</g>
+
+<!-- NODE B — Jeddah / Red Sea gateway -->
+<g transform="translate(538 440)">
+  <circle class="ring-b" r="20" fill="none" stroke="#22e4ff" stroke-width="0.7" cx="0" cy="0"/>
+  <circle class="node-b-pulse" r="8" fill="url(#node-glow)"/>
+  <circle r="2.6" fill="#e0f5ff"/>
+</g>
+
+<!-- NODE G — Dammam region (Gulf waypoint) -->
+<g transform="translate(388 528)">
+  <circle class="ring-g" r="16" fill="none" stroke="#0ea5e9" stroke-width="0.6" cx="0" cy="0"/>
+  <circle class="node-g-pulse" r="6" fill="url(#node-glow)"/>
+  <circle r="2.0" fill="#c8f0ff"/>
+</g>
+
+<!-- NODE C — Suez (Canal entrance) — double ring for emphasis -->
+<g transform="translate(628 370)">
+  <circle class="ring-c" r="24" fill="none" stroke="#22e4ff" stroke-width="0.8" cx="0" cy="0"/>
+  <circle class="node-c-pulse" r="8" fill="url(#node-glow)"/>
+  <circle r="2.8" fill="#e0f5ff"/>
+</g>
+
+<!-- NODE D — Alexandria (Mediterranean terminal) -->
+<g transform="translate(1340 128)">
+  <circle class="ring-d" r="22" fill="none" stroke="#22e4ff" stroke-width="0.7" cx="0" cy="0"/>
+  <circle class="node-d-pulse" r="8" fill="url(#node-glow)"/>
+  <circle r="2.6" fill="#e0f5ff"/>
+</g>
+
+<!-- NODE E — East Port Said (Mediterranean / Suez north end) -->
+<g transform="translate(1100 200)">
+  <circle class="ring-e" r="20" fill="none" stroke="#22e4ff" stroke-width="0.7" cx="0" cy="0"/>
+  <circle class="node-e-pulse" r="7" fill="url(#node-glow)"/>
+  <circle r="2.4" fill="#e0f5ff"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 07 — VESSEL MARKERS (traveling along route paths)              -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 07 — VESSEL MARKERS (SMIL animateMotion — standard SVG path-follow) -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- Vessel 1: Persian Gulf → Red Sea → Canal  (Dammam region → Jeddah) -->
+<g>
+  <use href="#yas-mark" width="14" height="14" x="-7" y="-7" style="color:#22e4ff;">
+    <animateMotion dur="11s" repeatCount="indefinite" rotate="0"
+      path="M388 528 C 402 523, 410 512, 420 498 C 448 468, 470 460, 490 456 C 510 452, 524 444, 538 440"/>
+    <animate attributeName="opacity"
+      values="0; 0; 1; 1; 0; 0"
+      keyTimes="0; 0.045; 0.09; 0.91; 0.955; 1"
+      dur="11s" repeatCount="indefinite"/>
+  </use>
+</g>
+
+<!-- Vessel 2: Red Sea → Suez Canal → Mediterranean  (Jeddah → Port Said) -->
+<g>
+  <use href="#yas-mark" width="16" height="16" x="-8" y="-8" style="color:#e0f5ff;">
+    <animateMotion dur="11s" repeatCount="indefinite" rotate="0"
+      path="M538 440 C 568 430, 590 418, 604 412 C 610 408, 620 398, 628 370 C 680 348, 740 310, 782 272 S 870 232, 950 218 C 1050 206, 1080 203, 1100 200"/>
+    <animate attributeName="opacity"
+      values="0; 0; 1; 1; 0; 0"
+      keyTimes="0; 0.045; 0.09; 0.91; 0.955; 1"
+      dur="11s" repeatCount="indefinite"/>
+  </use>
+</g>
+
+<!-- Vessel 3: Suez Canal northward  (midpoint → Port Said) -->
+<g>
+  <use href="#yas-mark" width="12" height="12" x="-6" y="-6" style="color:#22e4ff;">
+    <animateMotion dur="11s" repeatCount="indefinite" rotate="0"
+      path="M628 370 C 680 348, 740 310, 782 272 S 870 232, 950 218 C 1050 206, 1080 203, 1100 200"/>
+    <animate attributeName="opacity"
+      values="0; 0; 1; 1; 0; 0"
+      keyTimes="0; 0.045; 0.09; 0.91; 0.955; 1"
+      dur="11s" repeatCount="indefinite"/>
+  </use>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 08 — EGYPTIAN GATEWAY HIGHLIGHTS (the five demo ports)          -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- These are the actual project's gateway scenarios — shown as a vertical "EGYPT" column -->
+
+<!-- Egypt column label -->
+<g opacity="0.50" class="title-fade">
+  <text x="1560" y="42" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="8.5"
+        fill="#22d3ee" letter-spacing="0.32em">EGYPT · 5 GATEWAYS</text>
+</g>
+
+<!-- Thin vertical connector for Egypt column -->
+<line x1="1560" y1="50" x2="1560" y2="680" stroke="#1a4a7a" stroke-width="0.6" opacity="0.30" class="grid-pulse"/>
+
+<!-- Gateway data nodes stacked vertically on the Egypt column -->
+<!-- 1. Alexandria -->
+<g transform="translate(1560 128)">
+  <circle r="3.2" fill="#22d3ee" opacity="0.90"/>
+  <circle r="9" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.40" class="node-d-pulse"/>
+</g>
+<g opacity="0.55" class="title-fade">
+  <text x="1560" y="116" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="8"
+        fill="#22d3ee" letter-spacing="0.22em">ALEXANDRIA</text>
+</g>
+
+<!-- 2. Dekheila -->
+<g transform="translate(1560 218)">
+  <circle r="2.8" fill="#22d3ee" opacity="0.85"/>
+  <circle r="8" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.35" class="node-b-pulse"/>
+</g>
+<g opacity="0.50" class="title-fade">
+  <text x="1560" y="206" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="7.5"
+        fill="#22d3ee" letter-spacing="0.22em">DEKHEILA</text>
+</g>
+
+<!-- 3. Sokhna (Red Sea / Canal south) -->
+<g transform="translate(1560 310)">
+  <circle r="3.0" fill="#22d3ee" opacity="0.90"/>
+  <circle r="9" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.40" class="node-c-pulse"/>
+</g>
+<g opacity="0.55" class="title-fade">
+  <text x="1560" y="298" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="7.5"
+        fill="#22d3ee" letter-spacing="0.22em">SOHKNA</text>
+</g>
+
+<!-- 4. Damietta -->
+<g transform="translate(1560 418)">
+  <circle r="2.8" fill="#22d3ee" opacity="0.85"/>
+  <circle r="8" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.35" class="node-a-pulse"/>
+</g>
+<g opacity="0.50" class="title-fade">
+  <text x="1560" y="406" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="7.5"
+        fill="#22d3ee" letter-spacing="0.22em">DAMIETTA</text>
+</g>
+
+<!-- 5. East Port Said -->
+<g transform="translate(1560 540)">
+  <circle r="3.2" fill="#22d3ee" opacity="0.95"/>
+  <circle r="10" fill="none" stroke="#22d3ee" stroke-width="0.6" opacity="0.45" class="node-e-pulse"/>
+  <circle r="20" fill="none" stroke="#22e4ff" stroke-width="0.7" opacity="0.20" class="ring-e"/>
+</g>
+<g opacity="0.60" class="title-fade">
+  <text x="1560" y="552" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="7.5"
+        fill="#22d3ee" letter-spacing="0.22em">E. PORT SAID</text>
+</g>
+
+<!-- Egypt column connector dashes (animated) -->
+<line x1="1560" y1="125" x2="1560" y2="545" stroke="#22d3ee" stroke-width="0.6"
+      stroke-dasharray="3 6" opacity="0.28" class="route-main-dash"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 09 — CONTROL REFERENCE CORNER DOTS                             -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<g fill="#22e4ff" opacity="0.25" class="grid-pulse">
+  <circle cx="1780" cy="680" r="1.5"/>
+  <circle cx="1780" cy="672" r="1.0"/>
+  <circle cx="1780" cy="664" r="1.0"/>
+  <circle cx="1772" cy="680" r="1.0"/>
+  <circle cx="1764" cy="680" r="1.0"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 10 — YASLOGIST BRAND SIGNATURE (inside the hero scene)         -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- Placed on the right side of the scene, integrated as a floating mark -->
+<!-- The glow anchors the right side of the composition                   -->
+<g class="mark-float" transform="translate(1680 72)">
+  <!-- Outer ambient ring -->
+  <circle r="34" fill="url(#node-glow)" opacity="0.30" class="mark-glow"/>
+  <!-- The actual brand mark -->
+  <use href="#yas-mark" width="38" height="38" x="-19" y="-19"
+       style="color:#22e4ff; filter: drop-shadow(0 0 10px rgba(34,228,255,0.70));"/>
+  <!-- YASLOGIST wordmark beneath -->
+  <text x="0" y="52" text-anchor="middle"
+        font-family="'Archivo', 'IBM Plex Sans', sans-serif" font-size="17"
+        font-weight="800" letter-spacing="0.22em"
+        fill="url(#yas-grad)" class="mark-glow">YASLOGIST</text>
+</g>
+
+<!-- Secondary ambient glow on the right side of the scene -->
+<ellipse cx="1700" cy="120" rx="160" ry="120" fill="#22d3ee" opacity="0.045" class="mark-glow"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 11 — PROJECT TITLE BLOCK                                       -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<g class="title-fade">
+  <!-- Eyebrow row -->
+  <text x="160" y="672"
+        font-family="IBM Plex Mono, monospace" font-size="10"
+        fill="#22d3ee" fill-opacity="0.60" letter-spacing="0.44em"
+        class="title-fade">OCEAN · INTERACTIVE DEMO · EGYPT</text>
+
+  <!-- Primary title — two lines -->
+  <text x="160" y="638"
+        font-family="'Archivo', 'IBM Plex Sans', sans-serif" font-size="52"
+        font-weight="800" letter-spacing="-0.02em" fill="url(#text-grad)"
+        class="title-fade">Every container.</text>
+  <text x="160" y="698"
+        font-family="'Archivo', 'IBM Plex Sans', sans-serif" font-size="52"
+        font-weight="800" letter-spacing="-0.02em"
+        fill="#22e4ff" class="title-fade"
+        style="filter: drop-shadow(0 0 20px rgba(34,228,255,0.55));">One record, quay to gate.</text>
+
+  <!-- Divider line between title and subtitle -->
+  <line x1="160" y1="712" x2="880" y2="712" stroke="#22d3ee" stroke-width="0.8" opacity="0.30"/>
+
+  <!-- Technical subtitle -->
+  <text x="160" y="740"
+        font-family="IBM Plex Sans, sans-serif" font-size="13"
+        fill="#7bb8d8" fill-opacity="0.78" letter-spacing="0.04em"
+        class="title-fade">
+    Five Egyptian gateways · Predictive ETA · Vessel AIS · Cold-chain · ACID &amp; B/L stitching · Tamper-evident record
+  </text>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 12 — CORNER FRAME ACCENTS                                      -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- Top-left corner -->
+<line x1="12" y1="12" x2="12" y2="80" stroke="url(#corner-neon)" stroke-width="1.8" class="title-fade"/>
+<line x1="12" y1="12" x2="80" y2="12" stroke="url(#corner-neon)" stroke-width="1.8" class="title-fade"/>
+
+<!-- Top-right corner -->
+<line x1="1908" y1="12" x2="1908" y2="80" stroke="url(#corner-neon)" stroke-width="1.8" class="title-fade"/>
+<line x1="1908" y1="12" x2="1840" y2="12" stroke="url(#corner-neon)" stroke-width="1.8" class="title-fade"/>
+
+<!-- Bottom-left corner -->
+<line x1="12" y1="708" x2="12" y2="640" stroke="url(#corner-neon)" stroke-width="1.4" opacity="0.50" class="title-fade"/>
+<line x1="12" y1="708" x2="80" y2="708" stroke="url(#corner-neon)" stroke-width="1.4" opacity="0.50" class="title-fade"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 13 — BOUNDARY LIGHT STRIPS                                     -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<rect x="0" y="0" width="1920" height="2.5" fill="url(#border-top)" class="title-fade"/>
+<rect x="0" y="717.5" width="1920" height="2.5" fill="url(#border-bot)" class="title-fade"/>
+
+<!-- Subtle right-edge glow for the YASLOGIST mark area -->
+<rect x="1660" y="0" width="260" height="720" fill="url(#accent-grad-v)" opacity="0.06" class="mark-glow"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 14 — SCAN LINE EFFECT (subtle)                                -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<rect class="scan-a" x="0" y="0" width="1920" height="38" fill="#22e4ff" opacity="0" style="mix-blend-mode:screen"/>
+<rect class="scan-b" x="0" y="0" width="1920" height="22" fill="#22d3ee" opacity="0" style="mix-blend-mode:screen"/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 15 — TECHNICAL COORDINATE TICK (floating, top-right)          -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<g transform="translate(1840 60)" class="title-fade">
+  <rect x="-56" y="-16" width="112" height="32" rx="4" fill="#020a18" fill-opacity="0.55"
+        stroke="#22d3ee" stroke-width="0.5" stroke-opacity="0.30"/>
+  <text x="0" y="-2" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="8"
+        fill="#22d3ee" fill-opacity="0.70" letter-spacing="0.18em">CAM · ALT 2400M</text>
+  <text x="0" y="9" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="8"
+        fill="#22d3ee" fill-opacity="0.50" letter-spacing="0.18em">VEL-SYNC · ACTIVE</text>
+</g>
+
+<!-- SECOND floating telemetry tag — Suez Canal sector -->
+<g transform="translate(782 242)" class="title-fade">
+  <rect x="-50" y="-14" width="100" height="28" rx="3" fill="#020a18" fill-opacity="0.70"
+        stroke="#22d3ee" stroke-width="0.5" stroke-opacity="0.25"/>
+  <text x="0" y="-1" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="8"
+        fill="#22d3ee" fill-opacity="0.65" letter-spacing="0.16em">SECTOR 07 · DEMO</text>
+  <text x="0" y="10" text-anchor="middle"
+        font-family="IBM Plex Mono, monospace" font-size="8"
+        fill="#22d3ee" fill-opacity="0.45" letter-spacing="0.16em">AIS · SIMULATED</text>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 16 — MICRO-DATA FLOW DOTS along the route (decorative)        -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<g fill="#22e4ff">
+  <circle cx="380" cy="548" r="1.2" opacity="0.50" class="grid-pulse"/>
+  <circle cx="440" cy="510" r="1.0" opacity="0.40" class="grid-pulse"/>
+  <circle cx="490" cy="470" r="1.2" opacity="0.50" class="grid-pulse"/>
+  <circle cx="610" cy="395" r="1.0" opacity="0.40" class="grid-pulse"/>
+  <circle cx="720" cy="330" r="1.2" opacity="0.50" class="grid-pulse"/>
+  <circle cx="860" cy="252" r="1.0" opacity="0.40" class="grid-pulse"/>
+  <circle cx="1050" cy="209" r="1.2" opacity="0.50" class="grid-pulse"/>
+  <circle cx="1270" cy="186" r="1.0" opacity="0.40" class="grid-pulse"/>
+</g>
+
+<!-- Fine connection tick marks between data nodes -->
+<g stroke="#22d3ee" stroke-width="0.4" stroke-opacity="0.18" class="grid-pulse" fill="none">
+  <line x1="340"  y1="555" x2="388"  y2="528"/>
+  <line x1="388"  y1="528" x2="538"  y2="440"/>
+  <line x1="538"  y1="440" x2="628"  y2="370"/>
+  <line x1="628"  y1="370" x2="782"  y2="272"/>
+  <line x1="782"  y1="272" x2="1100" y2="200"/>
+  <line x1="1100" y1="200" x2="1340" y2="128"/>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 17 — ROUTE LABELS                                                -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<g font-family="IBM Plex Mono, monospace" font-size="8" fill="#22d3ee" fill-opacity="0.42" class="title-fade" letter-spacing="0.20em">
+  <text x="430" y="478" text-anchor="middle">GULF–RED SEA CORRIDOR</text>
+  <text x="830" y="242" text-anchor="middle">RED SEA · SUEZ</text>
+  <text x="1220" y="152" text-anchor="middle">MEDITERANEAN LANE</text>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 18 — SOURCE/STATUS BAR (bottom strip)                         -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#7bb8d8" fill-opacity="0.50" letter-spacing="0.20em" class="title-fade">
+  <text x="160" y="762">SRC: YASLOGIST OCEAN · SCENARIO DEMO · ILLUSTRATIVE MODEL</text>
+  <text x="1760" y="762" text-anchor="end">5 GATEWAYS · 5 ENGINES · 1 RECORD</text>
+</g>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- LAYER 19 — LOOP SEAM ANCHOR (invisible — visual continuity)         -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- The 11s CSS loop is mathematically consistent: all animations are    -->
+<!-- sine/cosine-style ease curves that return to the same value at       -->
+<!-- t=0 and t=11s. No visible seam.                                      -->
+
+</svg>
