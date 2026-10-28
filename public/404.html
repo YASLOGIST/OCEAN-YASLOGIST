@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,follow" />
+    <title>Page not found — YASLOGIST Ocean</title>
+    <meta
+      name="description"
+      content="The page you requested does not exist on YASLOGIST Ocean. Return to the demo homepage."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #04081a;
+        --ice: #eaf2ff;
+        --ghost: #8ba0bd;
+        --neon: #22e4ff;
+        --chrome: #1b2330;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ice);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 6vmin 1.25rem;
+        line-height: 1.6;
+      }
+      .panel {
+        width: 100%;
+        max-width: 40rem;
+        border: 1px solid color-mix(in srgb, var(--chrome) 80%, transparent);
+        border-radius: 1rem;
+        padding: clamp(1.75rem, 5vw, 3rem);
+        background: color-mix(in srgb, var(--chrome) 32%, transparent);
+      }
+      .kicker {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: .72rem;
+        letter-spacing: .26em;
+        text-transform: uppercase;
+        color: var(--neon);
+        margin: 0 0 1.25rem;
+      }
+      h1 {
+        font-size: clamp(1.6rem, 4vw, 2.4rem);
+        line-height: 1.15;
+        margin: 0 0 1rem;
+        font-weight: 700;
+      }
+      p { margin: 0 0 1rem; color: var(--ghost); }
+      p strong { color: var(--ice); font-weight: 600; }
+      .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+      a {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .7rem 1.1rem;
+        border-radius: .6rem;
+        text-decoration: none;
+        font-size: .9rem;
+        font-weight: 500;
+        border: 1px solid color-mix(in srgb, var(--chrome) 90%, transparent);
+        color: var(--ice);
+        transition: border-color .2s ease, color .2s ease;
+      }
+      a:hover { border-color: var(--neon); color: var(--neon); }
+      a.primary { border-color: color-mix(in srgb, var(--neon) 55%, transparent); }
+      .foot {
+        margin-top: 2rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: .68rem;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--ghost) 65%, transparent);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <p class="kicker">404 · not found</p>
+      <h1>This page is not on the manifest.</h1>
+      <p>
+        The address you followed does not match a page on <strong>YASLOGIST Ocean</strong>.
+        The demo itself is a single page — every section is reached by scrolling from the top, so
+        there are no deep links to lose.
+      </p>
+      <div class="actions">
+        <a class="primary" href="/">Return to the demo</a>
+        <a href="https://yaslogist.me">Corporate site</a>
+      </div>
+      <p class="foot">Simulated scenarios · no live customer operations</p>
+    </main>
+  </body>
+</html>

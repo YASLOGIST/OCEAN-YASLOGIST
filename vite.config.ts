@@ -126,11 +126,26 @@ export default defineConfig({
   // unaffected.
   base: "./",
   /* Agent/CI previews are reverse-proxied through an ephemeral hostname. The
-     development server binds beyond localhost and accepts that proxy host;
-     production remains governed by Vercel's host and security headers. */
+     development server binds beyond localhost, so it must accept the proxy
+     host; production remains governed by Vercel's host and security headers.
+
+     allowedHosts is an explicit list rather than `true`: with the server bound
+     to every interface, an open list lets any Host header be served, which
+     invites host-header spoofing on a machine reachable from a network. The
+     entries below cover local development, Vercel preview deployments and the
+     ephemeral agent preview host. Add a host here only if a preview is
+     actually rejected — do not widen it back to `true`. */
   server: {
     host: true,
-    allowedHosts: true,
+    allowedHosts: [
+      "localhost",
+      "127.0.0.1",
+      "[::1]",
+      ".localhost",
+      "ocean.yaslogist.me",
+      ".vercel.app",
+      ".e2b.app",
+    ],
   },
   plugins: [react(), tailwindcss(), singleFileBundle(), stripJunkFiles()],
   resolve: {

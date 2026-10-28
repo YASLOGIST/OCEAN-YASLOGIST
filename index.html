@@ -32,17 +32,38 @@
         }
       } catch (e) {}
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- The corporate hub's type stack, identical to main/index.html and
          land/index.html. Archivo = display (variable width axis), IBM Plex Sans
          = body, IBM Plex Mono = telemetry, IBM Plex Sans Arabic = Arabic UI,
          Aref Ruqaa = Arabic display and the Cairo clock label.
-         display=swap keeps text painted immediately. -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Aref+Ruqaa:wght@400;700&family=Aref+Ruqaa+Ink:wght@700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+         display=swap keeps text painted immediately.
+         The stack is self-hosted under /fonts: the page no longer makes a
+         third-party font request, and no external origin can inject the
+         stylesheet that decides how the interface is typeset. -->
+    <link rel="stylesheet" href="./fonts/fonts.css" />
+
+    <!-- Structured data. Deliberately minimal: it states what the page is, not
+         operational claims the demo does not make. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "name": "YASLOGIST",
+            "url": "https://yaslogist.me"
+          },
+          {
+            "@type": "WebApplication",
+            "name": "YASLOGIST Ocean",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "description": "Interactive sea-freight capability demo built for connected corridors across Egypt, Saudi Arabia, the Red Sea and the Gulf. The current simulated gateway scenario uses five Egyptian ports; no live customer operations.",
+            "isPartOf": { "@type": "Organization", "name": "YASLOGIST" }
+          }
+        ]
+      }
+    </script>
     <!-- Current YASLOGIST monogram: YL inside a single outer circle. -->
     <link
       rel="icon"
@@ -51,6 +72,35 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div
+        style="max-width: 46rem; margin: 4rem auto; padding: 0 1.25rem; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #1b2330; line-height: 1.65"
+      >
+        <p style="font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; color: #0b6b8a; margin: 0 0 .75rem">
+          YASLOGIST Ocean &middot; Demo
+        </p>
+        <h1 style="font-size: 1.6rem; margin: 0 0 1rem; line-height: 1.2">
+          Sea-freight intelligence across Egypt, Saudi Arabia and connected corridors
+        </h1>
+        <p style="margin: 0 0 1rem">
+          This page is an interactive capability demo: it renders its interface with JavaScript, so the
+          animated fleet view, the berth console and the voyage simulator need scripting enabled. With
+          JavaScript turned off you are seeing this fallback instead of an empty document.
+        </p>
+        <p style="margin: 0 0 1.5rem">
+          The scenario shown here is simulated and uses five Egyptian gateways. It is not a live operations
+          dashboard and no customer shipment data is involved.
+        </p>
+        <p style="margin: 0; font-size: .95rem">
+          Contact:
+          <a href="mailto:contact@yaslogist.me?subject=Enquiry%20%E2%80%94%20YASLOGIST" style="color: #0b6b8a">contact@yaslogist.me</a>
+          &middot;
+          <a href="https://wa.me/201041139910" style="color: #0b6b8a">WhatsApp</a>
+          &middot;
+          <a href="https://yaslogist.me" style="color: #0b6b8a">Corporate site</a>
+        </p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

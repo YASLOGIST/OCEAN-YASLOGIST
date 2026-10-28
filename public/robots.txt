@@ -1,0 +1,10 @@
+# YASLOGIST Ocean — a public commercial capability demo.
+#
+# Everything is reachable from the single page; there are no private paths to
+# hide and no query strings carrying state. The sitemap below is the only
+# source of truth for crawlers.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://ocean.yaslogist.me/sitemap.xml
