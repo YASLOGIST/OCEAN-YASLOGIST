@@ -10,7 +10,8 @@
     "test": "tsx tests/scroll-harness.ts",
     "typecheck": "tsc --noEmit",
     "check:bundle": "node scripts/check-bundle.mjs",
-    "gate": "npm run typecheck && npm run test && npm run build && npm run check:bundle"
+    "test:bundle-guard": "node scripts/test-bundle-guard.mjs",
+    "gate": "npm run typecheck && npm run test && npm run build && npm run check:bundle && npm run test:bundle-guard"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

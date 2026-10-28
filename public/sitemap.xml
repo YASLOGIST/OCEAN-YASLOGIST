@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The site is a single-page application: every section is reached by scrolling
+  from the top of https://ocean.yaslogist.me/, so the homepage is the only
+  crawlable URL. Nothing here claims a crawl date or a content hash, because
+  neither is knowable at build time.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ocean.yaslogist.me/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
