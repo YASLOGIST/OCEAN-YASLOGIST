@@ -3849,6 +3849,38 @@ input[type="range"].oq-range::-moz-range-track {
 [lang="ar"] :is(.hero-copy, .pillar-copy) :is(p, li) {
   text-align: right;
 }
+/* …and the column itself, not just its paragraphs. Under the LTR-pinned
+   document the flex rows (CTA pair, benefit chips) keep `justify-content:
+   flex-start`, so an Arabic hero read right-aligned down to the buttons and
+   then snapped back to the left gutter for the actions — the one place the
+   eye lands twice. Alignment only: nothing in the direction of the layout or
+   the order of the items changes. The founder card keeps its portrait on the
+   left; its text simply sits against the same right edge as everything else
+   in the column. */
+[lang="ar"] :is(.hero-copy, .pillar-copy) {
+  text-align: right;
+}
+/* Benefit rows are `[marker][text]`. With the text flush right the marker
+   was stranded at the far left of the column, an inch from the words it
+   marks; in RTL it belongs at the start of the run, which is the right. */
+[lang="ar"] :is(.hero-copy, .pillar-copy) li {
+  flex-direction: row-reverse;
+}
+/* Same for the stat block's rule: `border-s` resolves to the left edge under
+   the LTR document, so it hung off the wrong side of the numeral. */
+[lang="ar"] :is(.hero-copy, .pillar-copy) .border-s-2 {
+  border-inline-start-width: 0;
+  border-inline-end-width: 2px;
+  padding-inline-start: 0;
+  padding-inline-end: 1.25rem;
+}
+[lang="ar"] :is(.hero-copy, .pillar-copy) .flex-wrap {
+  /* Reverse *within the row only*: the primary action then reads first from
+     the right, and each benefit chip leads with its marker instead of
+     trailing it. The row still occupies the same box in the same column. */
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
 /* Any Arabic run that is set in a Latin-only face falls back per glyph and
    loses its joins. `--font-ar-tech` is the metrically-compatible Arabic face
    already used by the SVG canvases. */
@@ -3995,5 +4027,245 @@ input[type="range"].oq-range::-moz-range-track {
 @media (min-width: 1024px) and (min-height: 900px) {
   .hud-flow {
     display: block;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   · CRAFT PASS — optics, ground and surface
+   ═══════════════════════════════════════════════════════════════════════════
+   A house-style pass over the four things that made the page read as a
+   competent build rather than a designed one:
+
+     · the accent headline bloom was hot enough to halo its own letters;
+     · section headings sat on raw footage, so the lede lost its ground on
+       the bright passages (light theme worst);
+     · cards were flat tinted rectangles with no lit edge and no reply to
+       the pointer;
+     · the per-card accent palette was resolved for the dark ground only, so
+       in light the metric figures came out in pale-300 values on near-white.
+
+   Colour tokens are untouched. Everything below is optics and surface, and
+   the two Arabic-scoped guards keep the copy rules set earlier in this file
+   winning for Arabic (this block is appended, so an unguarded `letter-spacing`
+   or `line-height` here would silently override them).
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── A · Headline optics ──────────────────────────────────────────────────
+   Optical sizing at display scale wants slightly tighter tracking than the
+   shared defaults, and `balance` stops the last line of a two-line headline
+   from being one orphaned word. Arabic is excluded: those rules set their own
+   leading for the taller script, and they must keep winning. */
+:where(html:not([lang="ar"])) :is(.h1-hero, .h2-display) {
+  text-wrap: balance;
+  letter-spacing: -0.022em;
+}
+:where(html:not([lang="ar"])) .h2-display {
+  line-height: 1.15;
+}
+.sub-text {
+  color: color-mix(in srgb, var(--c-text) 84%, transparent);
+  text-wrap: pretty;
+}
+
+/* ── B · Bloom, not neon ──────────────────────────────────────────────────
+   The old double shadow at full token alpha put a 10px halo inside the
+   counters of the letterforms, which is what reads as cheap. One wide,
+   low-alpha bloom behind the word plus a short dark seat under it — the text
+   itself stays crisp. In light the accent is a mid-blue on pale footage: no
+   bloom at all, just a white lift so descenders keep their edge. */
+.text-glow {
+  /* `text-shadow` is painted *behind* the glyphs — and `.text-accent-grad`
+     fills those glyphs with a transparent colour over a clipped background
+     gradient. The shadow therefore showed straight through the letterforms
+     and washed the gradient out, worst in light where a white lift turned the
+     accent into pale blue on pale sky. `drop-shadow` follows the painted
+     alpha of the shape instead, so the bloom stays outside the letters. */
+  text-shadow: none;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--glow) 50%, transparent));
+}
+[data-theme="light"] .text-glow {
+  filter: none;
+}
+
+/* ── C · Ground under the section head ────────────────────────────────────
+   A pool of the page's own ground behind eyebrow + headline + lede. It is
+   painted inside the header's own box (never with a negative horizontal
+   inset, which would overflow the viewport) and isolated, so it layers over
+   the footage rather than under the section's content. Fades to nothing well
+   before the first card, so the scene still reads as the page's ground. */
+.section-head {
+  position: relative;
+  isolation: isolate;
+}
+.section-head::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -3rem 0 -2rem;
+  pointer-events: none;
+  background: radial-gradient(
+    62% 84% at 50% 45%,
+    color-mix(in srgb, var(--c-bg) 92%, transparent) 0%,
+    color-mix(in srgb, var(--c-bg) 60%, transparent) 46%,
+    transparent 76%
+  );
+  filter: blur(8px);
+}
+
+/* ── D · Card surface ─────────────────────────────────────────────────────
+   A lit top edge plus a 1px accent ring drawn inside the card's own radius.
+   Painted as an inset shadow rather than a fill layer so it never sits over
+   the copy the way a sheen gradient would, and it costs no extra element. */
+.solution-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent-rule) 16%, transparent);
+}
+[data-theme="light"] .solution-card::before {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent-rule) 22%, transparent);
+}
+
+/* The pointer gets an answer: the card rises a few pixels and the accent
+   ring takes over. Motion is gated with the rest of the house motion rules. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .solution-card {
+    transition:
+      transform 0.32s var(--ease-out-expo),
+      box-shadow 0.32s var(--ease-out-expo),
+      border-color var(--dur-fast) ease;
+  }
+  .solution-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 30px 60px -34px rgba(0, 8, 34, 0.9),
+      0 0 0 1px var(--accent-ring) inset;
+  }
+  [data-theme="light"] .solution-card:hover {
+    box-shadow:
+      0 26px 50px -30px rgba(12, 52, 86, 0.42),
+      0 0 0 1px var(--accent-ring) inset;
+  }
+}
+
+/* ── E · Accent ink resolved for the light card ───────────────────────────
+   The five accents are literal 300-level hues, chosen against the dark card
+   where they sit at 8–11:1. Composed on near-white they land at 1.6–2.3:1 —
+   the metric figures were the least readable thing on the section. Same
+   hues, resolved against the light ground; the icon then derives its tint
+   and ring from `currentColor`, so the two can never drift apart. */
+[data-theme="light"] .solution-card .text-cyan-300 { color: #0e7490 !important; }
+[data-theme="light"] .solution-card .text-sky-300 { color: #0369a1 !important; }
+[data-theme="light"] .solution-card .text-violet-300 { color: #6d28d9 !important; }
+[data-theme="light"] .solution-card .text-emerald-300 { color: #047857 !important; }
+[data-theme="light"] .solution-card .text-blue-300 { color: #1d4ed8 !important; }
+[data-theme="light"] .solution-icon {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 30%, transparent);
+}
+
+/* ── F · The metric deck reads as a readout ───────────────────────────────
+   Bigger figure, tighter tracking, and the DEMO chip becomes a proper pill
+   instead of a boxed micro-label that competed with the number beside it. */
+.solution-metric {
+  font-size: 2.05rem;
+  letter-spacing: -0.03em;
+}
+.solution-metric-label {
+  color: color-mix(in srgb, var(--c-muted) 90%, transparent);
+}
+.solution-number {
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+}
+.solution-demo {
+  border-radius: 999px;
+  padding: 0.26rem 0.5rem;
+  letter-spacing: 0.12em;
+}
+
+/* ── G · Buttons ──────────────────────────────────────────────────────────
+   The primary CTA gains the same lit-top/dark-foot edge as the panes; the
+   existing glow tokens keep owning the halo so nothing drifts per theme. */
+.btn-primary {
+  box-shadow:
+    var(--btn-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16);
+}
+.btn-primary:hover {
+  box-shadow:
+    var(--btn-glow-h),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+}
+
+/* ── H · Cinematic edge ───────────────────────────────────────────────────
+   Night footage wants its frame closed: a fixed vignette that darkens only
+   the outer band, sitting above section content (10) and below the ambient
+   HUD (40) and the header. Light keeps the page open — a white vignette over
+   pale footage reads as a smudge, not as depth. */
+[data-theme="dark"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  background: radial-gradient(
+    125% 95% at 50% 42%,
+    transparent 56%,
+    rgba(2, 6, 20, 0.2) 88%,
+    rgba(2, 6, 20, 0.3) 100%
+  );
+}
+
+/* ── I · Eyebrow pill ─────────────────────────────────────────────────────
+   One hairline of light across the top of the pill so it reads as glass
+   rather than as a tinted outline. */
+.section-tag {
+  border-color: color-mix(in srgb, var(--c-neon) 30%, transparent);
+  background: color-mix(in srgb, var(--c-neon) 7%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  letter-spacing: 0.16em;
+}
+/* The eyebrow's status dot leads the label in Arabic, as it does in every
+   other RTL run on the page. */
+[lang="ar"] .section-tag {
+  flex-direction: row-reverse;
+}
+[data-theme="light"] .section-tag {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-color: color-mix(in srgb, var(--c-neon) 26%, transparent);
+}
+
+/* ── J · Solutions bento ──────────────────────────────────────────────────
+   Five across at 1440 gave every card a 236px column for copy that runs four
+   to six lines — the narrowest measure on the page, holding its longest
+   paragraph. Six columns instead: three cards of two columns, then two of
+   three. Same five items, same order and same reading direction, but the
+   measure lands between 34 and 60 characters, which is where this copy
+   belongs, and the 3 + 2 rhythm reads as a composed row rather than as a
+   strip that fell one item short. */
+@media (min-width: 1280px) {
+  .solutions-grid {
+    grid-template-rows: auto auto;
+  }
+  .solution-card--wide .solution-desc {
+    max-width: 54ch;
+  }
+  .solution-card--wide {
+    padding: 1.75rem;
+  }
+  /* The wide pair sits on a single row of its own, so its metric deck is
+     pushed to the same baseline as the three above it. */
+  .solution-card--wide .solution-metric-deck {
+    margin-top: auto;
+    padding-top: 1.15rem;
   }
 }

@@ -324,7 +324,7 @@ export default function Simulator() {
   return (
     <section id="simulator" className="section-iso cv-auto section-pad relative scroll-mt-24">
       <div className="mx-auto max-w-7xl">
-        <div className="text-center">
+        <div className="section-head text-center">
           <Reveal>
             <SectionTag>{t("sim.tag")}</SectionTag>
           </Reveal>

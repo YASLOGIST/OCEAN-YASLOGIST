@@ -47,7 +47,7 @@ export default function Solutions() {
   return (
     <section id="solutions" className="cv-auto section-pad relative scroll-mt-24">
       <div className="relative z-[var(--z-section-content)] mx-auto max-w-7xl">
-        <div className="text-center">
+        <div className="section-head text-center">
           <Reveal>
             <SectionTag>{t("solutions.tag")}</SectionTag>
           </Reveal>
@@ -62,11 +62,21 @@ export default function Solutions() {
           </Reveal>
         </div>
 
-        <div className="solutions-grid mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="solutions-grid mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
+          {/* The grid item is the Reveal wrapper, not the card inside it, so the
+              span has to be declared on the wrapper — on the article it did
+              nothing, and the six-column grid collapsed to six single columns. */}
           {ACCENTS.map((a, i) => (
-            <Reveal key={i} delay={i * 90} from="up">
+            <Reveal
+              key={i}
+              delay={i * 90}
+              from="up"
+              className={`h-full ${i < 3 ? "xl:col-span-2" : "xl:col-span-3"}`}
+            >
               <article
-                className="solution-card relative flex h-full flex-col rounded-2xl p-5 sm:p-6"
+                className={`solution-card relative flex h-full flex-col rounded-2xl p-5 sm:p-6 ${
+                  i < 3 ? "" : "solution-card--wide"
+                }`}
                 style={{ ["--accent-rule" as string]: a.rule, ["--accent-ring" as string]: a.ring, ["--accent-tint" as string]: a.tint }}
               >
                 <div className="solution-card-top">

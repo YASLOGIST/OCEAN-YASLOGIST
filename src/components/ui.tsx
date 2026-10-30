@@ -283,7 +283,7 @@ export function SectionTag({ children, className }: { children: ReactNode; class
   return (
     <span
       className={cn(
-        "micro inline-flex items-center gap-2.5 rounded-full border border-neon/25 bg-neon/[0.06] px-4 py-1.5 font-mono text-neon",
+        "section-tag micro inline-flex items-center gap-2.5 rounded-full border border-neon/25 bg-neon/[0.06] px-4 py-1.5 font-mono text-neon",
         className
       )}
     >

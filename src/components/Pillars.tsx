@@ -288,7 +288,7 @@ export default function Pillars() {
   return (
     <div className="relative">
       {/* intro */}
-      <div className="relative mx-auto max-w-4xl px-6 pb-10 pt-32 text-center">
+      <div className="section-head relative mx-auto max-w-4xl px-6 pb-10 pt-32 text-center">
         <Reveal>
           <SectionTag>{t("pillarsIntro.tag")}</SectionTag>
         </Reveal>
