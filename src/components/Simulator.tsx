@@ -208,8 +208,8 @@ function MetricTile({
    sit on the north-east. Ain Sokhna is intentionally omitted because it falls
    outside the reliable visible extent of this base image. */
 function RouteMap({ computing }: { computing: boolean }) {
-  const { dir, lang } = useLang();
-  const rtl = dir === "rtl";
+  const { textDir, lang } = useLang();
+  const rtl = textDir === "rtl";
   const lab = svgTextProps("center", rtl, 0.9);
   const L = (en: string, ar: string, zh?: string, tr?: string, fr?: string) => {
     if (lang === "ar") return ar;
@@ -226,8 +226,11 @@ function RouteMap({ computing }: { computing: boolean }) {
   ];
   return (
     <div className={cn("route-intelligence", computing && "is-computing")}>
+      {/* "AIS + PORT SYNC" read as a live integration label on a panel whose
+          own copy says the positions are samples. Nothing in this repository
+          consumes an AIS feed; say what the panel actually is. */}
       <div className="route-intel-topline">
-        <span><i /> AIS + PORT SYNC</span>
+        <span><i /> {L("AIS-STYLE · SCENARIO SYNC", "نمط AIS · مزامنة سيناريو", "AIS 风格 · 场景同步", "AIS TARZI · SENARYO SENKRONU", "TYPE AIS · SYNC SCÉNARIO")}</span>
         <span className="tabular">31.2°N · 32.3°E</span>
       </div>
       <div className="route-map-stage">

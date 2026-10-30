@@ -90,36 +90,41 @@ export default function Hud() {
         <div className="absolute bottom-0 right-0 h-9 w-9 border-b-2 border-r-2 border-neon/30" />
       </div>
 
-      {/* top-left telemetry */}
-      <div ref={topLeftRef} className="pointer-events-none fixed left-8 top-20 z-40 hidden font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] text-ghost md:block">
-        <p className="text-neon/80">YASLOGIST OCEAN | DEMO</p>
-        <p>{t("hero.tag")}</p>
-        <p className="text-ice/40">{t("hud.sys")}</p>
+      {/* top-left telemetry. Desktop only: below `lg` the hero is a single
+          column, so this fixed chrome sat on the hero copy — and the tag line
+          repeated, word for word, the pill directly beneath it. */}
+      <div ref={topLeftRef} className="hud-corner pointer-events-none fixed left-8 top-20 z-40 hidden font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] lg:block">
+        <p className="hud-accent">YASLOGIST OCEAN | DEMO</p>
+        <p className="hud-dim">{t("hud.sys")}</p>
       </div>
 
       {/* top-right status and global logistics clock */}
-      <div ref={topRightRef} className="pointer-events-none fixed right-8 top-20 z-40 hidden text-end font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] text-ghost md:block">
+      <div ref={topRightRef} className="hud-corner pointer-events-none fixed right-8 top-20 z-40 hidden text-end font-mono text-[10px] uppercase leading-relaxed tracking-[0.2em] lg:block">
         <GlobalClock className="flex justify-end gap-3.5 mb-2.5" />
         <p>{t("hud.utc")}</p>
-        <p className="text-ice/40">{t("hud.health")}</p>
+        <p className="hud-dim">{t("hud.health")}</p>
       </div>
 
       {/* bottom-left: scroll velocity */}
-      <div ref={botLeftRef} className="pointer-events-none fixed bottom-8 left-8 z-40 hidden w-48 md:block">
-        <div className="mb-1.5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.25em] text-ghost">
+      {/* Velocity readout. `.hud-flow` gates it on viewport width AND height
+          (see index.css): it is fixed chrome drawn over the hero's copy column,
+          and in Arabic the founder card grows three lines taller than it does
+          in English — at 1024 × 768 that card's foot landed on this block. */}
+      <div ref={botLeftRef} className="hud-corner hud-flow pointer-events-none fixed bottom-8 left-8 z-40 w-48">
+        <div className="mb-1.5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.25em]">
           <span>{t("hud.flow")}</span>
-          <span ref={flowLabelRef} className="text-neon">
+          <span ref={flowLabelRef} className="hud-accent">
             ×1.00
           </span>
         </div>
         <div className="h-[3px] w-full overflow-hidden rounded bg-chrome/10">
           <div ref={flowRef} className="grad-bar h-full" style={{ width: 0 }} />
         </div>
-        <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.25em] text-ice/40">{t("hud.camNote")}</p>
+        <p className="hud-dim mt-1.5 font-mono text-[9px] uppercase tracking-[0.25em]">{t("hud.camNote")}</p>
       </div>
 
       {/* right dot navigation */}
-      <nav aria-label={sectionNavLabel} className="hud-dot-rail fixed right-3 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-end gap-4 lg:flex 2xl:right-5">
+      <nav aria-label={sectionNavLabel} className="hud-dot-rail hud-corner fixed right-3 top-1/2 z-40 hidden -translate-y-1/2 flex-col items-end gap-4 lg:flex 2xl:right-5">
         {DOT_IDS.map((id, i) => (
           <button
             key={id}
@@ -129,18 +134,16 @@ export default function Hud() {
           >
             <span
               className={cn(
-                "hud-dot-label hidden font-mono text-[9px] uppercase tracking-[0.25em] text-ghost/70 transition-all duration-300 group-hover:text-neon 2xl:block",
-                active === id ? "translate-x-0 text-neon opacity-100" : "translate-x-2 opacity-0"
+                "hud-dot-label hidden font-mono text-[9px] uppercase tracking-[0.25em] transition-all duration-300 2xl:block",
+                active === id ? "translate-x-0 hud-accent opacity-100" : "translate-x-2 opacity-0"
               )}
             >
               {t(`hud.dots.${i}`)}
             </span>
             <span
               className={cn(
-                "block h-2.5 w-2.5 rounded-full border transition-all duration-300",
-                active === id
-                  ? "glow-dot scale-125 border-neon bg-neon"
-                  : "border-neon/40 bg-transparent group-hover:border-neon/80"
+                "hud-dot block h-2.5 w-2.5 rounded-full border transition-all duration-300",
+                active === id ? "glow-dot scale-125" : "bg-transparent"
               )}
             />
           </button>

@@ -22,13 +22,12 @@
       try {
         var t = localStorage.getItem("oq-theme");
         if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+        /* Language changes the copy only. The document direction stays LTR in
+           every language so the page geometry never mirrors for Arabic. */
         var l = localStorage.getItem("oq-lang");
-        if (l === "ar") {
-          document.documentElement.lang = "ar";
-          document.documentElement.dir = "rtl";
-        } else if (l === "zh" || l === "tr" || l === "fr" || l === "en") {
+        document.documentElement.dir = "ltr";
+        if (l === "ar" || l === "zh" || l === "tr" || l === "fr" || l === "en") {
           document.documentElement.lang = l;
-          document.documentElement.dir = "ltr";
         }
       } catch (e) {}
     </script>

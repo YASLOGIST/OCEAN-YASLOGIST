@@ -29,11 +29,11 @@ function FounderBadge() {
    secondary labels are pushed into a quieter tier so the primary metric reads
    in well under a second. */
 function VesselCard() {
-  const { t, dir } = useLang();
+  const { t, lang } = useLang();
 
   const readouts = [
     { k: t("hero.telemetry.heading"), v: "212°" },
-    { k: t("hero.telemetry.draft"), v: dir === "rtl" ? "14.8 م" : "14.8 M" },
+    { k: t("hero.telemetry.draft"), v: lang === "ar" ? "14.8 م" : "14.8 M" },
     { k: t("hero.telemetry.cargo"), v: "24,108" },
     { k: t("hero.telemetry.eta"), v: "14:32" },
   ];
@@ -151,7 +151,7 @@ function ScrollCue() {
 }
 
 export default function Hero() {
-  const { t, ta, dir } = useLang();
+  const { t, ta } = useLang();
   const badges = ta("hero.badges");
 
   return (
@@ -214,7 +214,7 @@ export default function Hero() {
             </Reveal>
           </div>
 
-          <Reveal from={dir === "rtl" ? "left" : "right"} delay={320}>
+          <Reveal from="right" delay={320}>
             <VesselCard />
           </Reveal>
         </div>

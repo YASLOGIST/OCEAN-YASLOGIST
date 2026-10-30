@@ -83,8 +83,8 @@ const WIN_E1 = E1.filter(([, b]) => WIN_HIDDEN.includes(b));
 const WIN_E2 = E2.filter(([, b]) => b === WINNER);
 
 export default function NeuralForecast() {
-  const { t, dir } = useLang();
-  const rtl = dir === "rtl";
+  const { t, textDir } = useLang();
+  const rtl = textDir === "rtl";
   const n = (k: string) => t(`pillars.0.notes.${k}`);
   const hostRef = useRef<HTMLDivElement>(null);
   const [live, setLive] = useState(false);

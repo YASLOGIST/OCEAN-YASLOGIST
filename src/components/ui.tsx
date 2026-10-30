@@ -323,7 +323,7 @@ export function ArrowRight({ className }: { className?: string }) {
   return (
     <svg
       className={cn(
-        "h-4 w-4 transition-transform duration-300 rtl:-scale-x-100 group-hover:translate-x-1 rtl:group-hover:-translate-x-1",
+        "h-4 w-4 transition-transform duration-300 group-hover:translate-x-1",
         className
       )}
       viewBox="0 0 24 24"

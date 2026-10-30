@@ -68,7 +68,7 @@ export default function Stats() {
                   {LANES.map((l) => (
                     <div key={l.from} className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ghost">
                       <span className="text-neon">{l.from}</span>
-                      <svg viewBox="0 0 24 24" className="h-3 w-3 text-neon/50 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+                      <svg viewBox="0 0 24 24" className="h-3 w-3 text-neon/50" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
                         <path d="M5 12h14" />
                         <path d="m13 6 6 6-6 6" />
                       </svg>

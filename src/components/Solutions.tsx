@@ -79,7 +79,13 @@ export default function Solutions() {
 
                 <div className="solution-metric-deck">
                   <div>
-                    <div className={`solution-metric tabular font-display ${a.text}`}><bdi>{t(`solutions.items.${i}.metric`)}</bdi></div>
+                    {/* The metric is a figure with a unit, not prose: "2–8°C" must keep
+                        its numeric order in every language. Under the LTR-only
+                        document a <bdi> resolves direction from its own first strong
+                        character, and the Arabic unit ("2–8°م") is that character —
+                        so the range reordered to "8–2°م". Pin the figure's base
+                        direction; the Arabic unit still shapes correctly. */}
+                    <div className={`solution-metric tabular font-display ${a.text}`}><bdi dir="ltr">{t(`solutions.items.${i}.metric`)}</bdi></div>
                     <div className="solution-metric-label">{t(`solutions.items.${i}.metricLabel`)}</div>
                   </div>
                   <span className="solution-demo">DEMO</span>

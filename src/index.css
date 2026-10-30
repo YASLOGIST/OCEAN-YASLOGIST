@@ -953,9 +953,6 @@ input:focus-visible,
   line-height: 1;
   color: color-mix(in srgb, var(--c-neon) 55%, transparent);
 }
-[dir="rtl"] .bay-flow-step::after {
-  content: "‹";
-}
 .bay-flow-step:last-child::after {
   content: none;
 }
@@ -965,8 +962,7 @@ input:focus-visible,
    4.8px. Must sit AFTER the base `::after` rule - same specificity, so source
    order decides. */
 @media (max-width: 359px) {
-  .bay-flow-step::after,
-  [dir="rtl"] .bay-flow-step::after {
+  .bay-flow-step::after {
     content: none;
   }
 }
@@ -1252,12 +1248,6 @@ input:focus-visible,
 .btn-primary:hover::after {
   transform: translateX(420%) skewX(-18deg);
 }
-[dir="rtl"] .btn-primary::after {
-  transform: translateX(170%) skewX(18deg);
-}
-[dir="rtl"] .btn-primary:hover::after {
-  transform: translateX(-420%) skewX(18deg);
-}
 
 .btn-ghost {
   border: 1px solid var(--glass-brd);
@@ -1536,20 +1526,9 @@ input:focus-visible,
   transform: translateX(-140%);
   animation: chainpulse 2.2s linear infinite;
 }
-[dir="rtl"] .chain-pulse {
-  animation-name: chainpulseRtl;
-}
 @keyframes chainpulse {
   to {
     transform: translateX(320%);
-  }
-}
-@keyframes chainpulseRtl {
-  from {
-    transform: translateX(320%);
-  }
-  to {
-    transform: translateX(-140%);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -2340,9 +2319,6 @@ input[type="range"].oq-range::-moz-range-track {
 }
 .lang-pill[data-on="ar"] .lang-knob {
   transform: translateX(100%);
-}
-[dir="rtl"] .lang-pill[data-on="ar"] .lang-knob {
-  transform: translateX(-100%);
 }
 .lang-opt {
   position: relative;
@@ -3831,5 +3807,193 @@ input[type="range"].oq-range::-moz-range-track {
   .scroll-reveal {
     opacity: 1; transform: none; translate: none; scale: none;
     transition: none; will-change: auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   · LTR-ONLY LAYOUT · ARABIC TEXT HANDLING
+   ═══════════════════════════════════════════════════════════════════════════
+   The document is `dir="ltr"` in every language (LangProvider sets it and
+   index.html's boot script agrees), so switching to Arabic changes the copy
+   only: the header stays on the left, the cards keep their columns, the scene
+   progression and the section order never mirror.
+
+   What `dir=rtl` used to give the copy for free is restored here, per text
+   block rather than per page:
+
+   · `unicode-bidi: plaintext` — the CSS equivalent of `dir="auto"`. Each
+     paragraph resolves its own base direction from its first strong
+     character, so an Arabic sentence ends where an Arabic reader expects
+     (a trailing full stop lands at the visual left end of the line) and a
+     Latin token inside it — "ACID", "B/L", "SHA → SUZ" — keeps its own
+     order. Without it, an LTR paragraph direction pushes that punctuation
+     to the wrong end of every line.
+   · Alignment is left as the design set it: centred ledes stay centred,
+     and the two narrative columns (hero and pillar copy) are right-aligned
+     for Arabic because those are the blocks that are deliberately
+     left-aligned in English and read poorly flushed left in Arabic.
+   · Tracking is neutralised for Arabic wherever a utility class asks for
+     it, because letter-spacing severs cursive joins. The `[lang="ar"]`
+     rules earlier in this file already do this for the common token values;
+     the blanket rule below catches the rest without touching Latin copy,
+     which is scoped by the same `[lang="ar"]` ancestor.
+   ─────────────────────────────────────────────────────────────────────────── */
+[lang="ar"] :is(p, li, figcaption, blockquote, dd, dt, td, th) {
+  unicode-bidi: plaintext;
+}
+[lang="ar"] :is(h1, h2, h3, h4, h5, h6) {
+  /* Ordering only — alignment stays inherited so centred headings stay
+     centred instead of jumping to one edge of their block. */
+  unicode-bidi: plaintext;
+}
+[lang="ar"] :is(.hero-copy, .pillar-copy) :is(p, li) {
+  text-align: right;
+}
+/* Any Arabic run that is set in a Latin-only face falls back per glyph and
+   loses its joins. `--font-ar-tech` is the metrically-compatible Arabic face
+   already used by the SVG canvases. */
+[lang="ar"] .tracking-\[0\.05em\],
+[lang="ar"] .tracking-\[0\.06em\],
+[lang="ar"] .tracking-\[0\.08em\],
+[lang="ar"] .tracking-\[0\.14em\],
+[lang="ar"] .tracking-\[0\.2em\],
+[lang="ar"] .tracking-\[0\.22em\],
+[lang="ar"] .tracking-\[0\.25em\],
+[lang="ar"] .tracking-\[0\.28em\],
+[lang="ar"] .tracking-\[0\.3em\],
+[lang="ar"] .tracking-\[0\.34em\] {
+  letter-spacing: 0.01em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   · FOOTER GROUND — DARK
+   ═══════════════════════════════════════════════════════════════════════════
+   The light theme already grounds the footer (`--footer-ground`). Dark shipped
+   with `none`, on the argument that `.bg-night-veil` alone kept the copy above
+   4.5:1 — true against the *average* of the brightest tenth of the sequence,
+   but the end of the document lands on the lit-port passage, and the footer's
+   left column sits across a white ship's superstructure at that point. The
+   ramp below is the light theme's, expressed against the dark ground: nothing
+   at the top edge, ~90% by the first column, so the footage still reads as the
+   page's ground while the copy stops sharing luminance with a white hull. */
+[data-theme="dark"] {
+  --footer-ground: linear-gradient(
+    180deg,
+    transparent 0,
+    color-mix(in srgb, var(--c-bg) 90%, transparent) 2rem,
+    color-mix(in srgb, var(--c-bg) 95%, transparent) 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   · AMBIENT HUD INK
+   ═══════════════════════════════════════════════════════════════════════════
+   The corner readouts, the scroll cue and the dot rail are the only chrome
+   that sits straight on the footage. Dark tuned them; light inherited the
+   same pale inks and measured near-invisible against the day sequence's sky.
+   These two token sets are the whole fix — colour only, no layout change. */
+:root {
+  --hud-ink: #a8bcd8;
+  --hud-dim: rgba(232, 244, 255, 0.42);
+  --hud-accent: var(--c-neon);
+  --hud-shadow: 0 1px 3px rgba(2, 8, 24, 0.75);
+  --hud-dot: rgba(34, 228, 255, 0.42);
+  --hud-dot-on: var(--c-neon);
+}
+[data-theme="light"] {
+  --hud-ink: #0b3a57;
+  /* 9px uppercase ink needs the extra weight: at 0.72 alpha the dim tier
+     measured faint over the day sequence's pale water. */
+  --hud-dim: rgba(9, 52, 80, 0.86);
+  --hud-accent: #0369a1;
+  --hud-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+  --hud-dot: rgba(3, 105, 161, 0.45);
+  --hud-dot-on: #0369a1;
+}
+.hud-corner {
+  color: var(--hud-ink);
+  text-shadow: var(--hud-shadow);
+}
+.hud-corner .hud-accent,
+.hud-accent {
+  color: var(--hud-accent);
+}
+.hud-corner .hud-dim,
+.hud-dim {
+  color: var(--hud-dim);
+}
+.hud-dot {
+  border-color: var(--hud-dot);
+}
+.hud-dot-rail button:hover .hud-dot {
+  border-color: var(--hud-dot-on);
+}
+.hud-dot-rail .hud-dot.glow-dot {
+  border-color: var(--hud-dot-on);
+  background-color: var(--hud-dot-on);
+}
+.hud-dot-label {
+  color: var(--hud-ink);
+  text-shadow: var(--hud-shadow);
+}
+/* The hero's scroll cue is the same tier of chrome and shares the ink. */
+.scroll-cue span {
+  color: var(--hud-ink);
+  text-shadow: var(--hud-shadow);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   · MOBILE DRAWER FIT
+   ═══════════════════════════════════════════════════════════════════════════
+   At 390 × 844 the nine section rows ended 5px below the fold — the suite grid
+   and the language picker above them grew when they were added, and the last
+   row (`09 Connect`) was clipped at rest. `.nav-menu` is already
+   `overflow-y: auto`, so this only has to stop the rest position from being
+   short by a few pixels: the two separators above the list give back 8px. */
+.nav-menu > .mb-3 {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   · COPY GROUND — DARK
+   ═══════════════════════════════════════════════════════════════════════════
+   Light has carried a `.copy-readability` plate since the light footage was
+   measured crossing pale sky to dark hull inside one line of copy. Dark was
+   left bare on the assumption that night footage is dark — but the night
+   sequence's lit-port passages are not, and on the portrait crop a phone lands
+   its hero paragraph on floodlit containers. White-on-white measured under
+   3:1 there. Same plate, expressed for the dark ground: it is the light
+   rule's mirror, not a new surface, and it keeps the copy tier legible without
+   dimming the scene itself. */
+[data-theme="dark"] .copy-readability {
+  margin: -0.9rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(120, 190, 255, 0.14);
+  border-radius: 1.35rem;
+  background: linear-gradient(145deg, rgba(4, 10, 28, 0.58), rgba(4, 10, 28, 0.34));
+  box-shadow: 0 18px 54px -36px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(155, 220, 255, 0.08);
+  -webkit-backdrop-filter: blur(8px) saturate(1.02);
+  backdrop-filter: blur(8px) saturate(1.02);
+}
+@media (min-width: 640px) {
+  [data-theme="dark"] .copy-readability {
+    margin: -1.15rem;
+    padding: 1.15rem;
+  }
+}
+
+/* The hero's bottom-left velocity readout is the one piece of fixed chrome that
+   shares a column with hero content. It clears the founder card at 1440 × 900
+   in English, but in Arabic that card wraps three lines taller, and on shorter
+   viewports the two met. Gate it on both axes rather than on width alone: at
+   768–1023px the whole HUD is already retired, and below ~900px of height the
+   hero's copy column reaches the bottom gutter. */
+.hud-flow {
+  display: none;
+}
+@media (min-width: 1024px) and (min-height: 900px) {
+  .hud-flow {
+    display: block;
   }
 }

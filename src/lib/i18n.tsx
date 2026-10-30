@@ -304,7 +304,7 @@ const en: Dict = {
         "Shows how a building berth queue can be highlighted before handoff",
         "Demonstrates the link from vessel to booking, B/L and container",
       ],
-      chips: ["AIS Feed", "Berth Status", "Demurrage Watch"],
+      chips: ["AIS-style samples", "Berth Status", "Demurrage Watch"],
       statLabel: "Gateway scenarios modelled",
       panel: { title: "Gateway Berth View", status: "AIS · simulated" },
       notes: {
@@ -638,7 +638,7 @@ const ar: Dict = {
         "يوضح كيف يمكن إبراز تزايد طابور الرصيف قبل التسليم",
         "يعرض الربط بين السفينة والحجز والبوليصة والحاوية",
       ],
-      chips: ["تغذية AIS", "حالة الرصيف", "مراقبة الأرضيات"],
+      chips: ["عينات بنمط AIS", "حالة الرصيف", "مراقبة الأرضيات"],
       statLabel: "سيناريوهات منافذ ضمن النموذج",
       panel: { title: "عرض أرصفة المنافذ", status: "AIS · محاكاة" },
       notes: {
@@ -1307,7 +1307,7 @@ const tr: Dict = {
         "Büyüyen rıhtım kuyruğunun nasıl vurgulanabileceğini gösterir",
         "Gemi ile rezervasyon, konşimento ve konteyner bağlantısını gösterir",
       ],
-      chips: ["AIS Akışı", "Rıhtım Durumu", "Demoraj Takibi"],
+      chips: ["AIS tarzı örnekler", "Rıhtım Durumu", "Demoraj Takibi"],
       statLabel: "Modellenen liman senaryoları",
       panel: { title: "Liman Rıhtım Görünümü", status: "AIS · simüle" },
       notes: {
@@ -1642,7 +1642,7 @@ const fr: Dict = {
         "Montre comment une file d’attente croissante peut être mise en évidence",
         "Montre le lien entre navire, booking, connaissement et conteneur",
       ],
-      chips: ["Flux AIS", "État des Postes à Quai", "Surveillance Surestaries"],
+      chips: ["Échantillons type AIS", "État des Postes à Quai", "Surveillance Surestaries"],
       statLabel: "Scénarios de passerelles modélisés",
       panel: { title: "Vue des Postes Portuaires", status: "AIS · simulé" },
       notes: {
@@ -1811,7 +1811,11 @@ const DICTIONARIES: Record<Lang, Dict> = { en, ar, zh, tr, fr };
 
 type Ctx = {
   lang: Lang;
+  /* Document direction — fixed "ltr" in every language (see LangProvider). */
   dir: Dir;
+  /* Direction of the active language's script, for shaped text inside SVG
+     canvases and other places that pin an anchor per writing direction. */
+  textDir: Dir;
   t: (key: string) => string;
   ta: (key: string) => string[];
   setLang: (l: Lang) => void;
@@ -1820,6 +1824,7 @@ type Ctx = {
 const I18nCtx = createContext<Ctx>({
   lang: "en",
   dir: "ltr",
+  textDir: "ltr",
   t: (k) => k,
   ta: () => [],
   setLang: () => {},
@@ -1846,17 +1851,36 @@ export function LangProvider({ children }: { children: ReactNode }) {
     return "en";
   });
 
-  const dir: Dir = lang === "ar" ? "rtl" : "ltr";
+  /* ── LAYOUT DIRECTION IS FIXED LTR ────────────────────────────────────
+     Changing the language changes the copy, never the page geometry. The
+     document stays `dir="ltr"` in every language, so the header, the cards,
+     the scene progression and the section order never mirror for Arabic.
+
+     Arabic therefore needs two things that `dir=rtl` used to supply for
+     free, and both are handled without touching layout:
+
+     · Correct bidi paragraph direction (where a trailing full stop lands,
+       how a Latin token inside an Arabic sentence orders) — `[lang="ar"]`
+       prose in index.css sets `unicode-bidi: plaintext`, which resolves per
+       paragraph from its own first strong character, exactly like `dir=auto`.
+     · Arabic-capable faces and join-safe tracking — the existing
+       `[lang="ar"]` typography rules.
+
+     `textDir` carries the active language's script direction for the few
+     consumers that pin an anchor per writing direction (the SVG canvases).
+     `dir` remains in the context as the document direction: always "ltr". */
+  const dir: Dir = "ltr";
+  const textDir: Dir = lang === "ar" ? "rtl" : "ltr";
 
   useEffect(() => {
     document.documentElement.lang = lang;
-    document.documentElement.dir = dir;
+    document.documentElement.dir = "ltr";
     try {
       localStorage.setItem("oq-lang", lang);
     } catch {
       /* Keep the in-memory preference when persistence is blocked. */
     }
-  }, [lang, dir]);
+  }, [lang]);
 
   const t = useCallback((key: string): string => {
     const dict = DICTIONARIES[lang] || en;
@@ -1875,8 +1899,8 @@ export function LangProvider({ children }: { children: ReactNode }) {
   }, [lang]);
 
   const value = useMemo(
-    () => ({ lang, dir, t, ta, setLang }),
-    [lang, dir, t, ta]
+    () => ({ lang, dir, textDir, t, ta, setLang }),
+    [lang, textDir, t, ta]
   );
 
   return (

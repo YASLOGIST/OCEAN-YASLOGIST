@@ -99,7 +99,11 @@ export default function Footer() {
       </div>
 
       {/* bottom bar */}
-      <div className="mx-auto mt-14 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-chrome/10 pt-7 sm:flex-row">
+      {/* `pe` reserve on the wide breakpoint: the fixed YASLOGIST motion mark
+          sits in the viewport's bottom-end corner, and at 1440 it landed on
+          this row's back-to-surface control. The mark is branding, not content,
+          so the row yields to it rather than the other way round. */}
+      <div className="mx-auto mt-14 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-chrome/10 pt-7 sm:flex-row lg:pe-28">
         <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-ice/40">{t("footer.bottom")}</p>
         <div className="flex items-center gap-6 font-mono text-[9px] uppercase tracking-[0.22em] text-ghost">
           {(["terms", "privacy", "security"] as const).map((k) => (
