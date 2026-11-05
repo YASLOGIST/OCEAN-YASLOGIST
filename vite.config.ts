@@ -1,4 +1,5 @@
 import fs from "fs";
+import { createHash } from "node:crypto";
 import path from "path";
 import { fileURLToPath } from "url";
 import tailwindcss from "@tailwindcss/vite";
@@ -47,6 +48,10 @@ function singleFileBundle(): Plugin {
         let html = typeof htmlAsset.source === "string"
           ? htmlAsset.source
           : new TextDecoder().decode(htmlAsset.source);
+        const hashScript = (source: string) =>
+          `'sha256-${createHash("sha256").update(source.replace(/\r\n?/g, "\n")).digest("base64")}'`;
+        const scriptHashes = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)]
+          .map((match) => hashScript(match[1]));
 
         for (const jsName of jsNames) {
           const chunk = bundle[jsName];
@@ -57,8 +62,10 @@ function singleFileBundle(): Plugin {
             .replace(/"?__VITE_PRELOAD__"?/g, "void 0")
             .replace(/<(\/script>|!--)/g, "\\x3C$1")
             .trim();
-          html = html.replace(tag, (_match, beforeSrc: string, afterSrc: string) =>
-            `<script${beforeSrc}${afterSrc}>${code}</script>`);
+          html = html.replace(tag, (_match, beforeSrc: string, afterSrc: string) => {
+            scriptHashes.push(hashScript(code));
+            return `<script${beforeSrc}${afterSrc}>${code}</script>`;
+          });
           inlined.add(jsName);
           this.info(`Inlining: ${jsName}`);
         }
@@ -79,7 +86,11 @@ function singleFileBundle(): Plugin {
           this.info(`Inlining: ${cssName}`);
         }
 
-        htmlAsset.source = html;
+        // The browser applies this policy together with the hosting header.
+        // Hash the final script text so the single-file app can run without
+        // allowing inline scripts that did not come from the build.
+        const scriptPolicy = `script-src 'self' ${scriptHashes.join(" ")}`;
+        htmlAsset.source = html.replace("<head>", `<head>\n    <meta http-equiv="Content-Security-Policy" content="${scriptPolicy}">`);
       }
 
       inlined.forEach((name) => { delete bundle[name]; });
